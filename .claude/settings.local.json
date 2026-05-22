@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(gunzip -c \"C:/Users/natha/.claude/projects/C--Users-natha-Desktop-portfolio/f2757be7-05eb-411a-9846-b6e1aaba119d/tool-results/webfetch-1777375756144-zfwwkz.bin\")",
+      "Bash(tar -x -C /tmp/design_bundle)",
+      "Read(//tmp/**)",
+      "Bash(grep -iE \"\\\\.\\(jpg|jpeg|png|webp|gif\\)$\")",
+      "Bash(grep -iE \"\\\\.\\(jpg|jpeg|png|webp\\)$\")",
+      "Bash(magick identify *)",
+      "Bash(convert -identify /c/Users/natha/Desktop/portfolio/hero-bg.jpg)",
+      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp ok'\\)\")",
+      "Bash(node -e \"const jimp = require\\('jimp'\\); console.log\\('jimp ok'\\)\")",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\natha\\\\Desktop\\\\portfolio\\\\hero-bg.jpg\"\\); Write-Host \"Dimensions: $\\($img.Width\\)x$\\($img.Height\\)\"; $img.Dispose\\(\\))",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(where node *)",
+      "Bash(py --version)",
+      "PowerShell(Get-Command python, python3, node, ruby, php -ErrorAction SilentlyContinue)",
+      "Bash(curl -s -I http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "WebFetch(domain:uiverse.io)",
+      "WebSearch",
+      "Bash(identify \"C:/Users/natha/Desktop/portfolio/hero-bg-light.jpg\")",
+      "Bash(python3 -c \"from PIL import Image; i=Image.open\\('C:/Users/natha/Desktop/portfolio/hero-bg-light.jpg'\\); print\\(i.size, i.mode\\)\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

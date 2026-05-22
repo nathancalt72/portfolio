@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-Command", "$types=@{'.html'='text/html';'.css'='text/css';'.js'='application/javascript';'.jpg'='image/jpeg';'.png'='image/png';'.gif'='image/gif';'.webp'='image/webp';'.svg'='image/svg+xml'};$l=New-Object Net.HttpListener;$l.Prefixes.Add('http://localhost:3000/');$l.Start();while($true){$c=$l.GetContext();$p=$c.Request.Url.LocalPath;if($p -eq '/'){$p='/portfolio.html'};$f='C:\\Users\\natha\\Desktop\\portfolio'+$p.Replace('/','\\');$ext=[IO.Path]::GetExtension($f);$ct=if($types[$ext]){$types[$ext]}else{'application/octet-stream'};if(Test-Path $f){$b=[IO.File]::ReadAllBytes($f);$c.Response.ContentType=$ct;$c.Response.ContentLength64=$b.Length;$c.Response.OutputStream.Write($b,0,$b.Length)}else{$c.Response.StatusCode=404};$c.Response.Close()}"],
+      "port": 3000
+    }
+  ]
+}
