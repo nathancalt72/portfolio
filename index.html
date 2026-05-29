@@ -323,7 +323,12 @@ body.light .hero-vignette-light { opacity: 1; }
   font-size: clamp(64px, 10vw, 120px);
   font-weight: 700; letter-spacing: -.04em; line-height: .88;
   margin-bottom: 8px; color: var(--fg);
+  text-shadow:
+    0 0 6px  rgba(105,255,147,.2),
+    0 0 20px rgba(105,255,147,.08);
+  animation: neon-name-pulse 4s ease-in-out infinite;
 }
+body.light .hero-name { text-shadow: none; animation: none; }
 .hero-name::before {
   content: attr(data-text);
   position: absolute; left: 3px; top: 0;
@@ -371,6 +376,45 @@ body.light .hero-vignette-light { opacity: 1; }
   position: absolute; right: 48px; bottom: 60px;
   font-family: var(--mono); font-size: 9px; color: var(--fg-muted);
   letter-spacing: .1em; writing-mode: vertical-rl;
+}
+@keyframes neon-name-pulse {
+  0%,100% {
+    text-shadow:
+      0 0 6px  rgba(105,255,147,.2),
+      0 0 20px rgba(105,255,147,.08);
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(105,255,147,.32),
+      0 0 32px rgba(105,255,147,.14),
+      0 0 60px rgba(4,165,106,.08);
+  }
+}
+
+/* ── SCANLINES ── */
+.hero-scanlines {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,.055) 3px, rgba(0,0,0,.055) 4px
+  );
+}
+body.light .hero-scanlines { display: none; }
+
+/* ── JS GLITCH CLONES ── */
+.glitch-clone {
+  position: absolute; left: 0; top: 0; pointer-events: none;
+  font-size: inherit; font-weight: inherit;
+  letter-spacing: inherit; line-height: inherit;
+  white-space: nowrap; mix-blend-mode: screen;
+  will-change: clip-path, transform;
+}
+
+/* ── NAV LOGO HOVER GLOW ── */
+.nav-logo { transition: text-shadow .35s ease; }
+.nav-logo:hover {
+  text-shadow: 0 0 12px rgba(4,165,106,.75), 0 0 28px rgba(4,165,106,.3);
 }
 
 /* ═══════════════════════════════════════
@@ -932,6 +976,7 @@ body.light .hero-vignette-light { opacity: 1; }
   <video id="hero-video-a" src="hero-bg.mp4" muted playsinline preload="auto"></video>
   <video id="hero-video-b" muted playsinline preload="auto"></video>
   <div class="hero-grid-bg"></div>
+  <div class="hero-scanlines"></div>
   <div class="hero-vignette"></div>
   <div class="hero-vignette-light"></div>
   <div class="hero-glitch-lines">
@@ -1179,6 +1224,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
   requestAnimationFrame(animCursor);
 })();
+
 
 /* ── THEME TOGGLE + HERO VIDEO ── */
 const themeToggle = document.getElementById('themeToggle');
@@ -1600,6 +1646,60 @@ document.addEventListener('click', function (e) {
     })(i);
   }
 }, { passive: true });
+
+/* ── GLITCH ENGINE ── */
+(function() {
+  const names = document.querySelectorAll('.hero-name');
+  if (!names.length) return;
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function rndInt(a, b) { return Math.floor(rnd(a, b + 1)); }
+
+  function triggerGlitch() {
+    const ticks    = rndInt(4, 9);
+    const tickMs   = rnd(28, 52);
+    const clones   = [];
+
+    names.forEach(el => {
+      const r = document.createElement('span');
+      const b = document.createElement('span');
+      r.className = 'glitch-clone';
+      b.className = 'glitch-clone';
+      r.textContent = el.dataset.text;
+      b.textContent = el.dataset.text;
+      r.style.color = '#69ff93';
+      b.style.color = '#04a56a';
+      el.appendChild(r); el.appendChild(b);
+      clones.push({ el, r, b });
+    });
+
+    let tick = 0;
+    function doTick() {
+      if (tick >= ticks) {
+        clones.forEach(({ r, b }) => { r.remove(); b.remove(); });
+        setTimeout(triggerGlitch, rnd(3200, 7500));
+        return;
+      }
+      clones.forEach(({ r, b }) => {
+        const t1 = rnd(5, 75),  h1 = rnd(4, 22);
+        const t2 = rnd(5, 75),  h2 = rnd(4, 18);
+        const rx = (Math.random() - .5) * 28;
+        const bx = (Math.random() - .5) * 22;
+        r.style.clipPath = `polygon(0 ${t1}%,100% ${t1}%,100% ${t1+h1}%,0 ${t1+h1}%)`;
+        r.style.transform = `translateX(${rx}px)`;
+        r.style.opacity   = rnd(.6, 1);
+        b.style.clipPath  = `polygon(0 ${t2}%,100% ${t2}%,100% ${t2+h2}%,0 ${t2+h2}%)`;
+        b.style.transform = `translateX(${bx}px)`;
+        b.style.opacity   = rnd(.45, .85);
+      });
+      tick++;
+      setTimeout(doTick, tickMs);
+    }
+    doTick();
+  }
+
+  setTimeout(triggerGlitch, rnd(800, 2500));
+})();
 
 </script>
 </body>
