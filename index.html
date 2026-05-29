@@ -236,11 +236,16 @@ body.light #cursor-ring { border-color: rgba(1,63,34,.4); }
 .sec-label.accent { color: var(--cyan); }
 
 /* ── REVEAL ANIMATION ── */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+.reveal {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: .1s; }
-.reveal-delay-2 { transition-delay: .2s; }
-.reveal-delay-3 { transition-delay: .3s; }
+.reveal-delay-1 { transition-delay: .14s; }
+.reveal-delay-2 { transition-delay: .28s; }
+.reveal-delay-3 { transition-delay: .42s; }
 
 /* ═══════════════════════════════════════
    SECTION 1 — HERO
@@ -934,7 +939,7 @@ body.light .hero-vignette-light { opacity: 1; }
   </div>
 
   <!-- Content -->
-  <div class="hero-eyebrow reveal" data-i18n="hero_eyebrow">// MOTION DESIGNER & EDITOR — 2026</div>
+  <div class="hero-eyebrow reveal" data-i18n="hero_eyebrow">// MOTION DESIGNER & ÉDITEUR — 2026</div>
   <div class="hero-name reveal reveal-delay-1" data-text="NATHAN">NATHAN</div>
   <div class="hero-name reveal reveal-delay-2" data-text="CHARLOT">CHARLOT</div>
   <div class="hero-tagline reveal reveal-delay-3">
@@ -1295,64 +1300,62 @@ window.addEventListener('scroll', () => {
   const heroNames   = document.querySelectorAll('.hero-name');
   const heroTagline = document.querySelector('.hero-tagline');
   const heroScrollEl= document.querySelector('.hero-scroll');
-  const prlxEls = document.querySelectorAll('[data-prlx]');
+  const prlxEls     = document.querySelectorAll('[data-prlx]');
 
-  // Lerped mouse (normalised -1 → +1)
-  let lx = 0, ly = 0;
+  // Lerped values
+  let lx = 0, ly = 0, smoothY = 0;
+  // Hero text lerped offsets & blur
+  let hEY = 0, hN0 = 0, hN1 = 0, hTL = 0, hSC = 0, hBL = 0;
+  // Per-element lerped parallax
+  prlxEls.forEach(el => { el._tx = 0; el._bl = 0; });
+
+  const lerp = (a, b, t) => a + (b - a) * t;
 
   function update() {
-    const y = window.scrollY;
-    const h = window.innerHeight;
-    const W = window.innerWidth;
+    const rawY = window.scrollY;
+    const h    = window.innerHeight;
+    const W    = window.innerWidth;
 
-    // Smooth mouse tracking
+    // Smooth scroll position
+    smoothY = lerp(smoothY, rawY, 0.09);
+
+    // Smooth mouse
     const normX = (mx - W * 0.5) / (W * 0.5);
     const normY = (my - h * 0.5) / (h * 0.5);
-    lx += (normX - lx) * 0.06;
-    ly += (normY - ly) * 0.06;
+    lx = lerp(lx, normX, 0.06);
+    ly = lerp(ly, normY, 0.06);
 
-    /* ── Hero : drift X + blur au scroll, + suivi souris sur les cadres ── */
-    if (y < h * 1.2) {
-      heroBg.style.backgroundPositionY = `calc(50% + ${y * .15}px)`;
+    /* ── Hero text: smooth drift X + blur on scroll ── */
+    if (rawY < h * 1.5) {
+      hBL = lerp(hBL, Math.min(smoothY * .014, 10), 0.1);
+      hEY = lerp(hEY, -smoothY * .05, 0.1);
+      hN0 = lerp(hN0, -smoothY * .09, 0.1);
+      hN1 = lerp(hN1,  smoothY * .07, 0.1);
+      hTL = lerp(hTL,  smoothY * .04, 0.1);
+      hSC = lerp(hSC, -smoothY * .03, 0.1);
 
-      /* blur progressif sur le texte hero */
-      const blurPx = Math.min(y * .014, 10);
-
-      if (heroEyebrow) {
-        heroEyebrow.style.transform = `translateX(${-y * .05}px)`;
-        heroEyebrow.style.filter    = `blur(${blurPx * .5}px)`;
-      }
-      if (heroNames[0]) {
-        heroNames[0].style.transform = `translateX(${-y * .09}px)`;
-        heroNames[0].style.filter    = `blur(${blurPx}px)`;
-      }
-      if (heroNames[1]) {
-        heroNames[1].style.transform = `translateX(${y * .07}px)`;
-        heroNames[1].style.filter    = `blur(${blurPx * .75}px)`;
-      }
-      if (heroTagline) {
-        heroTagline.style.transform = `translateX(${y * .04}px)`;
-        heroTagline.style.filter    = `blur(${blurPx * .4}px)`;
-      }
-      if (heroScrollEl) {
-        heroScrollEl.style.transform = `translateX(${-y * .03}px)`;
-        heroScrollEl.style.filter    = `blur(${blurPx * .3}px)`;
-      }
+      if (heroEyebrow) { heroEyebrow.style.transform = `translateX(${hEY}px)`; heroEyebrow.style.filter = `blur(${hBL*.5}px)`; }
+      if (heroNames[0]) { heroNames[0].style.transform = `translateX(${hN0}px)`; heroNames[0].style.filter = `blur(${hBL}px)`; }
+      if (heroNames[1]) { heroNames[1].style.transform = `translateX(${hN1}px)`; heroNames[1].style.filter = `blur(${hBL*.75}px)`; }
+      if (heroTagline) { heroTagline.style.transform = `translateX(${hTL}px)`; heroTagline.style.filter = `blur(${hBL*.4}px)`; }
+      if (heroScrollEl) { heroScrollEl.style.transform = `translateX(${hSC}px)`; heroScrollEl.style.filter = `blur(${hBL*.3}px)`; }
     } else {
+      hBL = lerp(hBL, 0, 0.1); hEY = lerp(hEY, 0, 0.1); hN0 = lerp(hN0, 0, 0.1);
+      hN1 = lerp(hN1, 0, 0.1); hTL = lerp(hTL, 0, 0.1); hSC = lerp(hSC, 0, 0.1);
       [heroEyebrow, heroNames[0], heroNames[1], heroTagline, heroScrollEl]
-        .forEach(el => { if (el) { el.style.filter = ''; } });
+        .forEach(el => { if (el) el.style.filter = ''; });
     }
 
-    /* ── Sections : X + blur selon distance au centre du viewport ── */
+    /* ── Sections: smooth parallax X + blur ── */
     prlxEls.forEach(el => {
       const rect  = el.getBoundingClientRect();
       const speed = parseFloat(el.dataset.prlx);
       const dir   = parseFloat(el.dataset.prlxDir ?? '1');
       const pct   = Math.max(-1, Math.min(1, (rect.top + rect.height * .5 - h * .5) / h));
-      const dx    = pct * speed * 120 * dir;
-      const blur  = Math.abs(pct) * speed * 22;
-      el.style.transform = `translateX(${dx}px)`;
-      el.style.filter    = `blur(${Math.min(blur, 5)}px)`;
+      el._tx = lerp(el._tx, pct * speed * 120 * dir, 0.08);
+      el._bl = lerp(el._bl, Math.abs(pct) * speed * 22, 0.08);
+      el.style.transform = `translateX(${el._tx}px)`;
+      el.style.filter    = `blur(${Math.min(el._bl, 5)}px)`;
     });
 
     requestAnimationFrame(update);
@@ -1365,7 +1368,7 @@ window.addEventListener('scroll', () => {
 const revealEls = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: .15 });
+}, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
 revealEls.forEach(el => revealObs.observe(el));
 
 /* ── PROJECT CARDS ── */
