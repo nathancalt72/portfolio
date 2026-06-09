@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Le Guide Engagé — L'évasion qui a du sens · Surfrider Foundation</title>
+<meta name="description" content="Téléchargez gratuitement « Le Guide Engagé : L'évasion qui a du sens » — 10 destinations nature en France pour des vacances qui protègent l'Océan." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="components.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+
+/* ===== DATA ===== */
+const DESTINATIONS = [
+  { region: "Deux-Sèvres", name: "Le Marais Poitevin", base: "Niort", tag: "« La Venise Verte »" },
+  { region: "Lozère", name: "Les Cévennes", base: "Parc National", tag: "Classé UNESCO · ciel étoilé" },
+  { region: "Somme", name: "La Baie de Somme", base: "St-Valéry-sur-Somme", tag: "Phoques & estuaire" },
+  { region: "Aveyron / Lozère", name: "L'Aubrac", base: "Nasbinals", tag: "Plateaux & estives" },
+  { region: "Lot", name: "Les Causses du Quercy", base: "Cahors", tag: "Géoparc mondial UNESCO" },
+  { region: "Loire-Atlantique", name: "La Brière", base: "Guérande", tag: "Marais & marais salants" },
+  { region: "Bourgogne", name: "Le Morvan", base: "Parc régional", tag: "Forêts & lacs" },
+  { region: "Pyrénées-Atl.", name: "La Vallée d'Ossau", base: "Oloron-Ste-Marie", tag: "Sommets & gaves" },
+  { region: "Alsace", name: "Les Vosges du Nord", base: "Wissembourg", tag: "Réserve de biosphère" },
+  { region: "Doubs", name: "La Vallée de la Loue", base: "Ornans", tag: "Rivière & falaises" },
+];
+
+const FEATURES = [
+  { ic: "blue",   icon: "map",   title: "10 destinations engagées", text: "Pour chaque lieu, une présentation de la destination et de ses engagements environnementaux concrets." },
+  { ic: "green",  icon: "wave",  title: "Plages & espaces naturels", text: "Une sélection des plus belles plages, rivières et espaces naturels à explorer en respectant le vivant." },
+  { ic: "orange", icon: "fork",  title: "Restaurants engagés", text: "Nos adresses de tables investies dans une démarche durable, locale et de saison." },
+  { ic: "blue",   icon: "bike",  title: "Activités à faible impact", text: "Vélo, randonnée, surf et activités nautiques respectueuses de l'environnement." },
+  { ic: "green",  icon: "leaf",  title: "Conseils pratiques", text: "Des gestes simples pour réduire son impact en vacances et protéger littoraux et milieux aquatiques." },
+  { ic: "cream",  icon: "quote", title: "Paroles d'ambassadeurs", text: "Les recommandations et témoignages des ambassadeur·rice·s Surfrider, au plus près du terrain." },
+];
+
+const TONE = {
+  eyebrow: "Ebook gratuit · Surfrider Foundation",
+  title: ["L'ÉVASION", "QUI A DU", "SENS."],
+  accentWord: 2,
+  sub: "Partez autrement. 10 destinations nature en France pour des vacances qui protègent l'Océan au lieu de l'épuiser. Téléchargez le Guide Engagé, gratuitement.",
+  cta: "Recevoir le guide",
+  formTitle: "Recevez le Guide Engagé",
+  formSub: "Gratuit. Accès immédiat par e-mail.",
+};
+
+/* ===== ICONS ===== */
+const Icon = ({ name, size = 24, stroke = 2, color = "currentColor", fill = "none" }) => {
+  const p = { width: size, height: size, viewBox: "0 0 24 24", fill, stroke: color, strokeWidth: stroke, strokeLinecap: "round", strokeLinejoin: "round" };
+  const paths = {
+    check:    <polyline points="20 6 9 17 4 12" />,
+    arrow:    <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>,
+    arrowDown:<><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></>,
+    chevron:  <polyline points="6 9 12 15 18 9" />,
+    search:   <><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+    menu:     <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>,
+    heart:    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>,
+    map:      <><polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></>,
+    wave:     <path d="M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 17c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/>,
+    fork:     <><path d="M6 3v6a3 3 0 0 0 6 0V3M9 9v12"/><path d="M17 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4 2.5-1 2.5-4-1-5-2.5-5zM17 16v5"/></>,
+    bike:     <><circle cx="6" cy="17" r="3.2"/><circle cx="18" cy="17" r="3.2"/><path d="M6 17l4-7h5l-3 7M9.5 7h3"/></>,
+    leaf:     <path d="M11 20A7 7 0 0 1 4 13c0-5 6-9 16-9 0 9-4 16-9 16zM4 21c2-6 6-9 12-11"/>,
+    quote:    <path d="M7 7H4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2v3a3 3 0 0 1-3 3M20 7h-3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2v3a3 3 0 0 1-3 3"/>,
+    shield:   <><path d="M12 2 4 5v6c0 5 3.5 8 8 11 4.5-3 8-6 8-11V5z"/><polyline points="9 12 11 14 15 10"/></>,
+    gift:     <><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v9h14v-9M12 8S11 3 8 3a2.5 2.5 0 0 0 0 5zM12 8s1-5 4-5a2.5 2.5 0 0 1 0 5z"/></>,
+    clock:    <><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></>,
+    close:    <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+  };
+  return <svg {...p}>{paths[name]}</svg>;
+};
+
+const Logo = ({ footer = false }) => (
+  <a className="brand" href="#top" aria-label="Surfrider Foundation — accueil">
+    <img className="brand-img" src={footer ? "assets/logo-surfrider-white.png" : "assets/logo-surfrider.png"}
+      alt="Surfrider Foundation" />
+  </a>
+);
+
+/* ===== HEADER ===== */
+function Header({ onOpenForm }) {
+  const nav = ["Nos engagements", "Agir · soutenir", "Ressources", "L'asso", "Contact"];
+  return (
+    <header className="site-header" id="top">
+      <div className="wrap header-inner">
+        <Logo />
+        <nav className="main-nav">
+          {nav.map((n, i) => (
+            <a key={i} href="#" onClick={(e) => e.preventDefault()}>
+              {n}{i < 3 && <Icon name="chevron" size={9} className="chev" />}
+            </a>
+          ))}
+        </nav>
+        <div className="header-actions">
+          <button className="icon-btn" aria-label="Rechercher"><Icon name="search" size={18} /></button>
+          <button className="btn btn-blue header-cta" onClick={onOpenForm}>
+            <Icon name="gift" size={16} /> Recevoir le guide
+          </button>
+          <a className="btn btn-orange" href="#" onClick={(e) => e.preventDefault()}>
+            <Icon name="heart" size={16} /> Faire un don
+          </a>
+          <button className="icon-btn burger" aria-label="Menu"><Icon name="menu" size={20} /></button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ===== EBOOK COVER ===== */
+function EbookCover() {
+  return (
+    <div className="hero-visual">
+      <div className="ebook-card">
+        <div className="ebook-badge">100%<br/>GRATUIT</div>
+        <div className="ebook-cover">
+          <div className="ebook-cover-inner">
+            <div className="ec-title">Le Guide<br/>Engagé</div>
+            <div className="ec-wave"></div>
+            <div className="ec-sub">L'évasion qui a du sens</div>
+            <div style={{marginTop:18, display:'flex', gap:6, flexWrap:'wrap', justifyContent:'center'}}>
+              {["🏕️","🌊","🚴","🌿"].map((e,i) => (
+                <span key={i} style={{fontSize:22}}>{e}</span>
+              ))}
+            </div>
+            <div className="ec-logo">Surfrider Foundation</div>
+          </div>
+        </div>
+        <div className="ebook-spine"></div>
+      </div>
+    </div>
+  );
+}
+
+/* ===== FORM CARD ===== */
+function FormCard({ onSubmit, compact }) {
+  const [vals, setVals] = React.useState({ prenom: "", nom: "", email: "", cp: "" });
+  const [consent, setConsent] = React.useState(false);
+  const [errors, setErrors] = React.useState({});
+
+  const set = (k) => (e) => {
+    setVals((v) => ({ ...v, [k]: e.target.value }));
+    if (errors[k]) setErrors((er) => ({ ...er, [k]: false }));
+  };
+
+  const validate = () => {
+    const er = {};
+    if (!vals.prenom.trim()) er.prenom = true;
+    if (!vals.nom.trim()) er.nom = true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) er.email = true;
+    if (!/^\d{5}$/.test(vals.cp.trim())) er.cp = true;
+    if (!consent) er.consent = true;
+    setErrors(er);
+    return Object.keys(er).length === 0;
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (validate()) onSubmit({ ...vals });
+  };
+
+  const uid = compact ? "b" : "a";
+
+  return (
+    <form className="form-card" onSubmit={submit} noValidate>
+      <div className="form-head">
+        <div className="pill pill-green" style={{ marginBottom: 12 }}>
+          <Icon name="gift" size={14} /> Ebook offert
+        </div>
+        <h3 className="h3">{TONE.formTitle}</h3>
+        <p>{TONE.formSub}</p>
+      </div>
+
+      <div className="field-row">
+        <div className={"field" + (errors.prenom ? " error" : "")}>
+          <label>Prénom <span className="req">*</span></label>
+          <input value={vals.prenom} onChange={set("prenom")} placeholder="Camille" />
+          <div className="err-msg">Indiquez votre prénom</div>
+        </div>
+        <div className={"field" + (errors.nom ? " error" : "")}>
+          <label>Nom <span className="req">*</span></label>
+          <input value={vals.nom} onChange={set("nom")} placeholder="Durand" />
+          <div className="err-msg">Indiquez votre nom</div>
+        </div>
+      </div>
+
+      <div className={"field" + (errors.email ? " error" : "")}>
+        <label>Adresse e-mail <span className="req">*</span></label>
+        <input type="email" value={vals.email} onChange={set("email")} placeholder="camille.durand@email.fr" />
+        <div className="err-msg">Adresse e-mail invalide</div>
+      </div>
+
+      <div className={"field" + (errors.cp ? " error" : "")}>
+        <label>Code postal <span className="req">*</span></label>
+        <input inputMode="numeric" maxLength={5} value={vals.cp} onChange={set("cp")} placeholder="64200" />
+        <div className="err-msg">5 chiffres attendus</div>
+      </div>
+
+      <div className={"consent" + (errors.consent ? " error" : "")}>
+        <input type="checkbox" id={"consent-" + uid} checked={consent}
+          onChange={(e) => { setConsent(e.target.checked); if (errors.consent) setErrors((er) => ({ ...er, consent: false })); }} />
+        <label htmlFor={"consent-" + uid}>
+          J'accepte de recevoir le Guide Engagé et la newsletter de Surfrider Foundation.
+          Mes données sont traitées conformément à la <a href="#" onClick={(e) => e.preventDefault()}>politique de confidentialité</a>.
+        </label>
+      </div>
+
+      <button className="btn btn-blue full lg" type="submit">
+        {TONE.cta} <Icon name="arrow" size={18} />
+      </button>
+
+      <div className="form-foot-note">
+        <Icon name="shield" size={14} /> Sans engagement · Désinscription en 1 clic
+      </div>
+    </form>
+  );
+}
+
+/* ===== HERO ===== */
+function Hero({ onOpenForm }) {
+  return (
+    <section className="hero hero-bg-illustration">
+      <div className="hero-deco">
+        <span className="dot d1"></span>
+        <span className="dot d2"></span>
+        <span className="dot d3"></span>
+        <span className="ring"></span>
+      </div>
+      <div className="wrap hero-inner">
+        <div className="hero-grid hero-grid-cta">
+          <div className="hero-copy">
+            <div className="eyebrow" style={{ marginBottom: 18 }}>{TONE.eyebrow}</div>
+            <h1 className="display hero-title">
+              {TONE.title.map((line, i) => (
+                <span key={i} style={{ display: "block" }}>
+                  {TONE.accentWord === i ? <span className="accent-word">{line}</span> : line}
+                </span>
+              ))}
+            </h1>
+            <span className="underline-rule" style={{ background: "var(--orange)" }}></span>
+            <p className="hero-sub">{TONE.sub}</p>
+            <ul className="hero-benefits">
+              <li><Icon name="check" size={18} stroke={2.6} /> 10 destinations nature en France, loin du surtourisme</li>
+              <li><Icon name="check" size={18} stroke={2.6} /> Adresses durables, activités à faible impact & bons gestes</li>
+              <li><Icon name="check" size={18} stroke={2.6} /> 100% gratuit, reçu immédiatement par e-mail</li>
+            </ul>
+            <div className="hero-cta-row">
+              <button className="btn btn-white lg" onClick={onOpenForm}>
+                {TONE.cta} <Icon name="arrow" size={18} />
+              </button>
+              <span className="hero-trust" style={{ margin: 0 }}>
+                <span className="avs">
+                  <img src="assets/avatar-1.jpg" alt="" />
+                  <img src="assets/avatar-2.jpg" alt="" />
+                  <img src="assets/avatar-3.jpg" alt="" />
+                </span>
+                +12 000 voyageurs engagés
+              </span>
+            </div>
+          </div>
+          <EbookCover />
+        </div>
+      </div>
+      <svg className="hero-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,40 C240,90 480,0 720,30 C960,60 1200,90 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/>
+      </svg>
+    </section>
+  );
+}
+
+/* ===== FORM MODAL ===== */
+function FormModal({ open, onClose, onSubmit }) {
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-label="Recevoir le Guide Engagé">
+        <button className="modal-close" onClick={onClose} aria-label="Fermer"><Icon name="close" size={20} /></button>
+        <FormCard onSubmit={onSubmit} />
+      </div>
+    </div>
+  );
+}
+
+/* ===== REASSURE ===== */
+function Reassure() {
+  const items = [
+    { icon: "gift",  t: "Entièrement gratuit", x: "Le Guide Engagé est offert. Aucune carte bancaire, aucune contrepartie cachée." },
+    { icon: "leaf",  t: "Pensé pour l'Océan", x: "Chaque recommandation limite votre empreinte et protège les milieux aquatiques." },
+    { icon: "clock", t: "Accès immédiat", x: "Le guide arrive dans votre boîte mail en quelques secondes après l'inscription." },
+  ];
+  return (
+    <section className="section bg-tint">
+      <div className="wrap">
+        <div className="stat-row">
+          <div className="stat"><div className="num">10</div><div className="lab">destinations nature détaillées</div></div>
+          <div className="stat"><div className="num">30+</div><div className="lab">adresses & activités durables</div></div>
+          <div className="stat"><div className="num">100%</div><div className="lab">gratuit, sans engagement</div></div>
+        </div>
+        <div className="reassure-grid">
+          {items.map((it, i) => (
+            <div className="reassure" key={i}>
+              <div className="ic"><Icon name={it.icon} size={22} /></div>
+              <div><h4 className="h4">{it.t}</h4><p>{it.x}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== FEATURES ===== */
+function Features() {
+  return (
+    <section className="section bg-cream" id="contenu">
+      <div className="wrap">
+        <div className="section-head center" style={{ textAlign: "center" }}>
+          <div className="eyebrow">Dans votre ebook</div>
+          <h2 className="h2" style={{ marginTop: 12 }}>Ce que vous allez découvrir</h2>
+          <span className="underline-rule center"></span>
+          <p>« Le Guide Engagé » réunit tout ce qu'il faut pour des vacances qui ont du sens —
+            belles évasions, adresses responsables et gestes concrets pour protéger l'Océan.</p>
+        </div>
+        <div className="feature-grid">
+          {FEATURES.map((f, i) => (
+            <article className="feature" key={i}>
+              <div className={"ic " + f.ic}><Icon name={f.icon} size={26} /></div>
+              <h3 className="h4">{f.title}</h3>
+              <p>{f.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== DESTINATIONS ===== */
+function Destinations({ onOpenForm }) {
+  const scrollToForm = () => {
+    const el = document.getElementById("formulaire");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+  return (
+    <section className="section" id="destinations">
+      <div className="wrap">
+        <div className="dest-head-row">
+          <div className="section-head">
+            <div className="eyebrow">Le sommaire du guide</div>
+            <h2 className="h2" style={{ marginTop: 12 }}>10 destinations<br/>qui ont du sens</h2>
+            <span className="underline-rule accent"></span>
+          </div>
+          <p className="caption" style={{ maxWidth: 320 }}>
+            Des territoires d'intérieur préservés, choisis pour leur engagement environnemental
+            et leur art de l'évasion à faible impact.
+          </p>
+        </div>
+        <div className="dest-grid">
+          {DESTINATIONS.map((x, i) => (
+            <article className="dest-card" key={i}>
+              <div className="dest-img">
+                <div className="ph green" style={{ width: "100%", height: "100%" }}>
+                  {x.name.replace(/^Le |^La |^Les |^L'/, "")}
+                </div>
+              </div>
+              <span className="dest-num">{String(i + 1).padStart(2, "0")}</span>
+              <div className="dest-body">
+                <div className="dest-region">{x.region}</div>
+                <h4>{x.name}</h4>
+                <div className={"dest-tag" + (x.tag ? "" : " empty")}>{x.tag}</div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="dest-more">
+          <button className="btn btn-outline lg" onClick={scrollToForm}>
+            Débloquer les 10 destinations <Icon name="arrow" size={18} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== TESTIMONIAL ===== */
+function Testimonial() {
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div className="quote-card">
+          <div className="qimg">
+            <div className="ph" style={{ width: "100%", height: "100%" }}>portrait<br/>ambassadeur·rice</div>
+          </div>
+          <div>
+            <Icon name="quote" size={34} color="var(--blue)" />
+            <blockquote>
+              « Voyager autrement, c'est redécouvrir la France au rythme du vivant. Ce guide donne
+              les clés pour partir léger et revenir avec la certitude d'avoir respecté ce qu'on aime. »
+            </blockquote>
+            <div className="qauthor">Ambassadeur·rice Surfrider<span>Le Guide Engagé · édition 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== FORM SECTION ===== */
+function FormSection({ onSubmit }) {
+  return (
+    <section className="section bg-cream form-section" id="formulaire">
+      <div className="wrap">
+        <div className="form-section-grid">
+          <div className="section-head">
+            <div className="eyebrow">Plus qu'une étape</div>
+            <h2 className="h2" style={{ marginTop: 12 }}>Recevez votre<br/>Guide Engagé</h2>
+            <span className="underline-rule"></span>
+            <p>Renseignez vos coordonnées : nous vous envoyons immédiatement « L'évasion qui a du
+              sens » par e-mail. Gratuit, et toujours sans engagement.</p>
+            <ul className="hero-benefits" style={{ marginTop: 22 }}>
+              <li style={{ color: "var(--blue-dark)" }}><Icon name="check" size={18} stroke={2.6} color="var(--green)" /> 10 destinations nature détaillées</li>
+              <li style={{ color: "var(--blue-dark)" }}><Icon name="check" size={18} stroke={2.6} color="var(--green)" /> Adresses durables & activités à faible impact</li>
+              <li style={{ color: "var(--blue-dark)" }}><Icon name="check" size={18} stroke={2.6} color="var(--green)" /> Reçu immédiatement, gratuitement</li>
+            </ul>
+          </div>
+          <FormCard onSubmit={onSubmit} compact />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== DON BAND ===== */
+function DonBand() {
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div className="don-band bg-blue">
+          <div className="don-deco"><span className="c1"></span><span className="c2"></span></div>
+          <div className="don-grid">
+            <div>
+              <div className="eyebrow" style={{ color: "#bfe0f7" }}>Merci de protéger l'Océan</div>
+              <h2 className="display" style={{ fontSize: "clamp(34px,4.4vw,58px)", color: "#fff", marginTop: 12 }}>
+                L'Océan a besoin<br/>de vous
+              </h2>
+              <p style={{ color: "rgba(255,255,255,.9)", maxWidth: 460, marginTop: 16, fontWeight: 500 }}>
+                Ce guide est gratuit grâce à celles et ceux qui soutiennent Surfrider. En faisant un don,
+                vous agissez là où tout commence — et 66% de votre don est déductible de vos impôts.
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <a className="btn btn-orange lg full" href="#" onClick={(e) => e.preventDefault()}>
+                <Icon name="heart" size={18} /> Je soutiens Surfrider
+              </a>
+              <a className="btn btn-ghost-light lg full" href="#" onClick={(e) => e.preventDefault()}>
+                Devenir bénévole
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== FOOTER ===== */
+function Footer() {
+  const cols = [
+    { h: "Rejoindre l'action", items: ["Nous rejoindre", "Devenir bénévole", "Devenir adhérent·e", "Devenir partenaire"] },
+    { h: "Pour aller plus loin", items: ["Faire un don", "Nous contacter", "Espace presse", "FAQ"] },
+    { h: "Nos autres sites", items: ["Surfrider Europe", "Boutique en ligne", "Ocean Campus", "Surfrider Volunteers"] },
+  ];
+  return (
+    <footer className="site-footer">
+      <div className="footer-news">
+        <div className="wrap news-grid">
+          <div>
+            <h3>L'écho bleu</h3>
+            <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,.7)" }}>La newsletter de Surfrider pour tout comprendre, et même rire un peu.</p>
+          </div>
+          <form className="news-form" onSubmit={(e) => e.preventDefault()}>
+            <input type="email" placeholder="Votre adresse e-mail" aria-label="E-mail newsletter" />
+            <button className="btn btn-orange" type="submit">S'inscrire</button>
+          </form>
+        </div>
+      </div>
+      <div className="footer-main">
+        <div className="wrap">
+          <div className="footer-cols">
+            <div className="footer-brand">
+              <Logo footer />
+              <p>L'ONG Surfrider Foundation est un collectif d'activistes positifs qui agit concrètement
+                pour la protection de l'Océan.</p>
+              <div className="footer-social">
+                {[["IG","Instagram"],["in","LinkedIn"],["f","Facebook"],["@","Twitter/X"],["tk","TikTok"]].map(([s,lbl], i) => (
+                  <a key={i} href="#" onClick={(e) => e.preventDefault()} aria-label={lbl}><span style={{ fontSize: 12, fontWeight: 700 }}>{s}</span></a>
+                ))}
+              </div>
+            </div>
+            {cols.map((c, i) => (
+              <div className="footer-col" key={i}>
+                <h5>{c.h}</h5>
+                <ul>{c.items.map((it, j) => <li key={j}><a href="#" onClick={(e) => e.preventDefault()}>{it}</a></li>)}</ul>
+              </div>
+            ))}
+          </div>
+          <div className="footer-bottom">
+            <span>© 2026 Surfrider Foundation Europe — Le Guide Engagé</span>
+            <span>
+              <a href="#" onClick={(e) => e.preventDefault()}>Mentions légales</a>
+              <a href="#" onClick={(e) => e.preventDefault()}>Politique de confidentialité</a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ===== CONFIRMATION ===== */
+function Confirmation({ data, onReset }) {
+  return (
+    <section className="confirm-wrap">
+      <div className="wrap confirm-card">
+        <div className="confirm-check"><Icon name="check" size={46} stroke={3} /></div>
+        <h1>Merci {data.prenom} !<br/>Votre guide est en route</h1>
+        <p>
+          Nous venons d'envoyer « L'évasion qui a du sens » à <span className="email-hl">{data.email}</span>.
+          Vérifiez votre boîte de réception (et vos spams) : votre évasion responsable commence maintenant.
+        </p>
+        <div className="confirm-actions">
+          <a className="btn btn-blue lg" href="#" onClick={(e) => e.preventDefault()}>
+            <Icon name="arrowDown" size={18} /> Télécharger le guide (PDF)
+          </a>
+          <a className="btn btn-outline lg" href="#" onClick={(e) => { e.preventDefault(); onReset(); }}>
+            Revenir à la page
+          </a>
+        </div>
+        <div className="confirm-next">
+          <p style={{ marginTop: 0 }}>Envie d'aller plus loin pour protéger l'Océan ?</p>
+          <a className="btn btn-orange lg" href="#" onClick={(e) => e.preventDefault()}>
+            <Icon name="heart" size={18} /> Je soutiens Surfrider
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== APP ===== */
+function App() {
+  const [submitted, setSubmitted] = React.useState(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
+
+  const openForm = () => setModalOpen(true);
+  const handleSubmit = (data) => {
+    setModalOpen(false);
+    setSubmitted(data);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div>
+      <Header onOpenForm={openForm} />
+
+      {submitted ? (
+        <Confirmation data={submitted} onReset={() => setSubmitted(null)} />
+      ) : (
+        <main>
+          <Hero onOpenForm={openForm} />
+          <Reassure />
+          <Features />
+          <Destinations onOpenForm={openForm} />
+          <Testimonial />
+          <FormSection onSubmit={handleSubmit} />
+          <DonBand />
+        </main>
+      )}
+
+      <Footer />
+
+      <FormModal open={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleSubmit} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
