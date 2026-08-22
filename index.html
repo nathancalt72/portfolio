@@ -580,23 +580,19 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   let shiftX = 0, shiftY = 0;
 
   // Trailing spaces are stripped to save bytes, so the text box is narrower than
-  // the real grid and flexbox centres the wrong thing. Measure where the ink
-  // actually sits and offset by the difference.
+  // the real grid and flexbox centres the wrong thing.
+  // Centre on the centroid of the ink rather than its bounding box: stray glyphs
+  // out on the edges drag the box away from where the mass actually reads.
   function measureInk() {
-    let minC = Infinity, maxC = -1, minR = Infinity, maxR = -1;
+    let n = 0, sumC = 0, sumR = 0;
     frames.forEach(f => f.split('\n').forEach((l, r) => {
       for (let c = 0; c < l.length; c++) {
-        if (l[c] !== ' ') {
-          if (c < minC) minC = c;
-          if (c > maxC) maxC = c;
-          if (r < minR) minR = r;
-          if (r > maxR) maxR = r;
-        }
+        if (l[c] !== ' ') { n++; sumC += c; sumR += r; }
       }
     }));
-    if (maxC < 0) return;
-    shiftX = (minC + maxC) / 2 - cols / 2;
-    shiftY = (minR + maxR) / 2 - rows / 2;
+    if (!n) return;
+    shiftX = sumC / n - cols / 2;
+    shiftY = sumR / n - rows / 2;
   }
 
   function fit() {
