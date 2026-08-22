@@ -25,7 +25,9 @@
       "WebSearch",
       "Bash(identify \"C:/Users/natha/Desktop/portfolio/hero-bg-light.jpg\")",
       "Bash(python3 -c \"from PIL import Image; i=Image.open\\('C:/Users/natha/Desktop/portfolio/hero-bg-light.jpg'\\); print\\(i.size, i.mode\\)\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\natha\\\\landing page surfrider\\\\index.html\" \"C:\\\\Users\\\\natha\\\\Desktop\\\\portfolio\\\\surfrider-landing\\\\index.html\" -Force)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\natha\\\\landing page surfrider\\\\components.css\" \"C:\\\\Users\\\\natha\\\\Desktop\\\\portfolio\\\\surfrider-landing\\\\components.css\" -Force)"
     ]
   }
 }
