@@ -66,6 +66,13 @@ a { color: inherit; }
 .bg-columns span:nth-child(3) { left: calc(50% - .5px); }
 .bg-columns span:nth-child(4) { left: calc(75% - .5px); }
 .bg-columns span:nth-child(5) { right: 0; }
+/* Ascii animation as a fixed backdrop: plain text, so no blend mode or alpha
+   video is needed — the glyphs simply sit on the page colour. Held well below
+   the content and faint enough to read through. */
+#asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+#asciiBg pre { font-family: var(--mono); line-height: 1; white-space: pre; margin: 0;
+  color: var(--fg); opacity: .17; }
 .bg-grid-12 {
   position: fixed; inset: 0; z-index: 9500; pointer-events: none; display: none;
   grid-template-columns: repeat(12, 1fr); gap: 0;
@@ -127,10 +134,8 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 /* ═══════════════════════════════════════
    NAV
 ═══════════════════════════════════════ */
-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center;
-  justify-content: space-between; padding: 0 40px; height: 64px; border-bottom: 1px solid transparent;
-  transition: border-color .4s, background .4s, backdrop-filter .4s; }
-nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(14px); border-color: var(--border); }
+nav { position: relative; z-index: 100; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 40px; height: 64px; }
 .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px;
   color: var(--fg); text-decoration: none; letter-spacing: .02em; }
 .nav-short { display: none; }
@@ -151,17 +156,9 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 /* ═══════════════════════════════════════
    HERO
 ═══════════════════════════════════════ */
-#hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
-  padding: 100px 40px 0; }
+#hero { position: relative; min-height: 88vh; display: flex; flex-direction: column; justify-content: center;
+  padding: 40px 40px 0; }
 .hero-inner { position: relative; z-index: 1; width: 100%; }
-/* The clip is baked onto white and blended with multiply, so white reads as
-   no-op and the background grid stays visible through it. Avoids VP9 alpha,
-   which Safari does not support. */
-/* No z-index here on purpose: a positioned element with z-index would open a
-   stacking context and trap the multiply inside it, showing the clip's white
-   box. Depth comes from .hero-inner sitting at z-index 1. */
-.hero-ascii { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.hero-ascii video { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
 /* Reference sets weight 400, line-height 102% and indents the first line by one
    column (25%), so it starts on the second grid rule. */
@@ -327,6 +324,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 
 <div class="bg-grid"></div>
 <div class="bg-columns"><span></span><span></span><span></span><span></span><span></span></div>
+<div id="asciiBg"><pre id="asciiPre"></pre></div>
 <div class="bg-grid-12" id="bgGrid12"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
 <div class="page-transition" id="pageTransition">
@@ -369,9 +367,6 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 
 <!-- ═══ HERO ═══ -->
 <section id="hero">
-  <div class="hero-ascii">
-    <video id="asciiVideo" src="ascii-ink.webm" autoplay loop muted playsinline preload="auto"></video>
-  </div>
   <div class="hero-inner">
     <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">motion designer &amp; editor. based in france — <span class="mark">open</span> to impact-driven projects, 2026.</h1>
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
@@ -570,35 +565,46 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   }
 })();
 
-/* Reduced motion holds the clip on a still rather than hiding it — the artwork
-   is part of the layout, only the movement is the accessibility concern.
-   Otherwise kick playback: the autoplay attribute alone is not reliable. */
+/* ── ASCII BACKDROP ──
+   Frames are plain strings swapped into one <pre>, so this is a single DOM write
+   per tick rather than a video decode. Reduced motion holds frame 0 — the
+   artwork stays, only the movement goes. */
 (function () {
-  const vid = document.getElementById('asciiVideo');
-  if (!vid) return;
-  const still = () => { vid.pause(); try { vid.currentTime = 1.6; } catch (e) {} };
-  const kick = () => { const p = vid.play(); if (p) p.catch(function () {}); };
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pre = document.getElementById('asciiPre');
+  const box = document.getElementById('asciiBg');
+  if (!pre || !box) return;
+  const FPS = 15;
+  let frames = [], cols = 0, rows = 0, i = 0, timer = null;
 
-  function apply() {
-    if (reduced.matches) {
-      vid.removeAttribute('loop');
-      if (vid.readyState >= 1) still();
-      else vid.addEventListener('loadedmetadata', still, { once: true });
-    } else {
-      vid.setAttribute('loop', '');
-      kick();
-    }
+  function fit() {
+    if (!cols) return;
+    // Monospace advance is ~0.6em; size to fill on whichever axis binds first.
+    pre.style.fontSize = Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows) + 'px';
   }
-  window.addEventListener('load', apply);
-  document.addEventListener('pointerdown', apply, { once: true });
-  reduced.addEventListener('change', apply);
-  apply();
-})();
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function run() {
+    clearInterval(timer);
+    if (reduced.matches) { pre.textContent = frames[0]; return; }
+    timer = setInterval(() => { pre.textContent = frames[i = (i + 1) % frames.length]; }, 1000 / FPS);
+  }
 
-/* ── NAV SCROLL ── */
-const navEl2 = document.getElementById('nav');
-window.addEventListener('scroll', () => { navEl2.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
+  fetch('ascii-frames.json')
+    .then(r => r.json())
+    .then(data => {
+      frames = data;
+      const lines = frames[0].split('\n');
+      rows = lines.length;
+      // Trailing spaces are stripped to save bytes, so lines vary — take the widest.
+      cols = lines.reduce((m, l) => Math.max(m, l.length), 0);
+      pre.textContent = frames[0];
+      fit();
+      run();
+    })
+    .catch(function () {});
+
+  window.addEventListener('resize', fit);
+  reduced.addEventListener('change', run);
+})();
 
 /* ── REVEAL ── */
 const revealObs = new IntersectionObserver(entries => {
