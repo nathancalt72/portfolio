@@ -19,8 +19,11 @@
   /* --gold is text-safe on cream; --gold-fill is the raw moodboard yellow, blocks only */
   --gold:      #5f560f;
   --gold-fill: #c1b641;
-  --olive:     #81761a;
-  --red:       #d81f0f;
+  /* The two moodboard greens replace the former red accent.
+     --green-deep carries emphasis text, --green-light is fills only (1.8:1 on cream). */
+  --olive:      #81761a;
+  --green-deep: #81761a;
+  --green-light:#c1b641;
   --black:     #000;
   --ink-on-olive: #f4f1e6;
   --border:    #ddd3b5;
@@ -39,7 +42,8 @@ body {
   cursor: none; overflow-x: hidden; position: relative;
 }
 body.no-scroll-transition { overflow: hidden; height: 100vh; }
-::selection { background: var(--olive); color: var(--ink-on-olive); }
+/* Light green as a fill takes dark ink: 9:1, against 4:1 for cream on the deep green */
+::selection { background: var(--green-light); color: var(--fg); }
 a { color: inherit; }
 .lowercase { text-transform: lowercase; }
 
@@ -67,7 +71,7 @@ a { color: inherit; }
   grid-template-columns: repeat(12, 1fr); gap: 0;
 }
 .bg-grid-12.on { display: grid; }
-.bg-grid-12 span { border-right: 1px solid rgba(238,35,17,.35); height: 100%; }
+.bg-grid-12 span { border-right: 1px solid rgba(129,118,26,.4); height: 100%; }
 main, nav, footer, #hero { position: relative; z-index: 1; }
 
 /* ── PAGE TRANSITION CURTAIN ── */
@@ -90,8 +94,8 @@ main, nav, footer, #hero { position: relative; z-index: 1; }
 #cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(193,182,65,.4);
   border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%);
   transition: width .25s ease, height .25s ease, border-color .2s; }
-body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 4px; height: 4px; background: var(--red); }
-body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52px; height: 52px; border-color: rgba(238,35,17,.4); }
+body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 4px; height: 4px; background: var(--green-deep); }
+body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52px; height: 52px; border-color: rgba(129,118,26,.45); }
 @media (max-width: 600px) { #cursor, #cursor-ring { display: none; } body { cursor: auto; } a, button { cursor: pointer; } }
 
 /* ── SCROLL-FOLLOW LABEL ── */
@@ -111,7 +115,7 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 .reveal { opacity: 0; transform: translateY(36px); transition: opacity 1s cubic-bezier(.22,1,.36,1), transform 1s cubic-bezier(.22,1,.36,1); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 .reveal-delay-1 { transition-delay: .12s; } .reveal-delay-2 { transition-delay: .24s; } .reveal-delay-3 { transition-delay: .36s; }
-.dot-sq { width: 5px; height: 5px; background: var(--red); flex-shrink: 0; }
+.dot-sq { width: 5px; height: 5px; background: var(--green-deep); flex-shrink: 0; }
 .dot-sq.blink { animation: sq-blink 1.4s steps(1) infinite; }
 .dot-sq.static { background: var(--gold); }
 @keyframes sq-blink { 0%,100%{opacity:1} 50%{opacity:.15} }
@@ -151,7 +155,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .title-h1 { font-family: var(--display); font-weight: 400; text-transform: lowercase;
   letter-spacing: -.015em; line-height: 1.02; font-size: 44px;
   text-indent: 25%; min-width: 100%; }
-.title-h1 .mark { color: var(--red); }
+.title-h1 .mark { color: var(--green-deep); }
 .scroll-down-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
   color: var(--fg-muted); margin-top: 40px; }
 
@@ -179,7 +183,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .project-plus::before { width: 14px; height: 1px; transform: translate(-50%,-50%); }
 .project-plus::after { width: 1px; height: 14px; transform: translate(-50%,-50%); }
 .project.is-open .project-plus::after { transform: translate(-50%,-50%) rotate(90deg); }
-.project.is-open .project-plus::before, .project.is-open .project-plus::after { background: var(--red); }
+.project.is-open .project-plus::before, .project.is-open .project-plus::after { background: var(--green-deep); }
 
 .project-content_wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s cubic-bezier(.65,0,.35,1); }
 .project.is-open .project-content_wrapper { grid-template-rows: 1fr; }
@@ -216,7 +220,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .approach-body p { font-size: 16px; line-height: 1.95; font-weight: 300; color: var(--fg); max-width: 56ch; }
 .approach-body p + p { margin-top: 22px; }
 .approach-quote { margin-top: 40px; font-family: var(--display); font-weight: 700; font-style: italic;
-  font-size: 19px; color: var(--red); border-left: 1px solid var(--red); padding-left: 20px; max-width: 40ch; text-transform: lowercase; }
+  font-size: 19px; color: var(--green-deep); border-left: 2px solid var(--green-light); padding-left: 20px; max-width: 40ch; text-transform: lowercase; }
 .approach-status { display: flex; align-items: center; gap: 10px; margin-top: 40px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
 
@@ -251,7 +255,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
   flex-direction: column; justify-content: space-between; min-height: 50vh; }
 .contact-big { font-family: var(--display); font-weight: 700; text-transform: lowercase;
   font-size: clamp(40px, 6.6vw, 96px); letter-spacing: -.02em; line-height: .96; }
-.contact-big .mark { color: var(--red); }
+.contact-big .mark { color: var(--green-deep); }
 .contact-email { font-family: var(--mono); font-size: 13px; color: var(--gold); letter-spacing: .04em;
   text-decoration: none; margin-top: 32px; display: inline-block; border-bottom: 1px solid var(--gold);
   padding-bottom: 4px; width: fit-content; transition: opacity .2s; }
