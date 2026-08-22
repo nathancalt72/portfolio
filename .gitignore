@@ -1,0 +1,3 @@
+# ProRes masters — hundreds of MB, kept locally only.
+# The web-ready WebM exports are committed instead.
+*.mov

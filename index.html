@@ -72,7 +72,11 @@ a { color: inherit; }
 }
 .bg-grid-12.on { display: grid; }
 .bg-grid-12 span { border-right: 1px solid rgba(129,118,26,.4); height: 100%; }
-main, nav, footer, #hero { position: relative; z-index: 1; }
+main, nav, footer { position: relative; z-index: 1; }
+/* #hero is deliberately left at z-index auto: a stacking context here would trap
+   the ascii clip's multiply blend. It still paints over the fixed grids because
+   it is positioned and comes later in the DOM. */
+#hero { position: relative; }
 
 /* ── PAGE TRANSITION CURTAIN ── */
 .page-transition { position: fixed; inset: 0; z-index: 10000; display: flex; pointer-events: none; }
@@ -147,9 +151,25 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 /* ═══════════════════════════════════════
    HERO
 ═══════════════════════════════════════ */
-#hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+#hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
   padding: 100px 40px 0; }
-.hero-inner { width: 100%; }
+.hero-inner { position: relative; z-index: 1; width: 100%; }
+/* The clip is baked onto white and blended with multiply, so white reads as
+   no-op and the background grid stays visible through it. Avoids VP9 alpha,
+   which Safari does not support. */
+/* No z-index here on purpose: a positioned element with z-index would open a
+   stacking context and trap the multiply inside it, showing the clip's white
+   box. Depth comes from .hero-inner sitting at z-index 1. */
+.hero-ascii { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hero-ascii video { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+@media (prefers-reduced-motion: reduce) { .hero-ascii video { display: none; } }
+
+/* TEMP — variant picker, remove once the look is chosen */
+.ascii-pick { position: fixed; right: 16px; bottom: 16px; z-index: 200; display: flex; gap: 6px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); padding: 6px; border: 1px solid var(--border); }
+.ascii-pick button { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; cursor: none;
+  background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 5px 9px; }
+.ascii-pick button.on { border-color: var(--green-deep); color: var(--green-deep); }
 /* Reference sets weight 400, line-height 102% and indents the first line by one
    column (25%), so it starts on the second grid rule. */
 .title-h1 { font-family: var(--display); font-weight: 400; text-transform: lowercase;
@@ -356,11 +376,21 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 
 <!-- ═══ HERO ═══ -->
 <section id="hero">
+  <div class="hero-ascii">
+    <video id="asciiVideo" src="ascii-ink.webm" autoplay loop muted playsinline preload="auto"></video>
+  </div>
   <div class="hero-inner">
     <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">motion designer &amp; editor. based in france — <span class="mark">open</span> to impact-driven projects, 2026.</h1>
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
   </div>
 </section>
+
+<!-- TEMP — variant picker, remove once the look is chosen -->
+<div class="ascii-pick" id="asciiPick">
+  <button data-src="ascii-ink.webm" class="on">encre</button>
+  <button data-src="ascii-olive.webm">olive</button>
+  <button data-src="ascii-color.webm">couleur</button>
+</div>
 
 <!-- ═══ WORK ═══ -->
 <section id="work">
@@ -552,6 +582,31 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     document.fonts.load('400 100px "Space Grotesk"').then(resizeText).catch(function () {});
     document.fonts.ready.then(function () { requestAnimationFrame(resizeText); });
   }
+})();
+
+/* The autoplay attribute alone is not reliable even when muted; kick it once the
+   page is up, and again on the first interaction if the policy still refused. */
+(function () {
+  const vid = document.getElementById('asciiVideo');
+  if (!vid) return;
+  const kick = () => { const p = vid.play(); if (p) p.catch(function () {}); };
+  window.addEventListener('load', kick);
+  document.addEventListener('pointerdown', kick, { once: true });
+  kick();
+})();
+
+/* TEMP — variant picker, remove once the look is chosen */
+(function () {
+  const pick = document.getElementById('asciiPick');
+  const vid = document.getElementById('asciiVideo');
+  if (!pick || !vid) return;
+  pick.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    pick.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+    vid.src = btn.dataset.src;
+    vid.play();
+  });
 })();
 
 /* ── NAV SCROLL ── */
