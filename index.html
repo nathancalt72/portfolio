@@ -71,10 +71,8 @@ a { color: inherit; }
    the content and faint enough to read through. */
 #asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
   display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
-/* .45 is the ceiling: body text over a fully inked cell still measures 5.4:1,
-   where .55 would drop it to 4.0 and under the contrast floor. */
 #asciiBg pre { font-family: var(--mono); line-height: 1; white-space: pre; margin: 0;
-  color: var(--fg); opacity: .45; }
+  color: var(--fg); opacity: .6; }
 .bg-grid-12 {
   position: fixed; inset: 0; z-index: 9500; pointer-events: none; display: none;
   grid-template-columns: repeat(12, 1fr); gap: 0;
