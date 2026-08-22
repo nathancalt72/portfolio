@@ -60,13 +60,14 @@ main, nav, footer, #hero { position: relative; z-index: 1; }
 /* ── PAGE TRANSITION CURTAIN ── */
 .page-transition { position: fixed; inset: 0; z-index: 10000; display: flex; pointer-events: none; }
 .tc { flex: 1; }
-.tc-bg { width: 100%; height: 100%; transform-origin: top; background: var(--black); }
+/* Columns wipe away toward their own left edge, staggered left → right */
+.tc-bg { width: 100%; height: 100%; transform-origin: left; background: var(--black); }
 .page-transition.retract .tc-bg { animation: tc-retract .6s cubic-bezier(.65,0,.35,1) forwards; }
 .page-transition.retract .tc:nth-child(1) .tc-bg { animation-delay: 0s; }
 .page-transition.retract .tc:nth-child(2) .tc-bg { animation-delay: .07s; }
 .page-transition.retract .tc:nth-child(3) .tc-bg { animation-delay: .14s; }
 .page-transition.retract .tc:nth-child(4) .tc-bg { animation-delay: .21s; }
-@keyframes tc-retract { to { transform: scaleY(0); } }
+@keyframes tc-retract { to { transform: scaleX(0); } }
 .page-transition.hidden { display: none; }
 
 /* ── CURSOR ── */
