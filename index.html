@@ -42,13 +42,23 @@ a { color: inherit; }
 .lowercase { text-transform: lowercase; }
 
 /* ── SWISS BACKGROUND GRID ── */
+/* Faint horizontal rule texture */
 .bg-grid {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
-    repeating-linear-gradient(90deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent 8.3333%),
     repeating-linear-gradient(0deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent 64px);
-  opacity: .45;
+  opacity: .4;
 }
+/* Five hairlines on the quarters → four equal columns, matching the .tc blinds.
+   Positioned absolutely rather than with space-between, which spreads the gaps
+   between the 1px lines and drifts off the quarter marks. */
+.bg-columns { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-columns span { position: absolute; top: 0; height: 100%; width: 1px; background: var(--border-strong); }
+.bg-columns span:nth-child(1) { left: 0; }
+.bg-columns span:nth-child(2) { left: calc(25% - .5px); }
+.bg-columns span:nth-child(3) { left: calc(50% - .5px); }
+.bg-columns span:nth-child(4) { left: calc(75% - .5px); }
+.bg-columns span:nth-child(5) { right: 0; }
 .bg-grid-12 {
   position: fixed; inset: 0; z-index: 9500; pointer-events: none; display: none;
   grid-template-columns: repeat(12, 1fr); gap: 0;
@@ -293,6 +303,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 <body>
 
 <div class="bg-grid"></div>
+<div class="bg-columns"><span></span><span></span><span></span><span></span><span></span></div>
 <div class="bg-grid-12" id="bgGrid12"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
 <div class="page-transition" id="pageTransition">
