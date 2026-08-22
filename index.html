@@ -162,7 +162,6 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
    box. Depth comes from .hero-inner sitting at z-index 1. */
 .hero-ascii { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .hero-ascii video { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
-@media (prefers-reduced-motion: reduce) { .hero-ascii video { display: none; } }
 
 /* TEMP — variant picker, remove once the look is chosen */
 .ascii-pick { position: fixed; right: 16px; bottom: 16px; z-index: 200; display: flex; gap: 6px;
@@ -584,15 +583,30 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   }
 })();
 
-/* The autoplay attribute alone is not reliable even when muted; kick it once the
-   page is up, and again on the first interaction if the policy still refused. */
+/* Reduced motion holds the clip on a still rather than hiding it — the artwork
+   is part of the layout, only the movement is the accessibility concern.
+   Otherwise kick playback: the autoplay attribute alone is not reliable. */
 (function () {
   const vid = document.getElementById('asciiVideo');
   if (!vid) return;
+  const still = () => { vid.pause(); try { vid.currentTime = 1.6; } catch (e) {} };
   const kick = () => { const p = vid.play(); if (p) p.catch(function () {}); };
-  window.addEventListener('load', kick);
-  document.addEventListener('pointerdown', kick, { once: true });
-  kick();
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function apply() {
+    if (reduced.matches) {
+      vid.removeAttribute('loop');
+      if (vid.readyState >= 1) still();
+      else vid.addEventListener('loadedmetadata', still, { once: true });
+    } else {
+      vid.setAttribute('loop', '');
+      kick();
+    }
+  }
+  window.addEventListener('load', apply);
+  document.addEventListener('pointerdown', apply, { once: true });
+  reduced.addEventListener('change', apply);
+  apply();
 })();
 
 /* TEMP — variant picker, remove once the look is chosen */
