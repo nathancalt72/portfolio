@@ -11,33 +11,22 @@
    TOKENS
 ═══════════════════════════════════════ */
 :root {
-  --bg:        #12110b;
-  --bg-alt:    #0c0b06;
-  --panel:     #17150e;
-  --fg:        #f4f1e6;
-  --fg-muted:  #948d70;
-  --gold:      #c1b641;
-  --olive:     #81761a;
-  --red:       #ee2311;
-  --ink-on-olive: #0b0a04;
-  --border:    #262316;
-  --border-strong: #35311d;
-  --display: 'Archivo', sans-serif;
-  --mono:    'IBM Plex Mono', monospace;
-  --sans:    'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-body.light {
   --bg:        #f2ede0;
   --bg-alt:    #e9e2ce;
   --panel:     #ece5d3;
   --fg:        #171509;
   --fg-muted:  #6d6650;
+  /* --gold is text-safe on cream; --gold-fill is the raw moodboard yellow, blocks only */
   --gold:      #5f560f;
-  --olive:     #6c621a;
-  --red:       #c81c0e;
+  --gold-fill: #c1b641;
+  --olive:     #81761a;
+  --red:       #d81f0f;
   --ink-on-olive: #f4f1e6;
   --border:    #ddd3b5;
   --border-strong: #c9bd97;
+  --display: 'Archivo', sans-serif;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -45,13 +34,8 @@ body {
   background: var(--bg); color: var(--fg);
   font-family: var(--sans); font-weight: 300;
   cursor: none; overflow-x: hidden; position: relative;
-  transition: background-color .8s ease, color .8s ease;
 }
 body.no-scroll-transition { overflow: hidden; height: 100vh; }
-body.theme-transitioning *, body.theme-transitioning *::before, body.theme-transitioning *::after {
-  transition: color .8s ease, background-color .8s ease, border-color .8s ease,
-              box-shadow .8s ease, fill .8s ease, opacity .8s ease !important;
-}
 ::selection { background: var(--olive); color: var(--ink-on-olive); }
 a { color: inherit; }
 .lowercase { text-transform: lowercase; }
@@ -78,7 +62,7 @@ main, nav, footer, #hero { position: relative; z-index: 1; }
 .tc-bg { width: 100%; height: 100%; transform-origin: top; }
 .tc:nth-child(1) .tc-bg { background: var(--bg); }
 .tc:nth-child(2) .tc-bg { background: var(--olive); }
-.tc:nth-child(3) .tc-bg { background: var(--gold); }
+.tc:nth-child(3) .tc-bg { background: var(--gold-fill); }
 .tc:nth-child(4) .tc-bg { background: var(--red); }
 .page-transition.retract .tc-bg { animation: tc-retract .6s cubic-bezier(.65,0,.35,1) forwards; }
 .page-transition.retract .tc:nth-child(1) .tc-bg { animation-delay: 0s; }
@@ -142,10 +126,6 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .lang-btn.active { color: var(--gold); border-bottom: 1px solid var(--gold); }
 .lang-btn:hover:not(.active) { color: var(--fg); }
 .lang-sep { font-family: var(--mono); font-size: 9px; color: var(--border-strong); }
-.theme-toggle { background: none; border: 1px solid var(--border); cursor: none; color: var(--fg-muted);
-  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: border-color .2s, color .2s; }
-.theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
-body.light .icon-moon { display: none; } body:not(.light) .icon-sun { display: none; }
 .nav-hamburger { display: none; }
 .mobile-menu { display: none; }
 
@@ -352,10 +332,6 @@ body.light .icon-moon { display: none; } body:not(.light) .icon-sun { display: n
       <button class="lang-btn" data-lang="en">EN</button>
     </div>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span></button>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
-      <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
   </div>
 </nav>
 
@@ -549,17 +525,6 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   window.addEventListener('resize', resizeText);
   applyLangHooks.push(resizeText);
 })();
-
-/* ── THEME TOGGLE ── */
-const themeToggle = document.getElementById('themeToggle');
-if ((localStorage.getItem('theme') || 'dark') === 'light') document.body.classList.add('light');
-themeToggle.addEventListener('click', () => {
-  const goLight = !document.body.classList.contains('light');
-  document.body.classList.add('theme-transitioning');
-  document.body.classList.toggle('light');
-  localStorage.setItem('theme', goLight ? 'light' : 'dark');
-  setTimeout(() => document.body.classList.remove('theme-transitioning'), 1100);
-});
 
 /* ── NAV SCROLL ── */
 const navEl2 = document.getElementById('nav');
