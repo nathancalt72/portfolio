@@ -42,12 +42,13 @@ a { color: inherit; }
 .lowercase { text-transform: lowercase; }
 
 /* ── SWISS BACKGROUND GRID ── */
-/* Faint horizontal rule texture */
+/* Fine 10px pixel grid — barely-there texture, far lighter than the columns */
 .bg-grid {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
-    repeating-linear-gradient(0deg, var(--border) 0, var(--border) 1px, transparent 1px, transparent 64px);
-  opacity: .4;
+    repeating-linear-gradient(90deg, var(--fg) 0, var(--fg) 1px, transparent 1px, transparent 10px),
+    repeating-linear-gradient(0deg,  var(--fg) 0, var(--fg) 1px, transparent 1px, transparent 10px);
+  opacity: .045;
 }
 /* Five hairlines on the quarters → four equal columns, matching the .tc blinds.
    Positioned absolutely rather than with space-between, which spreads the gaps
