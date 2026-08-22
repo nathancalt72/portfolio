@@ -581,18 +581,25 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 
   // Trailing spaces are stripped to save bytes, so the text box is narrower than
   // the real grid and flexbox centres the wrong thing.
-  // Centre on the centroid of the ink rather than its bounding box: stray glyphs
-  // out on the edges drag the box away from where the mass actually reads.
+  // The two axes need different anchors, because the artwork is lopsided in
+  // opposite ways. Horizontally, stray glyphs off to the left stretch the
+  // bounding box past where the mass reads, so use the centroid. Vertically the
+  // foliage is dense up top and the stems trail off thin below, which pulls the
+  // centroid high — there, the bounding box is what leaves even margins.
   function measureInk() {
-    let n = 0, sumC = 0, sumR = 0;
+    let n = 0, sumC = 0, minR = Infinity, maxR = -1;
     frames.forEach(f => f.split('\n').forEach((l, r) => {
       for (let c = 0; c < l.length; c++) {
-        if (l[c] !== ' ') { n++; sumC += c; sumR += r; }
+        if (l[c] !== ' ') {
+          n++; sumC += c;
+          if (r < minR) minR = r;
+          if (r > maxR) maxR = r;
+        }
       }
     }));
     if (!n) return;
     shiftX = sumC / n - cols / 2;
-    shiftY = sumR / n - rows / 2;
+    shiftY = (minR + maxR + 1) / 2 - rows / 2;
   }
 
   function fit() {
