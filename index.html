@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>nathan charlot — portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,700;0,800;0,900;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
    TOKENS
@@ -25,12 +25,14 @@
   --ink-on-olive: #f4f1e6;
   --border:    #ddd3b5;
   --border-strong: #c9bd97;
-  --display: 'Archivo', sans-serif;
+  --display: 'Space Grotesk', 'Archivo', sans-serif;
   --mono:    'IBM Plex Mono', monospace;
   --sans:    'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Reserve the scrollbar gutter so locking the scroll during the loading curtain
+   does not widen the page and leave the auto-fitted headline mis-sized. */
+html { scroll-behavior: smooth; scrollbar-gutter: stable; }
 body {
   background: var(--bg); color: var(--fg);
   font-family: var(--sans); font-weight: 300;
@@ -144,8 +146,11 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 #hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
   padding: 100px 40px 0; }
 .hero-inner { width: 100%; }
-.title-h1 { font-family: var(--display); font-weight: 800; text-transform: lowercase;
-  letter-spacing: -.02em; line-height: .98; font-size: 44px; }
+/* Reference sets weight 400, line-height 102% and indents the first line by one
+   column (25%), so it starts on the second grid rule. */
+.title-h1 { font-family: var(--display); font-weight: 400; text-transform: lowercase;
+  letter-spacing: -.015em; line-height: 1.02; font-size: 44px;
+  text-indent: 25%; min-width: 100%; }
 .title-h1 .mark { color: var(--red); }
 .scroll-down-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
   color: var(--fg-muted); margin-top: 40px; }
@@ -205,7 +210,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 ═══════════════════════════════════════ */
 #approach { border-top: 1px solid var(--border); padding: 90px 40px; display: grid;
   grid-template-columns: .9fr 1.1fr; gap: 70px; }
-.approach-lead { font-family: var(--display); font-weight: 800; text-transform: lowercase;
+.approach-lead { font-family: var(--display); font-weight: 700; text-transform: lowercase;
   font-size: clamp(30px, 3.6vw, 50px); line-height: 1.04; letter-spacing: -.01em; }
 .approach-lead .mark { color: var(--gold); }
 .approach-body p { font-size: 16px; line-height: 1.95; font-weight: 300; color: var(--fg); max-width: 56ch; }
@@ -229,7 +234,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .cap-card:hover::before { opacity: 1; }
 .cap-card > * { position: relative; z-index: 1; }
 .cap-num { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); }
-.cap-title { font-family: var(--display); font-weight: 800; text-transform: lowercase; font-size: 27px;
+.cap-title { font-family: var(--display); font-weight: 700; text-transform: lowercase; font-size: 27px;
   margin-top: 18px; letter-spacing: -.01em; transition: color .3s; }
 .cap-card:hover .cap-title { color: var(--gold); }
 .cap-desc { font-size: 13px; color: var(--fg-muted); line-height: 1.75; margin-top: 12px; max-width: 30ch; }
@@ -244,7 +249,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 ═══════════════════════════════════════ */
 #contact { border-top: 1px solid var(--border); padding: 100px 40px 60px; display: flex;
   flex-direction: column; justify-content: space-between; min-height: 50vh; }
-.contact-big { font-family: var(--display); font-weight: 800; text-transform: lowercase;
+.contact-big { font-family: var(--display); font-weight: 700; text-transform: lowercase;
   font-size: clamp(40px, 6.6vw, 96px); letter-spacing: -.02em; line-height: .96; }
 .contact-big .mark { color: var(--red); }
 .contact-email { font-family: var(--mono); font-size: 13px; color: var(--gold); letter-spacing: .04em;
@@ -286,7 +291,7 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
     background: color-mix(in srgb, var(--bg) 97%, transparent); z-index: 99;
     flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
   .mobile-menu.open { display: flex; }
-  .mobile-menu a { font-family: var(--display); font-weight: 800; text-transform: lowercase; font-size: 22px; color: var(--fg); text-decoration: none; }
+  .mobile-menu a { font-family: var(--display); font-weight: 700; text-transform: lowercase; font-size: 22px; color: var(--fg); text-decoration: none; }
   nav { height: 56px; padding: 0 18px; }
   .nav-short { display: inline; } .nav-long { display: none; }
   .lang-switcher { margin-left: auto; margin-right: 14px; }
@@ -435,6 +440,8 @@ window.addEventListener('keydown', e => {
       setTimeout(function () {
         pt.classList.add('hidden');
         document.body.classList.remove('no-scroll-transition');
+        // Unlocking the scroll can change the available width; re-fit the headline.
+        window.dispatchEvent(new Event('resize'));
       }, 650);
     }, 250);
   });
@@ -523,7 +530,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     const container = h1.parentElement;
     const containerWidth = container.offsetWidth;
     const isMobile = window.innerWidth < 768;
-    const targetHeight = window.innerHeight * (isMobile ? .5 : .56);
+    const targetHeight = window.innerHeight * (isMobile ? .37 : .44);
     let size = 20;
     h1.style.fontSize = size + 'px';
     while (h1.scrollHeight < targetHeight && h1.scrollWidth <= containerWidth + 1 && size < 260) {
@@ -534,6 +541,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   window.addEventListener('load', resizeText);
   window.addEventListener('resize', resizeText);
   applyLangHooks.push(resizeText);
+  // Fit against real metrics: on `load` the webfont may still be swapping, which
+  // sizes the headline off the fallback and can cost it a whole line. `ready`
+  // alone can resolve before the face is applied, so await the face itself too.
+  if (document.fonts) {
+    document.fonts.load('400 100px "Space Grotesk"').then(resizeText).catch(function () {});
+    document.fonts.ready.then(function () { requestAnimationFrame(resizeText); });
+  }
 })();
 
 /* ── NAV SCROLL ── */
