@@ -70,7 +70,7 @@ a { color: inherit; }
    video is needed — the glyphs simply sit on the page colour. Held well below
    the content and faint enough to read through. */
 #asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
 /* .45 is the ceiling: body text over a fully inked cell still measures 5.4:1,
    where .55 would drop it to 4.0 and under the contrast floor. */
 #asciiBg pre { font-family: var(--mono); line-height: 1; white-space: pre; margin: 0;
@@ -577,29 +577,23 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   if (!pre || !box) return;
   const FPS = 15;
   let frames = [], cols = 0, rows = 0, i = 0, timer = null;
-  let shiftX = 0, shiftY = 0;
+  let shiftX = 0;
 
   // Trailing spaces are stripped to save bytes, so the text box is narrower than
-  // the real grid and flexbox centres the wrong thing.
-  // The two axes need different anchors, because the artwork is lopsided in
-  // opposite ways. Horizontally, stray glyphs off to the left stretch the
-  // bounding box past where the mass reads, so use the centroid. Vertically the
-  // foliage is dense up top and the stems trail off thin below, which pulls the
-  // centroid high — there, the bounding box is what leaves even margins.
+  // the real grid and flexbox centres the wrong thing. Centre on the centroid of
+  // the ink rather than its bounding box: stray glyphs off to the left stretch
+  // the box past where the mass actually reads.
+  // Vertically there is nothing to correct — the ink runs to the last row, and
+  // the container aligns to flex-end, so the artwork already sits on the bottom.
   function measureInk() {
-    let n = 0, sumC = 0, minR = Infinity, maxR = -1;
-    frames.forEach(f => f.split('\n').forEach((l, r) => {
+    let n = 0, sumC = 0;
+    frames.forEach(f => f.split('\n').forEach(l => {
       for (let c = 0; c < l.length; c++) {
-        if (l[c] !== ' ') {
-          n++; sumC += c;
-          if (r < minR) minR = r;
-          if (r > maxR) maxR = r;
-        }
+        if (l[c] !== ' ') { n++; sumC += c; }
       }
     }));
     if (!n) return;
     shiftX = sumC / n - cols / 2;
-    shiftY = (minR + maxR + 1) / 2 - rows / 2;
   }
 
   function fit() {
@@ -607,7 +601,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // Monospace advance is ~0.6em; size to fill on whichever axis binds first.
     const size = Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows);
     pre.style.fontSize = size + 'px';
-    pre.style.transform = 'translate(' + (-shiftX * size * 0.6) + 'px,' + (-shiftY * size) + 'px)';
+    pre.style.transform = 'translateX(' + (-shiftX * size * 0.6) + 'px)';
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   function run() {
