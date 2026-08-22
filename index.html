@@ -577,11 +577,34 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   if (!pre || !box) return;
   const FPS = 15;
   let frames = [], cols = 0, rows = 0, i = 0, timer = null;
+  let shiftX = 0, shiftY = 0;
+
+  // Trailing spaces are stripped to save bytes, so the text box is narrower than
+  // the real grid and flexbox centres the wrong thing. Measure where the ink
+  // actually sits and offset by the difference.
+  function measureInk() {
+    let minC = Infinity, maxC = -1, minR = Infinity, maxR = -1;
+    frames.forEach(f => f.split('\n').forEach((l, r) => {
+      for (let c = 0; c < l.length; c++) {
+        if (l[c] !== ' ') {
+          if (c < minC) minC = c;
+          if (c > maxC) maxC = c;
+          if (r < minR) minR = r;
+          if (r > maxR) maxR = r;
+        }
+      }
+    }));
+    if (maxC < 0) return;
+    shiftX = (minC + maxC) / 2 - cols / 2;
+    shiftY = (minR + maxR) / 2 - rows / 2;
+  }
 
   function fit() {
     if (!cols) return;
     // Monospace advance is ~0.6em; size to fill on whichever axis binds first.
-    pre.style.fontSize = Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows) + 'px';
+    const size = Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows);
+    pre.style.fontSize = size + 'px';
+    pre.style.transform = 'translate(' + (-shiftX * size * 0.6) + 'px,' + (-shiftY * size) + 'px)';
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   function run() {
@@ -598,6 +621,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       rows = lines.length;
       // Trailing spaces are stripped to save bytes, so lines vary — take the widest.
       cols = lines.reduce((m, l) => Math.max(m, l.length), 0);
+      measureInk();
       pre.textContent = frames[0];
       fit();
       run();
