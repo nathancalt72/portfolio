@@ -163,12 +163,6 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
 .hero-ascii { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .hero-ascii video { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
-/* TEMP — variant picker, remove once the look is chosen */
-.ascii-pick { position: fixed; right: 16px; bottom: 16px; z-index: 200; display: flex; gap: 6px;
-  background: color-mix(in srgb, var(--bg) 92%, transparent); padding: 6px; border: 1px solid var(--border); }
-.ascii-pick button { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; cursor: none;
-  background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 5px 9px; }
-.ascii-pick button.on { border-color: var(--green-deep); color: var(--green-deep); }
 /* Reference sets weight 400, line-height 102% and indents the first line by one
    column (25%), so it starts on the second grid rule. */
 .title-h1 { font-family: var(--display); font-weight: 400; text-transform: lowercase;
@@ -383,13 +377,6 @@ nav.scrolled { background: color-mix(in srgb, var(--bg) 88%, transparent); backd
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
   </div>
 </section>
-
-<!-- TEMP — variant picker, remove once the look is chosen -->
-<div class="ascii-pick" id="asciiPick">
-  <button data-src="ascii-ink.webm" class="on">encre</button>
-  <button data-src="ascii-olive.webm">olive</button>
-  <button data-src="ascii-color.webm">couleur</button>
-</div>
 
 <!-- ═══ WORK ═══ -->
 <section id="work">
@@ -607,20 +594,6 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   document.addEventListener('pointerdown', apply, { once: true });
   reduced.addEventListener('change', apply);
   apply();
-})();
-
-/* TEMP — variant picker, remove once the look is chosen */
-(function () {
-  const pick = document.getElementById('asciiPick');
-  const vid = document.getElementById('asciiVideo');
-  if (!pick || !vid) return;
-  pick.addEventListener('click', e => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    pick.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
-    vid.src = btn.dataset.src;
-    vid.play();
-  });
 })();
 
 /* ── NAV SCROLL ── */
