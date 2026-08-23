@@ -172,34 +172,42 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    WORK — ACCORDION
 ═══════════════════════════════════════ */
-#work { padding: 90px 40px 40px; }
+/* --pad is what the project rows cancel out to reach the viewport edges */
+#work { --pad: 40px; padding: 90px var(--pad) 40px; }
 .work-tag_wrapper { margin-bottom: 30px; }
 .cat-group + .cat-group { margin-top: 54px; }
 .cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
 .cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em;
   text-transform: lowercase; color: var(--green-deep); }
 .cat-count { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-.project {
-  border-top: 1px solid var(--border);
-}
+/* Rows break out of the section padding so their four columns line up with the
+   background rules at the viewport quarters, as on the reference layout. */
+.project { border-top: 1px solid var(--border); margin: 0 calc(-1 * var(--pad)); }
 .cat-group .project:last-child { border-bottom: 1px solid var(--border); }
-.project-header {
-  display: grid; grid-template-columns: auto 1fr auto auto 30px; align-items: center; gap: 24px;
-  padding: 26px 0; cursor: none;
+.project-header, .project-content {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
 }
-.project-num { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-.project-name { font-family: var(--display); font-weight: 700; font-size: clamp(22px, 3.2vw, 38px);
-  text-transform: lowercase; letter-spacing: -.01em; transition: color .3s; }
-.project-header:hover .project-name { color: var(--gold); }
-.project-tags { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .06em; }
-.project-year { font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
-.project-plus { width: 22px; height: 22px; position: relative; }
-.project-plus::before, .project-plus::after { content: ''; position: absolute; background: var(--fg-muted);
-  top: 50%; left: 50%; transition: transform .35s ease, background .3s; }
-.project-plus::before { width: 14px; height: 1px; transform: translate(-50%,-50%); }
-.project-plus::after { width: 1px; height: 14px; transform: translate(-50%,-50%); }
-.project.is-open .project-plus::after { transform: translate(-50%,-50%) rotate(90deg); }
-.project.is-open .project-plus::before, .project.is-open .project-plus::after { background: var(--green-deep); }
+.project-header { align-items: baseline; padding: 14px 0; cursor: none; }
+.pcol { padding-left: 12px; padding-right: 18px; min-width: 0; }
+.pcol-4 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.project-num { font-family: var(--mono); font-size: 10px; color: var(--fg-muted);
+  letter-spacing: .1em; margin-right: 10px; }
+.project-name { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .02em;
+  text-transform: lowercase; transition: color .3s; }
+.project-header:hover .project-name { color: var(--green-deep); }
+.project-tags { font-family: var(--mono); font-size: 13px; color: var(--fg); letter-spacing: .02em;
+  text-transform: lowercase; }
+.project-year { font-family: var(--mono); font-size: 13px; color: var(--fg); letter-spacing: .02em; }
+/* Open rows invert, the way the reference marks the active project */
+.project.is-open .project-header { background: var(--fg); }
+.project.is-open .project-name,
+.project.is-open .project-tags,
+.project.is-open .project-year { color: var(--bg); }
+.project.is-open .project-num { color: var(--border-strong); }
+.project-plus { font-family: var(--mono); font-size: 14px; line-height: 1; color: var(--fg-muted);
+  transition: transform .35s ease, color .3s; }
+.project-plus::before { content: '+'; }
+.project.is-open .project-plus { color: var(--bg); transform: rotate(45deg); }
 
 /* Opening runs on one eased curve, and the contents slide up behind it in
    sequence — text first, then the deliverables, then the visuals. */
@@ -207,38 +215,27 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   transition: grid-template-rows .75s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content_wrapper { grid-template-rows: 1fr; }
 .project-content_inner { overflow: hidden; }
-.project-content, .sub-works {
+.project-content {
   opacity: 0; transform: translateY(22px);
   transition: opacity .55s ease, transform .65s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content { opacity: 1; transform: none; transition-delay: .1s; }
-.project.is-open .sub-works { opacity: 1; transform: none; transition-delay: .18s; }
-.project-content { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 30px; padding: 4px 0 34px; border-top: 1px solid var(--border); margin-top: -1px; padding-top: 30px; }
-.project-desc { font-size: 15px; line-height: 1.85; font-weight: 300; max-width: 56ch; min-height: 1.85em; }
-.project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 11px; line-height: 2; color: var(--fg-muted); }
+.project-content { padding: 18px 0 26px; }
+.project-desc { font-size: 14px; line-height: 1.75; font-weight: 300; min-height: 1.75em; }
+.project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 13px; line-height: 1.9;
+  color: var(--fg); letter-spacing: .01em; }
 .project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; }
 .project-meta-value a:hover { border-color: var(--gold); }
 
-/* Deliverables inside a grouped project (an apprenticeship covering several jobs) */
-.sub-works { list-style: none; counter-reset: sw; margin: 0 0 34px; padding: 0;
-  border-top: 1px solid var(--border); }
-.sub-work { counter-increment: sw; display: grid; grid-template-columns: 28px 190px 1fr;
-  gap: 20px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--border); }
-.sub-work::before { content: counter(sw, decimal-leading-zero);
-  font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-.sub-work-name { font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
-  text-transform: lowercase; color: var(--green-deep); }
-.sub-work-desc { font-size: 14px; line-height: 1.8; font-weight: 300; color: var(--fg); max-width: 62ch; }
-
-.project-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border);
-  padding-bottom: 40px; }
-/* --d staggers each visual, so the grid glides in rather than snapping as a block */
-.grid-item { position: relative; background: var(--bg); overflow: hidden; cursor: none;
+/* Visuals run as one horizontal band at a common height, scrolled sideways */
+.project-grid { display: flex; gap: 1px; background: var(--border);
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+/* --d staggers each visual, so the band glides in rather than snapping as a block */
+.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
   opacity: 0; transform: translateY(38px);
   transition: opacity .7s ease var(--d, 0ms),
               transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms); }
 .grid-item.in { opacity: 1; transform: translateY(0); }
-.grid-item.is-active { grid-column: span 2; }
-.thumb { position: relative; width: 100%; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
+.thumb { position: relative; height: 340px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
 .thumb.landscape { aspect-ratio: 4/3; }
 .thumb.portrait { aspect-ratio: 3/4; }
 .thumb.square { aspect-ratio: 1/1; }
@@ -273,6 +270,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   padding: 0 28px 48px; align-items: start; }
 .lb-cover { position: sticky; top: 88px; }
 .lb-rest { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+/* A deliverable with no pages yet is just its write-up */
+.lb.text-only .lb-body { display: none; }
+.lb.text-only .lb-desc { font-size: 15px; }
 .sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
   overflow: hidden; transition: border-color .25s; }
 .sheet:hover { border-color: var(--green-deep); }
@@ -376,17 +376,19 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  nav, #hero, #work, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
+  nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
+  #work { --pad: 22px; padding: 70px var(--pad) 34px; }
   #approach { grid-template-columns: 1fr; gap: 36px; }
   .cap-grid { grid-template-columns: 1fr; }
   .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
-  .project-header { grid-template-columns: auto 1fr auto 26px; gap: 14px; }
-  .project-tags { display: none; }
-  .project-content { grid-template-columns: 1fr; gap: 22px; }
-  .sub-work { grid-template-columns: 24px 1fr; gap: 6px 14px; }
-  .sub-work-desc { grid-column: 2; }
-  .project-grid { grid-template-columns: repeat(2, 1fr); }
-  .grid-item.is-active { grid-column: span 2; }
+  /* Four columns are too tight to read here: name and year on one line, the
+     rest of the metadata stacked underneath. */
+  .project-header { grid-template-columns: 1fr auto; }
+  .project-header .pcol:nth-child(2), .project-header .pcol:nth-child(3) { display: none; }
+  .project-content { grid-template-columns: 1fr 1fr; }
+  .project-content .pcol:nth-child(2) { display: none; }
+  .project-content .pcol:first-child { grid-column: 1 / -1; padding-bottom: 18px; }
+  .thumb { height: 260px; }
   .contact-footer { flex-direction: column; align-items: flex-start; gap: 16px; }
   .nav-links { display: none; }
 }
@@ -406,8 +408,8 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .lang-switcher { margin-left: auto; margin-right: 14px; }
   #hero { padding: 88px 18px 0; }
   .title-h1 { font-size: 32px; }
-  #work { padding: 60px 18px 30px; }
-  .project-grid { grid-template-columns: repeat(2, 1fr); }
+  #work { --pad: 18px; padding: 60px var(--pad) 30px; }
+  .thumb { height: 220px; }
   #approach { padding: 60px 18px; }
   .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
@@ -776,31 +778,29 @@ const projectGroups = [
      desc:{fr:"Alternance à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication — de la charte graphique à la signalétique du site, en passant par le web et les réseaux sociaux. Le périmètre couvrait aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
            en:"Apprenticeship at Carrosserie Industrielle Toutain, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
      client:'Carrosserie Toutain · HLSolutions', site:'https://sastoutain.com/', credits:'Nathan Charlot',
-     works:[
-       {name:{fr:'Charte graphique', en:'Brand guidelines'},
-        desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Construction du système visuel complet autour de cet existant.",
-              en:"The logo and brand name had been settled for years, with no guidelines holding them together. Built the full visual system around what already existed."}},
-       {name:{fr:'Signalétique', en:'Signage'},
-        desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie : plan de circulation, photographies, mockups.",
-              en:"Floor markings, panels and plans for the site itself: circulation plan, photography, mockups."}},
-       {name:{fr:'Site internet', en:'Website'},
-        desc:{fr:"Site internet de la carrosserie.", en:"The company website."}},
-       {name:{fr:'Social media', en:'Social media'},
-        desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
-              en:"Editorial content for the brand's social channels."}},
-       {name:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
-        desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie.",
-              en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business."}},
-     ],
+     // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
        {ratio:'landscape', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
-        gallery:{
-          title:{fr:'Charte graphique — Carrosserie Toutain', en:'Brand guidelines — Carrosserie Toutain'},
-          desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Ce document pose le système complet : logotypes et déclinaisons, règles d'usage, typographie, palette, iconographie et formes récurrentes, puis les applications sur supports réels.",
-                en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
-          images:['01','02','03','04','05','06','07','08','09','10','11','12','13'].map(n => 'projects/cit-charte/' + n + '.jpg')
-        }},
-       'square','portrait','landscape','square','portrait','portrait','landscape']},
+        title:{fr:'Charte graphique', en:'Brand guidelines'},
+        desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Ce document pose le système complet : logotypes et déclinaisons, règles d'usage, typographie, palette, iconographie et formes récurrentes, puis les applications sur supports réels.",
+              en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
+        images:['01','02','03','04','05','06','07','08','09','10','11','12','13'].map(n => 'projects/cit-charte/' + n + '.jpg')},
+       {ratio:'landscape', label:'signalétique',
+        title:{fr:'Signalétique', en:'Signage'},
+        desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie : plan de circulation, photographies, mockups.",
+              en:"Floor markings, panels and plans for the site itself: circulation plan, photography, mockups."}},
+       {ratio:'landscape', label:'site internet',
+        title:{fr:'Site internet', en:'Website'},
+        desc:{fr:"Site internet de la carrosserie.", en:"The company website."}},
+       {ratio:'square', label:'social media',
+        title:{fr:'Social media', en:'Social media'},
+        desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
+              en:"Editorial content for the brand's social channels."}},
+       {ratio:'portrait', label:'flyers hlsolutions',
+        title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
+        desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie.",
+              en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business."}},
+     ]},
 
     {title:{fr:'Ma Nouvelle Assurance', en:'Ma Nouvelle Assurance'},
      tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'—',
@@ -842,15 +842,16 @@ projectList.innerHTML = projectGroups.map(group => {
   const rows = group.items.map((p, n) => {
     const num = String(n + 1).padStart(2, '0');
     const idx = projectIndex++;
-    // A thumb is either a bare ratio string (placeholder) or an object with a real
-    // image, optionally carrying a gallery of slides to open in the viewer.
+    // A thumb is either a bare ratio string (placeholder) or a deliverable: a
+    // label, a write-up, and optionally the pages behind it. Anything carrying a
+    // write-up opens the viewer; the rest keep the in-place expand.
     const grid = p.thumbs.map((t, gi) => {
       const o = typeof t === 'string' ? { ratio: t } : t;
-      const gal = o.gallery ? galleries.push(o.gallery) - 1 : -1;
+      const gal = o.desc ? galleries.push(o) - 1 : -1;
       const inner = o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
         : `<div class="thumb-label">[ img ]</div>`;
-      const count = gal > -1 ? ` data-count="${o.gallery.images.length} slides"` : '';
+      const count = o.images ? ` data-count="${o.images.length} pages"` : '';
       return `
       <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${count}>${inner}</div>
@@ -860,26 +861,22 @@ projectList.innerHTML = projectGroups.map(group => {
     return `
     <div class="project" data-index="${idx}">
       <div class="project-header">
-        <span class="project-num">${num}</span>
-        <span class="project-name" data-fr="${esc(p.title.fr)}" data-en="${esc(p.title.en)}">${p.title.en}</span>
-        <span class="project-tags" data-fr="${esc(p.tags.fr)}" data-en="${esc(p.tags.en)}">${p.tags.en}</span>
-        <span class="project-year">${p.year}</span>
-        <span class="project-plus"></span>
+        <span class="pcol">
+          <span class="project-num">${num}</span>
+          <span class="project-name" data-fr="${esc(p.title.fr)}" data-en="${esc(p.title.en)}">${p.title.en}</span>
+        </span>
+        <span class="pcol"></span>
+        <span class="pcol"><span class="project-tags" data-fr="${esc(p.tags.fr)}" data-en="${esc(p.tags.en)}">${p.tags.en}</span></span>
+        <span class="pcol pcol-4"><span class="project-year">${p.year}</span><span class="project-plus"></span></span>
       </div>
       <div class="project-content_wrapper">
         <div class="project-content_inner">
           <div class="project-content">
-            <p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}"></p>
-            <div>
-              <div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div>
-            </div>
-            <div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div>
+            <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}"></p></div>
+            <div class="pcol"></div>
+            <div class="pcol"><div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div></div>
+            <div class="pcol"><div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
           </div>
-          ${p.works ? `<ol class="sub-works">${p.works.map(w => `
-            <li class="sub-work">
-              <span class="sub-work-name" data-fr="${esc(w.name.fr)}" data-en="${esc(w.name.en)}">${w.name.en}</span>
-              <span class="sub-work-desc" data-fr="${esc(w.desc.fr)}" data-en="${esc(w.desc.en)}">${w.desc.en}</span>
-            </li>`).join('')}</ol>` : ''}
           <div class="project-grid">${grid}</div>
         </div>
       </div>
@@ -972,15 +969,17 @@ function lbOpen(g) {
   lbGallery = g;
   lbTitle.textContent = g.title[currentLang] || g.title.en;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
-  lbCounter.textContent = String(g.images.length).padStart(2, '0') + ' ' + (currentLang === 'fr' ? 'pages' : 'pages');
+  const imgs = g.images || [];
+  lbCounter.textContent = imgs.length ? String(imgs.length).padStart(2, '0') + ' pages' : '';
   const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
       <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
       <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
     </div>`;
   // The cover is eager; the rest load lazily as the right column is scrolled.
-  lbCover.innerHTML = sheet(g.images[0], 0);
-  lbRest.innerHTML = g.images.slice(1).map((src, i) => sheet(src, i + 1)).join('');
+  lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
+  lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
+  lb.classList.toggle('text-only', !imgs.length);
   lb.classList.add('open');
   lb.scrollTop = 0;
   document.body.style.overflow = 'hidden';
@@ -992,7 +991,7 @@ function lbClose() {
   lbGallery = null;
 }
 function zoomShow(i) {
-  if (!lbGallery) return;
+  if (!lbGallery || !lbGallery.images) return;
   lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
   lbImg.src = lbGallery.images[lbAt];
   lbZoomCounter.textContent = String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
