@@ -238,26 +238,26 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; }
 .project-meta-value a:hover { border-color: var(--gold); }
 
-/* Visuals run as one horizontal band at a common height, scrolled sideways */
-.project-grid { display: flex; gap: 1px; background: var(--border);
-  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+/* Visuals sit at a common height and keep their own ratio; anything that will
+   not fit alongside wraps to the next line rather than opening a sideways
+   scroll. */
+.project-grid { display: flex; flex-wrap: wrap; gap: 1px; background: var(--border);
+  align-items: flex-start; }
 /* --d staggers each visual, so the band glides in rather than snapping as a block */
 .grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
   opacity: 0; transform: translateY(38px);
   transition: opacity .7s ease var(--d, 0ms),
               transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms); }
 .grid-item.in { opacity: 1; transform: translateY(0); }
-.thumb { position: relative; height: 340px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
+.thumb { position: relative; height: 238px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
 .thumb.landscape { aspect-ratio: 4/3; }
 .thumb.portrait { aspect-ratio: 3/4; }
 .thumb.square { aspect-ratio: 1/1; }
 .thumb-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: var(--mono); font-size: 9px; color: var(--fg-muted); opacity: .5; }
-.thumb img, .thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Height drives the zoom: the aspect ratio widens the tile to match, so the band
-   reflows around the film instead of a panel opening over the page. */
-.thumb { transition: height .6s cubic-bezier(.22,1,.36,1); }
-.grid-item.is-film.is-open .thumb { height: 560px; }
+/* contain, never cover: a visual is shown whole. Tiles carry the media's own
+   ratio so there is nothing to letterbox. */
+.thumb img, .thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .grid-item.is-film .thumb-sound { position: absolute; left: 8px; bottom: 8px; z-index: 2;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: lowercase;
   color: var(--bg); background: var(--green-deep); padding: 3px 7px; transition: opacity .3s; }
@@ -430,10 +430,7 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   .project-content { grid-template-columns: 1fr 1fr; }
   .project-content .pcol:nth-child(2) { display: none; }
   .project-content .pcol:first-child { grid-column: 1 / -1; padding-bottom: 18px; }
-  .thumb { height: 260px; }
-  /* Cap the zoom by height: the ratio turns height into width, and a tile wider
-     than the screen helps nobody. */
-  .grid-item.is-film.is-open .thumb { height: 420px; }
+  .thumb { height: 182px; }
   .contact-footer { flex-direction: column; align-items: flex-start; gap: 16px; }
   .nav-links { display: none; }
 }
@@ -454,8 +451,7 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   #hero { padding: 88px 18px 0; }
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 30px; }
-  .thumb { height: 220px; }
-  .grid-item.is-film.is-open .thumb { height: 280px; }
+  .thumb { height: 154px; }
   #approach { padding: 60px 18px; }
   .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
@@ -826,7 +822,7 @@ const projectGroups = [
      client:'Carrosserie Toutain · HLSolutions', site:'https://sastoutain.com/', credits:'Nathan Charlot',
      // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
-       {ratio:'landscape', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
+       {ratio:'landscape', ar:'2400/1697', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
         title:{fr:'Charte graphique', en:'Brand guidelines'},
         desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Ce document pose le système complet : logotypes et déclinaisons, règles d'usage, typographie, palette, iconographie et formes récurrentes, puis les applications sur supports réels.",
               en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
@@ -835,7 +831,7 @@ const projectGroups = [
         title:{fr:'Signalétique', en:'Signage'},
         desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie : plan de circulation, photographies, mockups.",
               en:"Floor markings, panels and plans for the site itself: circulation plan, photography, mockups."}},
-       {ratio:'landscape', label:'site internet', src:'projects/cit-video/thumb.jpg',
+       {ratio:'landscape', ar:'16/9', label:'site internet', src:'projects/cit-video/thumb.jpg',
         title:{fr:'Site internet', en:'Website'},
         desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l'accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l'iPhone 15 Pro.",
               en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
@@ -844,7 +840,7 @@ const projectGroups = [
         title:{fr:'Social media', en:'Social media'},
         desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
               en:"Editorial content for the brand's social channels."}},
-       {ratio:'landscape', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
+       {ratio:'landscape', ar:'16/9', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
         title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
         desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
               en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business. This one introduces their augmented-reality vehicle inspection headset, made for their stand at the SoluTrans 2025 trade show."},
@@ -914,7 +910,7 @@ projectList.innerHTML = projectGroups.map(group => {
         : '';
       return `
       <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
-        <div class="thumb ${o.ratio}"${count}>${inner}</div>
+        <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}${count}>${inner}</div>
         <div class="grid-item-tag">${o.label ? esc(o.label) : group.key + '_' + num + String(gi+1).padStart(2,'0') + '.jpg'}</div>
         ${desc}
       </div>`;
@@ -1116,8 +1112,8 @@ document.addEventListener('click', e => {
   const item = e.target.closest('.grid-item');
   if (!item) return;
 
-  // A film grows inside the band and turns its sound on, rather than opening a
-  // panel over the page. Collapsing puts it back to a silent loop.
+  // A film stays its own size and simply turns its sound on, rather than
+  // resizing or opening a panel. Clicking again puts it back to a silent loop.
   if (item.classList.contains('is-film')) {
     const film = item.querySelector('video');
     const opening = !item.classList.contains('is-open');
