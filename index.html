@@ -285,6 +285,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* A deliverable with no pages yet is just its write-up */
 .lb.text-only .lb-body { display: none; }
 .lb.text-only .lb-desc { font-size: 15px; }
+/* A film gets the full width rather than the cover-plus-grid split */
+.lb.film .lb-body { grid-template-columns: 1fr; }
+.lb.film .lb-cover { position: static; }
+.lb-film { display: block; width: 100%; max-height: 78vh; background: var(--fg); }
 .sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
   overflow: hidden; transition: border-color .25s; }
 .sheet:hover { border-color: var(--green-deep); }
@@ -807,17 +811,20 @@ const projectGroups = [
         title:{fr:'Signalétique', en:'Signage'},
         desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie : plan de circulation, photographies, mockups.",
               en:"Floor markings, panels and plans for the site itself: circulation plan, photography, mockups."}},
-       {ratio:'landscape', label:'site internet',
+       {ratio:'landscape', label:'site internet', src:'projects/cit-video/thumb.jpg',
         title:{fr:'Site internet', en:'Website'},
-        desc:{fr:"Site internet de la carrosserie.", en:"The company website."}},
+        desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l'accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l'iPhone 15 Pro.",
+              en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
+        video:'projects/cit-video/toutain-video.webm', poster:'projects/cit-video/poster.jpg'},
        {ratio:'square', label:'social media',
         title:{fr:'Social media', en:'Social media'},
         desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
               en:"Editorial content for the brand's social channels."}},
-       {ratio:'portrait', label:'flyers hlsolutions',
+       {ratio:'landscape', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
         title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
-        desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie.",
-              en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business."}},
+        desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
+              en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business. This one introduces their augmented-reality vehicle inspection headset, made for their stand at the SoluTrans 2025 trade show."},
+        images:['projects/hl-flyer/01.jpg']},
      ]},
 
     {title:{fr:'Ma Nouvelle Assurance', en:'Ma Nouvelle Assurance'},
@@ -850,6 +857,7 @@ const projectGroups = [
 
 const projectList = document.getElementById('projectList');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const pageCount = n => String(n).padStart(2, '0') + (n > 1 ? ' pages' : ' page');
 // A site field holding a URL renders as a link, labelled by its bare domain.
 const siteCell = s => /^https?:\/\//.test(s)
   ? `<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>`
@@ -869,7 +877,8 @@ projectList.innerHTML = projectGroups.map(group => {
       const inner = o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
         : `<div class="thumb-label">[ img ]</div>`;
-      const count = o.images ? ` data-count="${o.images.length} pages"` : '';
+      const count = o.video ? ' data-count="vidéo"'
+        : o.images ? ` data-count="${pageCount(o.images.length)}"` : '';
       return `
       <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${count}>${inner}</div>
@@ -988,22 +997,34 @@ function lbOpen(g) {
   lbTitle.textContent = g.title[currentLang] || g.title.en;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
   const imgs = g.images || [];
-  lbCounter.textContent = imgs.length ? String(imgs.length).padStart(2, '0') + ' pages' : '';
+  lbCounter.textContent = imgs.length ? pageCount(imgs.length) : '';
   const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
       <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
       <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
     </div>`;
-  // The cover is eager; the rest load lazily as the right column is scrolled.
-  lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
-  lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
-  lb.classList.toggle('text-only', !imgs.length);
+  // A film takes the whole width and plays in place; pages keep the cover-plus-
+  // grid split. preload="none" so opening the entry does not pull megabytes.
+  if (g.video) {
+    lbCounter.textContent = '';
+    lbCover.innerHTML = `<video class="lb-film" controls playsinline preload="none"
+        poster="${esc(g.poster || '')}" src="${esc(g.video)}"></video>`;
+    lbRest.innerHTML = '';
+  } else {
+    lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
+    lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
+  }
+  lb.classList.toggle('film', !!g.video);
+  lb.classList.toggle('text-only', !imgs.length && !g.video);
   lb.classList.add('open');
   lb.scrollTop = 0;
   document.body.style.overflow = 'hidden';
 }
 function lbClose() {
   zoomClose();
+  // Stop the film rather than leave it running behind a closed panel.
+  const film = lb.querySelector('.lb-film');
+  if (film) { film.pause(); film.removeAttribute('src'); film.load(); }
   lb.classList.remove('open');
   document.body.style.overflow = '';
   lbGallery = null;
