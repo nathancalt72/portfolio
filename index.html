@@ -841,10 +841,19 @@ const projectGroups = [
               en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
         video:'projects/cit-video/preview.mp4', film:'projects/cit-video/film.mp4',
         poster:'projects/cit-video/poster.jpg'},
-       {ratio:'square', label:'social media',
-        title:{fr:'Social media', en:'Social media'},
-        desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
-              en:"Editorial content for the brand's social channels."}},
+       {ratio:'square', ar:'1300/1150', label:'post recrutement',
+        src:'projects/cit-social/thumb.jpg', poster:'projects/cit-social/thumb.jpg',
+        title:{fr:'Post recrutement', en:'Recruitment post'},
+        desc:{fr:"Post LinkedIn pour la Carrosserie Toutain : recrutement d'un technicien BE dessinateur développement, en CDI à La Flèche.",
+              en:"LinkedIn post for Carrosserie Toutain: hiring a design-office draughtsman on a permanent contract in La Flèche."},
+        video:'projects/cit-social/recrutement.mp4', silent:true},
+
+       {ratio:'portrait', ar:'900/1080', label:'vœux 2026',
+        src:'projects/hl-social/thumb.jpg', poster:'projects/hl-social/thumb.jpg',
+        title:{fr:'Vœux 2026', en:'New year 2026'},
+        desc:{fr:"Vœux de bonne année pour le compte LinkedIn de HLSolutions.",
+              en:"New year greetings for the HLSolutions LinkedIn account."},
+        video:'projects/hl-social/voeux-2026.mp4', silent:true},
        {ratio:'landscape', ar:'16/9', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
         title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
         desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
@@ -903,8 +912,8 @@ projectList.innerHTML = projectGroups.map(group => {
       // tile is clicked, which is why it sits in a data attribute.
       const inner = o.video
         ? `<video autoplay muted loop playsinline preload="metadata" poster="${esc(o.poster || '')}"
-             src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}></video>
-           <span class="thumb-sound">${'—'}</span>`
+             src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
+           ${o.silent ? '' : '<span class="thumb-sound">—</span>'}`
         : o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
         : `<div class="thumb-label">[ img ]</div>`;
@@ -1147,9 +1156,11 @@ document.addEventListener('click', e => {
         film.src = want;
         film.load();
       }
-      film.loop = !opening;
-      film.muted = !opening;
-      film.controls = opening;
+      // A silent post has no sound to turn on, so it just keeps looping.
+      const silent = film.dataset.silent === '1';
+      film.loop = silent || !opening;
+      film.muted = silent || !opening;
+      film.controls = opening && !silent;
       const pr = film.play(); if (pr) pr.catch(function () {});
     }
     return;
