@@ -661,46 +661,71 @@ function renderCaps() {
    accordions survive a language switch. */
 const projectGroups = [
   { key: 'pro', items: [
-    {title:'Project Title', tags:'Motion Design, Direction', year:'2026',
-     desc:'Description du projet — courte présentation de la démarche créative, des contraintes et des résultats obtenus. À remplacer par ton texte.',
-     client:'Agency / Brand', site:'—', credits:'Nathan Charlot',
-     thumbs:['landscape','portrait','square','landscape']},
-    {title:'Project Title', tags:'Editing, Color Grading', year:'2026',
-     desc:'Description du projet. À remplacer par ton texte.',
-     client:'Agency / Brand', site:'—', credits:'Nathan Charlot',
-     thumbs:['portrait','landscape','square','portrait']},
-    {title:'Project Title', tags:'Brand Identity, Illustrator', year:'2025',
-     desc:'Description du projet. À remplacer par ton texte.',
-     client:'Agency / Brand', site:'—', credits:'Nathan Charlot',
-     thumbs:['square','square','landscape','portrait']},
+    {title:{fr:'Site internet Toutain', en:'Toutain website'},
+     tags:{fr:'Web design', en:'Web design'}, year:'—',
+     desc:{fr:"Site internet de la Carrosserie Industrielle Toutain.",
+           en:"Website for Carrosserie Industrielle Toutain."},
+     client:'Carrosserie Industrielle Toutain', site:'—', credits:'Nathan Charlot',
+     thumbs:['landscape','portrait','landscape','square']},
+
+    {title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
+     tags:{fr:'Print, Édition', en:'Print, Editorial'}, year:'—',
+     desc:{fr:"Série de flyers pour la marque HLSolutions.",
+           en:"A set of flyers for the HLSolutions brand."},
+     client:'HLSolutions', site:'—', credits:'Nathan Charlot',
+     thumbs:['portrait','portrait','portrait','portrait']},
+
+    {title:{fr:'Charte graphique Toutain', en:'Toutain brand guidelines'},
+     tags:{fr:'Identité de marque', en:'Brand identity'}, year:'—',
+     desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Construction du système visuel complet autour de cet existant.",
+           en:"The logo and brand name had been settled for years, with no guidelines holding them together. Built the full visual system around what already existed."},
+     client:'Carrosserie Industrielle Toutain', site:'—', credits:'Nathan Charlot',
+     thumbs:['landscape','square','portrait','landscape']},
+
+    {title:{fr:'Signalétique Toutain', en:'Toutain signage'},
+     tags:{fr:'Signalétique, Environnement', en:'Signage, Wayfinding'}, year:'—',
+     desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie : plan de circulation, photographies, mockups.",
+           en:"Floor markings, panels and plans for the coachbuilder's own site: circulation plan, photography, mockups."},
+     client:'Carrosserie Industrielle Toutain', site:'—', credits:'Nathan Charlot',
+     thumbs:['landscape','landscape','square','portrait']},
+
+    {title:{fr:'Social media Toutain', en:'Toutain social media'},
+     tags:{fr:'Social media, Design', en:'Social media, Design'}, year:'—',
+     desc:{fr:"Contenus social media pour la Carrosserie Industrielle Toutain.",
+           en:"Social media content for Carrosserie Industrielle Toutain."},
+     client:'Carrosserie Industrielle Toutain', site:'—', credits:'Nathan Charlot',
+     thumbs:['square','square','square']},
+
+    {title:{fr:'Ma Nouvelle Assurance', en:'Ma Nouvelle Assurance'},
+     tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'—',
+     desc:{fr:"Motion design pour les réseaux sociaux et miniatures YouTube, réalisé en stage pour cette startup de courtage en assurance de prêts.",
+           en:"Social media motion design and YouTube thumbnails, made during an internship at this loan-insurance brokerage startup."},
+     client:'Ma Nouvelle Assurance', site:'—', credits:'Nathan Charlot',
+     thumbs:['landscape','landscape','square','landscape']},
   ]},
   { key: 'school', items: [
-    {title:'Project Title', tags:'Motion Design, After Effects', year:'2026',
-     desc:'Description du projet. À remplacer par ton texte.',
+    {title:{fr:'Titre du projet', en:'Project title'},
+     tags:{fr:'Motion design', en:'Motion design'}, year:'—',
+     desc:{fr:'Description du projet. À remplacer.', en:'Project description. To be replaced.'},
      client:'—', site:'—', credits:'Nathan Charlot',
      thumbs:['landscape','square','portrait','landscape']},
-    {title:'Project Title', tags:'Editing, Post-prod', year:'2025',
-     desc:'Description du projet. À remplacer par ton texte.',
+    {title:{fr:'Titre du projet', en:'Project title'},
+     tags:{fr:'Montage, Post-prod', en:'Editing, Post-production'}, year:'—',
+     desc:{fr:'Description du projet. À remplacer.', en:'Project description. To be replaced.'},
      client:'—', site:'—', credits:'Nathan Charlot',
      thumbs:['landscape','landscape','portrait','square']},
-    {title:'Project Title', tags:'Motion Design, Typography', year:'2025',
-     desc:'Description du projet. À remplacer par ton texte.',
-     client:'—', site:'—', credits:'Nathan Charlot',
-     thumbs:['square','portrait','landscape','square']},
   ]},
   { key: 'personal', items: [
-    {title:'Project Title', tags:'Photography, Edit', year:'2026',
-     desc:'Description du projet. À remplacer par ton texte.',
+    {title:{fr:'Titre du projet', en:'Project title'},
+     tags:{fr:'Photographie', en:'Photography'}, year:'—',
+     desc:{fr:'Description du projet. À remplacer.', en:'Project description. To be replaced.'},
      client:'—', site:'—', credits:'Nathan Charlot',
      thumbs:['portrait','portrait','square','landscape']},
-    {title:'Project Title', tags:'Color Grading, Post-prod', year:'2024',
-     desc:'Description du projet. À remplacer par ton texte.',
-     client:'—', site:'—', credits:'Nathan Charlot',
-     thumbs:['portrait','landscape','square','landscape']},
   ]},
 ];
 
 const projectList = document.getElementById('projectList');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 let projectIndex = 0;
 projectList.innerHTML = projectGroups.map(group => {
   const rows = group.items.map((p, n) => {
@@ -715,15 +740,15 @@ projectList.innerHTML = projectGroups.map(group => {
     <div class="project" data-index="${idx}">
       <div class="project-header">
         <span class="project-num">${num}</span>
-        <span class="project-name">${p.title}</span>
-        <span class="project-tags">${p.tags}</span>
+        <span class="project-name" data-fr="${esc(p.title.fr)}" data-en="${esc(p.title.en)}">${p.title.en}</span>
+        <span class="project-tags" data-fr="${esc(p.tags.fr)}" data-en="${esc(p.tags.en)}">${p.tags.en}</span>
         <span class="project-year">${p.year}</span>
         <span class="project-plus"></span>
       </div>
       <div class="project-content_wrapper">
         <div class="project-content_inner">
           <div class="project-content">
-            <p class="project-desc" data-scramble-src="${p.desc}"></p>
+            <p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}"></p>
             <div>
               <div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div>
             </div>
@@ -884,6 +909,20 @@ function applyLang(lang) {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-i18n]').forEach(el => { if (t[el.dataset.i18n] !== undefined) el.innerHTML = t[el.dataset.i18n]; });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml]; });
+  // Project copy lives in the project data, not the dictionary, so it carries both
+  // languages on the element. Swapping attributes leaves the DOM in place, which
+  // is what keeps an open accordion open across a language switch.
+  document.querySelectorAll('[data-fr][data-en]').forEach(el => {
+    const v = el.dataset[lang];
+    if (v === undefined) return;
+    if (el.classList.contains('project-desc')) {
+      el.dataset.scrambleSrc = v;
+      // Only overwrite once the scramble has finished, or it fights the animation.
+      if (el.dataset.done) el.textContent = v;
+    } else {
+      el.textContent = v;
+    }
+  });
   document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.lang === lang); });
   renderCaps();
   applyLangHooks.forEach(fn => fn());
