@@ -332,6 +332,8 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   border: 1px solid var(--border); color: var(--fg-muted); width: 40px; height: 40px; flex-shrink: 0; }
 .lb-nav:hover { border-color: var(--green-deep); color: var(--green-deep); }
 .lb-nav[disabled] { opacity: .25; }
+/* A lone page has nowhere to page to */
+.lb-zoom.solo .lb-nav { display: none; }
 .lb-zoom-close { position: absolute; top: 16px; right: 28px; font-family: var(--mono); font-size: 14px;
   cursor: none; background: none; border: 1px solid var(--border); color: var(--fg-muted);
   width: 32px; height: 32px; }
@@ -1024,13 +1026,22 @@ const lbCover = document.getElementById('lbCover');
 const lbRest = document.getElementById('lbRest');
 const lbPrev = document.getElementById('lbPrev');
 const lbNext = document.getElementById('lbNext');
-let lbGallery = null, lbAt = 0;
+let lbGallery = null, lbAt = 0, lbSoloZoom = false;
 
 function lbOpen(g) {
   lbGallery = g;
   lbTitle.textContent = g.title[currentLang] || g.title.en;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
   const imgs = g.images || [];
+
+  // One page has nothing to browse, so skip the panel and just show it big.
+  lbSoloZoom = imgs.length === 1 && !g.video;
+  if (lbSoloZoom) {
+    zoomShow(0);
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+
   lbCounter.textContent = imgs.length ? pageCount(imgs.length) : '';
   const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
@@ -1064,24 +1075,29 @@ function lbOpen(g) {
   document.body.style.overflow = 'hidden';
 }
 function lbClose() {
-  zoomClose();
+  lbZoom.classList.remove('open');
   // Stop the film rather than leave it running behind a closed panel.
   const film = lb.querySelector('.lb-film');
   if (film) { film.pause(); film.removeAttribute('src'); film.load(); }
   lb.classList.remove('open');
   document.body.style.overflow = '';
   lbGallery = null;
+  lbSoloZoom = false;
 }
 function zoomShow(i) {
   if (!lbGallery || !lbGallery.images) return;
   lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
   lbImg.src = lbGallery.images[lbAt];
-  lbZoomCounter.textContent = String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
+  const solo = lbGallery.images.length === 1;
+  lbZoomCounter.textContent = solo ? '' : String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
   lbPrev.disabled = lbAt === 0;
   lbNext.disabled = lbAt === lbGallery.images.length - 1;
+  lbZoom.classList.toggle('solo', solo);
   lbZoom.classList.add('open');
 }
-function zoomClose() { lbZoom.classList.remove('open'); }
+// Opened straight into the zoom, there is no panel to fall back to, so closing
+// the zoom has to close the whole thing.
+function zoomClose() { if (lbSoloZoom) lbClose(); else lbZoom.classList.remove('open'); }
 
 lb.addEventListener('click', e => {
   // First click on a silent loop turns the sound on and reveals the controls.
