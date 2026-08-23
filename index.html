@@ -201,9 +201,17 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project.is-open .project-plus::after { transform: translate(-50%,-50%) rotate(90deg); }
 .project.is-open .project-plus::before, .project.is-open .project-plus::after { background: var(--green-deep); }
 
-.project-content_wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s cubic-bezier(.65,0,.35,1); }
+/* Opening runs on one eased curve, and the contents slide up behind it in
+   sequence — text first, then the deliverables, then the visuals. */
+.project-content_wrapper { display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows .75s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content_wrapper { grid-template-rows: 1fr; }
 .project-content_inner { overflow: hidden; }
+.project-content, .sub-works {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .55s ease, transform .65s cubic-bezier(.22,1,.36,1); }
+.project.is-open .project-content { opacity: 1; transform: none; transition-delay: .1s; }
+.project.is-open .sub-works { opacity: 1; transform: none; transition-delay: .18s; }
 .project-content { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 30px; padding: 4px 0 34px; border-top: 1px solid var(--border); margin-top: -1px; padding-top: 30px; }
 .project-desc { font-size: 15px; line-height: 1.85; font-weight: 300; max-width: 56ch; min-height: 1.85em; }
 .project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 11px; line-height: 2; color: var(--fg-muted); }
@@ -223,8 +231,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 
 .project-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border);
   padding-bottom: 40px; }
+/* --d staggers each visual, so the grid glides in rather than snapping as a block */
 .grid-item { position: relative; background: var(--bg); overflow: hidden; cursor: none;
-  opacity: 0; transform: translateY(60px); transition: opacity .6s ease, transform .6s ease; }
+  opacity: 0; transform: translateY(38px);
+  transition: opacity .7s ease var(--d, 0ms),
+              transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms); }
 .grid-item.in { opacity: 1; transform: translateY(0); }
 .grid-item.is-active { grid-column: span 2; }
 .thumb { position: relative; width: 100%; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
@@ -256,8 +267,12 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 6px 12px; }
 .lb-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
 .lb-desc { padding: 26px 28px 22px; font-size: 14px; line-height: 1.8; color: var(--fg); max-width: 78ch; }
-.lb-sheets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 28px 48px; }
-.lb-sheets .sheet:first-child { grid-column: 1 / -1; }
+/* Cover holds the left column and stays put; the rest of the pages scroll past
+   it on the right. Stacks to one column on a phone. */
+.lb-body { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px;
+  padding: 0 28px 48px; align-items: start; }
+.lb-cover { position: sticky; top: 88px; }
+.lb-rest { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
   overflow: hidden; transition: border-color .25s; }
 .sheet:hover { border-color: var(--green-deep); }
@@ -284,11 +299,12 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .lb-zoom-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
 .lb-zoom-counter { position: absolute; top: 22px; left: 28px; font-family: var(--mono);
   font-size: 10px; letter-spacing: .1em; color: var(--fg-muted); }
-@media (max-width: 900px) { .lb-sheets { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .lb-body { grid-template-columns: 1fr; } .lb-cover { position: static; } }
 @media (max-width: 600px) {
   .lb-top { padding: 12px 16px; }
   .lb-desc { padding: 18px 16px 16px; font-size: 13px; }
-  .lb-sheets { grid-template-columns: 1fr; padding: 0 16px 36px; }
+  .lb-body { padding: 0 16px 36px; }
+  .lb-rest { grid-template-columns: 1fr; }
   .lb-zoom { padding: 56px 12px 20px; gap: 8px; }
   .lb-nav { width: 34px; height: 34px; }
   .lb-zoom-close { right: 12px; } .lb-zoom-counter { left: 16px; }
@@ -509,7 +525,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
     <button class="lb-close" id="lbClose" data-i18n="lb_close">close</button>
   </div>
   <p class="lb-desc" id="lbDesc"></p>
-  <div class="lb-sheets" id="lbSheets"></div>
+  <div class="lb-body">
+    <div class="lb-cover" id="lbCover"></div>
+    <div class="lb-rest" id="lbRest"></div>
+  </div>
 </div>
 <div class="lb-zoom" id="lbZoom" role="dialog" aria-modal="true">
   <span class="lb-zoom-counter" id="lbZoomCounter"></span>
@@ -833,7 +852,7 @@ projectList.innerHTML = projectGroups.map(group => {
         : `<div class="thumb-label">[ img ]</div>`;
       const count = gal > -1 ? ` data-count="${o.gallery.images.length} slides"` : '';
       return `
-      <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
+      <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${count}>${inner}</div>
         <div class="grid-item-tag">${o.label ? esc(o.label) : group.key + '_' + num + String(gi+1).padStart(2,'0') + '.jpg'}</div>
       </div>`;
@@ -899,19 +918,22 @@ function scrambleIn(el) {
   tick();
 }
 
-const gridObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); gridObs.unobserve(e.target); } });
-}, { threshold: .1, rootMargin: '0px 0px -10% 0px' });
-
 document.querySelectorAll('.project-header').forEach(header => {
   header.addEventListener('click', () => {
     const project = header.closest('.project');
     const wasOpen = project.classList.contains('is-open');
     project.classList.toggle('is-open');
-    if (!wasOpen) {
-      const desc = project.querySelector('.project-desc');
-      scrambleIn(desc);
-      project.querySelectorAll('.grid-item').forEach(item => gridObs.observe(item));
+    const items = project.querySelectorAll('.grid-item');
+    if (wasOpen) {
+      // Reset so the visuals glide in again next time, without the open stagger
+      // dragging the fade-out out behind the collapsing panel.
+      items.forEach(item => { item.style.transitionDelay = '0ms'; item.classList.remove('in'); });
+    } else {
+      scrambleIn(project.querySelector('.project-desc'));
+      // Set directly rather than waiting a frame: the items have been sitting in
+      // their hidden state since the last close, so there is already something to
+      // transition from — and rAF does not fire while the page is hidden.
+      items.forEach(item => { item.style.transitionDelay = ''; item.classList.add('in'); });
     }
   });
 });
@@ -940,7 +962,8 @@ const lbTitle = document.getElementById('lbTitle');
 const lbDesc = document.getElementById('lbDesc');
 const lbCounter = document.getElementById('lbCounter');
 const lbZoomCounter = document.getElementById('lbZoomCounter');
-const lbSheets = document.getElementById('lbSheets');
+const lbCover = document.getElementById('lbCover');
+const lbRest = document.getElementById('lbRest');
 const lbPrev = document.getElementById('lbPrev');
 const lbNext = document.getElementById('lbNext');
 let lbGallery = null, lbAt = 0;
@@ -950,12 +973,14 @@ function lbOpen(g) {
   lbTitle.textContent = g.title[currentLang] || g.title.en;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
   lbCounter.textContent = String(g.images.length).padStart(2, '0') + ' ' + (currentLang === 'fr' ? 'pages' : 'pages');
-  // The cover is eager; the rest load lazily as the overview is scrolled.
-  lbSheets.innerHTML = g.images.map((src, i) => `
+  const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
       <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
       <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
-    </div>`).join('');
+    </div>`;
+  // The cover is eager; the rest load lazily as the right column is scrolled.
+  lbCover.innerHTML = sheet(g.images[0], 0);
+  lbRest.innerHTML = g.images.slice(1).map((src, i) => sheet(src, i + 1)).join('');
   lb.classList.add('open');
   lb.scrollTop = 0;
   document.body.style.overflow = 'hidden';
@@ -977,7 +1002,7 @@ function zoomShow(i) {
 }
 function zoomClose() { lbZoom.classList.remove('open'); }
 
-lbSheets.addEventListener('click', e => {
+lb.addEventListener('click', e => {
   const sheet = e.target.closest('.sheet');
   if (sheet) zoomShow(+sheet.dataset.at);
 });
