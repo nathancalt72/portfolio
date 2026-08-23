@@ -187,7 +187,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project-header, .project-content {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
 }
-.project-header { align-items: baseline; padding: 9px 0; cursor: none; }
+/* font-size here as well as on the children: the cells would otherwise inherit
+   the 16px body size and their line boxes, not the 12px text, would set the row
+   height. Explicit line-height for the same reason — `normal` on the mono face
+   adds stray pixels the padding cannot account for. */
+.project-header { align-items: baseline; padding: 3px 0; font-size: 12px; line-height: 1.2; cursor: none; }
 .pcol { padding-left: 12px; padding-right: 18px; min-width: 0; }
 .pcol-4 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 /* Name and description run across the first two columns so they do not wrap
@@ -212,7 +216,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project.is-open .project-tags,
 .project.is-open .project-year { color: var(--bg); }
 .project.is-open .project-num { color: var(--border-strong); }
-.project-plus { font-family: var(--mono); font-size: 14px; line-height: 1; color: var(--fg-muted);
+.project-plus { font-family: var(--mono); font-size: 12px; line-height: 1.2; color: var(--fg-muted);
   transition: transform .35s ease, color .3s; }
 .project-plus::before { content: '+'; }
 .project.is-open .project-plus { color: var(--bg); transform: rotate(45deg); }
