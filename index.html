@@ -240,17 +240,27 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 
 /* Visuals run as one horizontal band at a common height, scrolled sideways */
 .project-grid { display: flex; gap: 1px; background: var(--border);
-  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; align-items: flex-start; }
 /* --d staggers each visual, so the band glides in rather than snapping as a block */
 .grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
   opacity: 0; transform: translateY(38px);
   transition: opacity .7s ease var(--d, 0ms),
               transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms); }
 .grid-item.in { opacity: 1; transform: translateY(0); }
-.thumb { position: relative; height: 340px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
+/* Height drives the zoom: the aspect ratio widens the tile to match, so the
+   band reflows around it instead of an overlay opening on top. */
+.thumb { position: relative; height: 340px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px);
+  transition: height .6s cubic-bezier(.22,1,.36,1); }
 .thumb.landscape { aspect-ratio: 4/3; }
 .thumb.portrait { aspect-ratio: 3/4; }
 .thumb.square { aspect-ratio: 1/1; }
+.grid-item.is-open .thumb { height: 560px; }
+.grid-item-desc { display: none; padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
+  font-weight: 300; color: var(--fg); max-width: 60ch; }
+.grid-item.is-open .grid-item-desc { display: block; }
+.grid-item.is-open .grid-item-tag { color: var(--green-deep); }
+/* Pages revealed by an expanded deliverable */
+.grid-item.extra .thumb { height: 340px; }
 .thumb-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: var(--mono); font-size: 9px; color: var(--fg-muted); opacity: .5; }
 .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -258,69 +268,6 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
   background: var(--green-deep); padding: 3px 7px; }
 
-/* ── DOCUMENT VIEWER ──
-   Whole document at a glance: cover full width, remaining pages in a grid that
-   drops from three columns to one on a phone. Clicking any page zooms it. */
-.lb { position: fixed; inset: 0; z-index: 300; background: var(--bg);
-  overflow-y: auto; overflow-x: hidden; opacity: 0; pointer-events: none;
-  transition: opacity .3s ease; }
-.lb.open { opacity: 1; pointer-events: auto; }
-.lb-top { position: sticky; top: 0; z-index: 2;
-  display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  padding: 16px 28px; border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); }
-.lb-title { font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
-  text-transform: lowercase; color: var(--green-deep); }
-.lb-counter { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-.lb-close { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; cursor: none;
-  background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 6px 12px; }
-.lb-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-desc { padding: 26px 28px 22px; font-size: 14px; line-height: 1.8; color: var(--fg); max-width: 78ch; }
-/* Cover holds the left column and stays put; the rest of the pages scroll past
-   it on the right. Stacks to one column on a phone. */
-.lb-body { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px;
-  padding: 0 28px 48px; align-items: start; }
-.lb-cover { position: sticky; top: 88px; }
-.lb-rest { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-/* A deliverable with no pages yet is just its write-up */
-.lb.text-only .lb-body { display: none; }
-.lb.text-only .lb-desc { font-size: 15px; }
-.sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
-  overflow: hidden; transition: border-color .25s; }
-.sheet:hover { border-color: var(--green-deep); }
-.sheet img { display: block; width: 100%; height: auto; }
-.sheet-num { position: absolute; left: 0; bottom: 0; font-family: var(--mono); font-size: 9px;
-  letter-spacing: .1em; color: var(--bg); background: var(--green-deep); padding: 3px 7px;
-  opacity: 0; transition: opacity .25s; }
-.sheet:hover .sheet-num { opacity: 1; }
-
-/* Zoom layer, on top of the overview */
-.lb-zoom { position: fixed; inset: 0; z-index: 310;
-  background: color-mix(in srgb, var(--bg) 96%, transparent);
-  display: flex; align-items: center; gap: 18px; padding: 64px 28px 28px;
-  opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.lb-zoom.open { opacity: 1; pointer-events: auto; }
-.lb-zoom img { flex: 1; min-width: 0; max-height: 100%; object-fit: contain; }
-.lb-nav { font-family: var(--mono); font-size: 15px; cursor: none; background: none;
-  border: 1px solid var(--border); color: var(--fg-muted); width: 40px; height: 40px; flex-shrink: 0; }
-.lb-nav:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-nav[disabled] { opacity: .25; }
-.lb-zoom-close { position: absolute; top: 16px; right: 28px; font-family: var(--mono); font-size: 14px;
-  cursor: none; background: none; border: 1px solid var(--border); color: var(--fg-muted);
-  width: 32px; height: 32px; }
-.lb-zoom-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-zoom-counter { position: absolute; top: 22px; left: 28px; font-family: var(--mono);
-  font-size: 10px; letter-spacing: .1em; color: var(--fg-muted); }
-@media (max-width: 900px) { .lb-body { grid-template-columns: 1fr; } .lb-cover { position: static; } }
-@media (max-width: 600px) {
-  .lb-top { padding: 12px 16px; }
-  .lb-desc { padding: 18px 16px 16px; font-size: 13px; }
-  .lb-body { padding: 0 16px 36px; }
-  .lb-rest { grid-template-columns: 1fr; }
-  .lb-zoom { padding: 56px 12px 20px; gap: 8px; }
-  .lb-nav { width: 34px; height: 34px; }
-  .lb-zoom-close { right: 12px; } .lb-zoom-counter { left: 16px; }
-}
 .grid-item-tag { padding: 8px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: .04em;
   color: var(--fg-muted); border-top: 1px solid var(--border); background: var(--bg); }
 
@@ -407,6 +354,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .project-content .pcol:nth-child(2) { display: none; }
   .project-content .pcol:first-child { grid-column: 1 / -1; padding-bottom: 18px; }
   .thumb { height: 260px; }
+  /* Cap the zoom by height, since the aspect ratio turns height into width and
+     a tile wider than the screen helps nobody. */
+  .grid-item.is-open .thumb { height: 420px; }
+  .grid-item.extra .thumb { height: 260px; }
   .contact-footer { flex-direction: column; align-items: flex-start; gap: 16px; }
   .nav-links { display: none; }
 }
@@ -428,6 +379,8 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 30px; }
   .thumb { height: 220px; }
+  .grid-item.is-open .thumb { height: 280px; }
+  .grid-item.extra .thumb { height: 220px; }
   #approach { padding: 60px 18px; }
   .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
@@ -536,27 +489,6 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
     </div>
   </div>
 </section>
-
-<!-- ═══ SLIDE VIEWER ═══ -->
-<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="document">
-  <div class="lb-top">
-    <span class="lb-title" id="lbTitle"></span>
-    <span class="lb-counter" id="lbCounter"></span>
-    <button class="lb-close" id="lbClose" data-i18n="lb_close">close</button>
-  </div>
-  <p class="lb-desc" id="lbDesc"></p>
-  <div class="lb-body">
-    <div class="lb-cover" id="lbCover"></div>
-    <div class="lb-rest" id="lbRest"></div>
-  </div>
-</div>
-<div class="lb-zoom" id="lbZoom" role="dialog" aria-modal="true">
-  <span class="lb-zoom-counter" id="lbZoomCounter"></span>
-  <button class="lb-zoom-close" id="lbZoomClose" aria-label="close">×</button>
-  <button class="lb-nav" id="lbPrev" aria-label="previous">←</button>
-  <img id="lbImg" alt="">
-  <button class="lb-nav" id="lbNext" aria-label="next">→</button>
-</div>
 
 <!-- ═══ FOOTER ═══ -->
 <footer id="footer">
@@ -870,10 +802,14 @@ projectList.innerHTML = projectGroups.map(group => {
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
         : `<div class="thumb-label">[ img ]</div>`;
       const count = o.images ? ` data-count="${o.images.length} pages"` : '';
+      const desc = o.desc
+        ? `<div class="grid-item-desc" data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</div>`
+        : '';
       return `
       <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${count}>${inner}</div>
         <div class="grid-item-tag">${o.label ? esc(o.label) : group.key + '_' + num + String(gi+1).padStart(2,'0') + '.jpg'}</div>
+        ${desc}
       </div>`;
     }).join('');
     return `
@@ -968,99 +904,43 @@ document.querySelectorAll('.project-header').forEach(header => {
   obs.observe(firstHeader);
 })();
 
-/* ── DOCUMENT VIEWER ──
-   Two levels: an overview of every page, and a zoom layer over it. */
-const lb = document.getElementById('lightbox');
-const lbZoom = document.getElementById('lbZoom');
-const lbImg = document.getElementById('lbImg');
-const lbTitle = document.getElementById('lbTitle');
-const lbDesc = document.getElementById('lbDesc');
-const lbCounter = document.getElementById('lbCounter');
-const lbZoomCounter = document.getElementById('lbZoomCounter');
-const lbCover = document.getElementById('lbCover');
-const lbRest = document.getElementById('lbRest');
-const lbPrev = document.getElementById('lbPrev');
-const lbNext = document.getElementById('lbNext');
-let lbGallery = null, lbAt = 0;
-
-function lbOpen(g) {
-  lbGallery = g;
-  lbTitle.textContent = g.title[currentLang] || g.title.en;
-  lbDesc.textContent = g.desc[currentLang] || g.desc.en;
-  const imgs = g.images || [];
-  lbCounter.textContent = imgs.length ? String(imgs.length).padStart(2, '0') + ' pages' : '';
-  const sheet = (src, i) => `
-    <div class="sheet" data-at="${i}">
-      <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
-      <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
-    </div>`;
-  // The cover is eager; the rest load lazily as the right column is scrolled.
-  lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
-  lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
-  lb.classList.toggle('text-only', !imgs.length);
-  lb.classList.add('open');
-  lb.scrollTop = 0;
-  document.body.style.overflow = 'hidden';
+/* ── EXPAND A VISUAL IN PLACE ──
+   Clicking a visual zooms it inside the band and, where the deliverable has
+   more pages behind it, drops them in alongside — the surrounding content
+   reflows rather than an overlay opening on top. */
+function collapseItem(item) {
+  item.classList.remove('is-open');
+  const grid = item.closest('.project-grid');
+  grid.querySelectorAll('.grid-item.extra').forEach(el => el.remove());
 }
-function lbClose() {
-  zoomClose();
-  lb.classList.remove('open');
-  document.body.style.overflow = '';
-  lbGallery = null;
-}
-function zoomShow(i) {
-  if (!lbGallery || !lbGallery.images) return;
-  lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
-  lbImg.src = lbGallery.images[lbAt];
-  lbZoomCounter.textContent = String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
-  lbPrev.disabled = lbAt === 0;
-  lbNext.disabled = lbAt === lbGallery.images.length - 1;
-  lbZoom.classList.add('open');
-}
-function zoomClose() { lbZoom.classList.remove('open'); }
 
-lb.addEventListener('click', e => {
-  const sheet = e.target.closest('.sheet');
-  if (sheet) zoomShow(+sheet.dataset.at);
-});
-lbPrev.addEventListener('click', () => zoomShow(lbAt - 1));
-lbNext.addEventListener('click', () => zoomShow(lbAt + 1));
-document.getElementById('lbZoomClose').addEventListener('click', zoomClose);
-document.getElementById('lbClose').addEventListener('click', lbClose);
-document.addEventListener('keydown', e => {
-  if (!lbGallery) return;
-  const zoomed = lbZoom.classList.contains('open');
-  if (e.key === 'Escape') { zoomed ? zoomClose() : lbClose(); }
-  else if (zoomed && e.key === 'ArrowLeft') zoomShow(lbAt - 1);
-  else if (zoomed && e.key === 'ArrowRight') zoomShow(lbAt + 1);
-});
-
-/* grid item click-to-enlarge (lightweight FLIP) */
 document.addEventListener('click', e => {
   const item = e.target.closest('.grid-item');
-  if (!item) return;
-  // Items backed by a gallery open the viewer instead of expanding in place.
-  if (item.dataset.gallery !== undefined) { lbOpen(galleries[+item.dataset.gallery]); return; }
+  if (!item || item.classList.contains('extra')) return;
   const grid = item.closest('.project-grid');
-  const items = Array.from(grid.querySelectorAll('.grid-item'));
-  const before = new Map(items.map(el => [el, el.getBoundingClientRect()]));
-  item.classList.toggle('is-active');
-  requestAnimationFrame(() => {
-    items.forEach(el => {
-      const b = before.get(el), a = el.getBoundingClientRect();
-      const dx = b.left - a.left, dy = b.top - a.top;
-      const sx = b.width / a.width, sy = b.height / a.height;
-      if (dx || dy || sx !== 1 || sy !== 1) {
-        el.style.transformOrigin = 'top left';
-        el.style.transition = 'none';
-        el.style.transform = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
-        requestAnimationFrame(() => {
-          el.style.transition = 'transform .5s cubic-bezier(.65,0,.35,1)';
-          el.style.transform = '';
-        });
-      }
-    });
+  const wasOpen = item.classList.contains('is-open');
+
+  // One at a time, so the band never turns into a wall of open tiles.
+  grid.querySelectorAll('.grid-item.is-open').forEach(collapseItem);
+  if (wasOpen) return;
+
+  item.classList.add('is-open');
+  const gi = item.dataset.gallery;
+  if (gi === undefined) return;
+  const imgs = galleries[+gi].images;
+  if (!imgs || imgs.length < 2) return;
+
+  // Pages after the cover, inserted right behind the tile that owns them.
+  const frag = document.createDocumentFragment();
+  imgs.slice(1).forEach((src, i) => {
+    const el = document.createElement('div');
+    el.className = 'grid-item extra in';
+    el.style.setProperty('--d', (i * 55) + 'ms');
+    el.innerHTML = `<div class="thumb landscape"><img src="${esc(src)}" alt="" loading="lazy"></div>
+      <div class="grid-item-tag">${String(i + 2).padStart(2, '0')} / ${String(imgs.length).padStart(2, '0')}</div>`;
+    frag.appendChild(el);
   });
+  item.after(frag);
 });
 
 /* ── HAMBURGER ── */
@@ -1083,7 +963,6 @@ const translations = {
     hero_title: 'motion designer &amp; monteur. basé en france — <span class="mark">à l\'écoute</span> de projets à impact, 2026.',
     hero_scroll: 'défiler',
     work_label: 'projets',
-    lb_close: 'fermer',
     cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
     pm_client_label: 'client :<br>site :<br>crédits :',
     approach_label: 'à propos',
@@ -1102,7 +981,6 @@ const translations = {
     hero_title: 'motion designer &amp; editor. based in france — <span class="mark">open</span> to impact-driven projects, 2026.',
     hero_scroll: 'scroll',
     work_label: 'projects',
-    lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client_label: 'client:<br>site:<br>credits:',
     approach_label: 'about',
