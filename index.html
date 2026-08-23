@@ -238,29 +238,60 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
   background: var(--green-deep); padding: 3px 7px; }
 
-/* ── SLIDE VIEWER ── */
+/* ── DOCUMENT VIEWER ──
+   Whole document at a glance: cover full width, remaining pages in a grid that
+   drops from three columns to one on a phone. Clicking any page zooms it. */
 .lb { position: fixed; inset: 0; z-index: 300; background: var(--bg);
-  display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+  overflow-y: auto; overflow-x: hidden; opacity: 0; pointer-events: none;
   transition: opacity .3s ease; }
 .lb.open { opacity: 1; pointer-events: auto; }
-.lb-top { display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  padding: 16px 28px; border-bottom: 1px solid var(--border); }
+.lb-top { position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 16px 28px; border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); }
 .lb-title { font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
   text-transform: lowercase; color: var(--green-deep); }
 .lb-counter { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
 .lb-close { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; cursor: none;
   background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 6px 12px; }
 .lb-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-stage { flex: 1; display: flex; align-items: center; gap: 18px; padding: 22px 28px; min-height: 0; }
-.lb-img { flex: 1; min-width: 0; height: 100%; object-fit: contain; }
+.lb-desc { padding: 26px 28px 22px; font-size: 14px; line-height: 1.8; color: var(--fg); max-width: 78ch; }
+.lb-sheets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 28px 48px; }
+.lb-sheets .sheet:first-child { grid-column: 1 / -1; }
+.sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
+  overflow: hidden; transition: border-color .25s; }
+.sheet:hover { border-color: var(--green-deep); }
+.sheet img { display: block; width: 100%; height: auto; }
+.sheet-num { position: absolute; left: 0; bottom: 0; font-family: var(--mono); font-size: 9px;
+  letter-spacing: .1em; color: var(--bg); background: var(--green-deep); padding: 3px 7px;
+  opacity: 0; transition: opacity .25s; }
+.sheet:hover .sheet-num { opacity: 1; }
+
+/* Zoom layer, on top of the overview */
+.lb-zoom { position: fixed; inset: 0; z-index: 310;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  display: flex; align-items: center; gap: 18px; padding: 64px 28px 28px;
+  opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.lb-zoom.open { opacity: 1; pointer-events: auto; }
+.lb-zoom img { flex: 1; min-width: 0; max-height: 100%; object-fit: contain; }
 .lb-nav { font-family: var(--mono); font-size: 15px; cursor: none; background: none;
   border: 1px solid var(--border); color: var(--fg-muted); width: 40px; height: 40px; flex-shrink: 0; }
 .lb-nav:hover { border-color: var(--green-deep); color: var(--green-deep); }
 .lb-nav[disabled] { opacity: .25; }
-.lb-desc { padding: 0 28px 22px; font-size: 14px; line-height: 1.8; color: var(--fg); max-width: 78ch; }
+.lb-zoom-close { position: absolute; top: 16px; right: 28px; font-family: var(--mono); font-size: 14px;
+  cursor: none; background: none; border: 1px solid var(--border); color: var(--fg-muted);
+  width: 32px; height: 32px; }
+.lb-zoom-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
+.lb-zoom-counter { position: absolute; top: 22px; left: 28px; font-family: var(--mono);
+  font-size: 10px; letter-spacing: .1em; color: var(--fg-muted); }
+@media (max-width: 900px) { .lb-sheets { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) {
-  .lb-top { padding: 12px 16px; } .lb-stage { padding: 14px 12px; gap: 8px; }
-  .lb-nav { width: 34px; height: 34px; } .lb-desc { padding: 0 16px 16px; font-size: 13px; }
+  .lb-top { padding: 12px 16px; }
+  .lb-desc { padding: 18px 16px 16px; font-size: 13px; }
+  .lb-sheets { grid-template-columns: 1fr; padding: 0 16px 36px; }
+  .lb-zoom { padding: 56px 12px 20px; gap: 8px; }
+  .lb-nav { width: 34px; height: 34px; }
+  .lb-zoom-close { right: 12px; } .lb-zoom-counter { left: 16px; }
 }
 .grid-item-tag { padding: 8px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: .04em;
   color: var(--fg-muted); border-top: 1px solid var(--border); background: var(--bg); }
@@ -471,18 +502,21 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 </section>
 
 <!-- ═══ SLIDE VIEWER ═══ -->
-<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="slides">
+<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="document">
   <div class="lb-top">
     <span class="lb-title" id="lbTitle"></span>
     <span class="lb-counter" id="lbCounter"></span>
     <button class="lb-close" id="lbClose" data-i18n="lb_close">close</button>
   </div>
-  <div class="lb-stage">
-    <button class="lb-nav" id="lbPrev" aria-label="previous">←</button>
-    <img class="lb-img" id="lbImg" alt="">
-    <button class="lb-nav" id="lbNext" aria-label="next">→</button>
-  </div>
   <p class="lb-desc" id="lbDesc"></p>
+  <div class="lb-sheets" id="lbSheets"></div>
+</div>
+<div class="lb-zoom" id="lbZoom" role="dialog" aria-modal="true">
+  <span class="lb-zoom-counter" id="lbZoomCounter"></span>
+  <button class="lb-zoom-close" id="lbZoomClose" aria-label="close">×</button>
+  <button class="lb-nav" id="lbPrev" aria-label="previous">←</button>
+  <img id="lbImg" alt="">
+  <button class="lb-nav" id="lbNext" aria-label="next">→</button>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
@@ -897,45 +931,66 @@ document.querySelectorAll('.project-header').forEach(header => {
   obs.observe(firstHeader);
 })();
 
-/* ── SLIDE VIEWER ── */
+/* ── DOCUMENT VIEWER ──
+   Two levels: an overview of every page, and a zoom layer over it. */
 const lb = document.getElementById('lightbox');
+const lbZoom = document.getElementById('lbZoom');
 const lbImg = document.getElementById('lbImg');
 const lbTitle = document.getElementById('lbTitle');
 const lbDesc = document.getElementById('lbDesc');
 const lbCounter = document.getElementById('lbCounter');
+const lbZoomCounter = document.getElementById('lbZoomCounter');
+const lbSheets = document.getElementById('lbSheets');
 const lbPrev = document.getElementById('lbPrev');
 const lbNext = document.getElementById('lbNext');
 let lbGallery = null, lbAt = 0;
 
-function lbShow(i) {
-  if (!lbGallery) return;
-  lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
-  lbImg.src = lbGallery.images[lbAt];
-  lbCounter.textContent = String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
-  lbPrev.disabled = lbAt === 0;
-  lbNext.disabled = lbAt === lbGallery.images.length - 1;
-}
 function lbOpen(g) {
   lbGallery = g;
   lbTitle.textContent = g.title[currentLang] || g.title.en;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
-  lbShow(0);
+  lbCounter.textContent = String(g.images.length).padStart(2, '0') + ' ' + (currentLang === 'fr' ? 'pages' : 'pages');
+  // The cover is eager; the rest load lazily as the overview is scrolled.
+  lbSheets.innerHTML = g.images.map((src, i) => `
+    <div class="sheet" data-at="${i}">
+      <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
+      <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
+    </div>`).join('');
   lb.classList.add('open');
+  lb.scrollTop = 0;
   document.body.style.overflow = 'hidden';
 }
 function lbClose() {
+  zoomClose();
   lb.classList.remove('open');
   document.body.style.overflow = '';
   lbGallery = null;
 }
-lbPrev.addEventListener('click', () => lbShow(lbAt - 1));
-lbNext.addEventListener('click', () => lbShow(lbAt + 1));
+function zoomShow(i) {
+  if (!lbGallery) return;
+  lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
+  lbImg.src = lbGallery.images[lbAt];
+  lbZoomCounter.textContent = String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
+  lbPrev.disabled = lbAt === 0;
+  lbNext.disabled = lbAt === lbGallery.images.length - 1;
+  lbZoom.classList.add('open');
+}
+function zoomClose() { lbZoom.classList.remove('open'); }
+
+lbSheets.addEventListener('click', e => {
+  const sheet = e.target.closest('.sheet');
+  if (sheet) zoomShow(+sheet.dataset.at);
+});
+lbPrev.addEventListener('click', () => zoomShow(lbAt - 1));
+lbNext.addEventListener('click', () => zoomShow(lbAt + 1));
+document.getElementById('lbZoomClose').addEventListener('click', zoomClose);
 document.getElementById('lbClose').addEventListener('click', lbClose);
 document.addEventListener('keydown', e => {
   if (!lbGallery) return;
-  if (e.key === 'Escape') lbClose();
-  else if (e.key === 'ArrowLeft') lbShow(lbAt - 1);
-  else if (e.key === 'ArrowRight') lbShow(lbAt + 1);
+  const zoomed = lbZoom.classList.contains('open');
+  if (e.key === 'Escape') { zoomed ? zoomClose() : lbClose(); }
+  else if (zoomed && e.key === 'ArrowLeft') zoomShow(lbAt - 1);
+  else if (zoomed && e.key === 'ArrowRight') zoomShow(lbAt + 1);
 });
 
 /* grid item click-to-enlarge (lightweight FLIP) */
