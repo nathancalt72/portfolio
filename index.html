@@ -253,7 +253,21 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .thumb.square { aspect-ratio: 1/1; }
 .thumb-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-family: var(--mono); font-size: 9px; color: var(--fg-muted); opacity: .5; }
-.thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.thumb img, .thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Height drives the zoom: the aspect ratio widens the tile to match, so the band
+   reflows around the film instead of a panel opening over the page. */
+.thumb { transition: height .6s cubic-bezier(.22,1,.36,1); }
+.grid-item.is-film.is-open .thumb { height: 560px; }
+.grid-item.is-film .thumb-sound { position: absolute; left: 8px; bottom: 8px; z-index: 2;
+  font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: lowercase;
+  color: var(--bg); background: var(--green-deep); padding: 3px 7px; transition: opacity .3s; }
+.grid-item.is-film .thumb-sound::before { content: 'cliquer pour le son'; }
+html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for sound'; }
+.grid-item.is-film.is-open .thumb-sound { opacity: 0; }
+.grid-item-desc { display: none; padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
+  font-weight: 300; color: var(--fg); max-width: 60ch; }
+.grid-item.is-open .grid-item-desc { display: block; }
+.grid-item.is-open .grid-item-tag { color: var(--green-deep); }
 .grid-item.has-gallery .thumb::after { content: attr(data-count); position: absolute; right: 8px; bottom: 8px;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
   background: var(--green-deep); padding: 3px 7px; }
@@ -417,6 +431,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .project-content .pcol:nth-child(2) { display: none; }
   .project-content .pcol:first-child { grid-column: 1 / -1; padding-bottom: 18px; }
   .thumb { height: 260px; }
+  /* Cap the zoom by height: the ratio turns height into width, and a tile wider
+     than the screen helps nobody. */
+  .grid-item.is-film.is-open .thumb { height: 420px; }
   .contact-footer { flex-direction: column; align-items: flex-start; gap: 16px; }
   .nav-links { display: none; }
 }
@@ -438,6 +455,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 30px; }
   .thumb { height: 220px; }
+  .grid-item.is-film.is-open .thumb { height: 280px; }
   #approach { padding: 60px 18px; }
   .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
@@ -880,15 +898,25 @@ projectList.innerHTML = projectGroups.map(group => {
     const grid = p.thumbs.map((t, gi) => {
       const o = typeof t === 'string' ? { ratio: t } : t;
       const gal = o.desc ? galleries.push(o) - 1 : -1;
-      const inner = o.src
+      // A film plays right in the band — silent loop until it is clicked open.
+      const inner = o.video
+        ? `<video autoplay muted loop playsinline preload="metadata" poster="${esc(o.poster || '')}" src="${esc(o.video)}"></video>
+           <span class="thumb-sound">${'—'}</span>`
+        : o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
         : `<div class="thumb-label">[ img ]</div>`;
       const count = o.video ? ' data-count="vidéo"'
         : o.images ? ` data-count="${pageCount(o.images.length)}"` : '';
+      // A film expands in place, so its write-up has to live in the tile — there
+      // is no panel to carry it.
+      const desc = o.video && o.desc
+        ? `<div class="grid-item-desc" data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</div>`
+        : '';
       return `
-      <div class="grid-item${gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${gal > -1 ? ` data-gallery="${gal}"` : ''}>
+      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${count}>${inner}</div>
         <div class="grid-item-tag">${o.label ? esc(o.label) : group.key + '_' + num + String(gi+1).padStart(2,'0') + '.jpg'}</div>
+        ${desc}
       </div>`;
     }).join('');
     return `
@@ -1087,6 +1115,21 @@ document.addEventListener('keydown', e => {
 document.addEventListener('click', e => {
   const item = e.target.closest('.grid-item');
   if (!item) return;
+
+  // A film grows inside the band and turns its sound on, rather than opening a
+  // panel over the page. Collapsing puts it back to a silent loop.
+  if (item.classList.contains('is-film')) {
+    const film = item.querySelector('video');
+    const opening = !item.classList.contains('is-open');
+    item.classList.toggle('is-open', opening);
+    if (film) {
+      film.muted = !opening;
+      film.controls = opening;
+      const pr = film.play(); if (pr) pr.catch(function () {});
+    }
+    return;
+  }
+
   // Items backed by a gallery open the viewer instead of expanding in place.
   if (item.dataset.gallery !== undefined) { lbOpen(galleries[+item.dataset.gallery]); return; }
   const grid = item.closest('.project-grid');
