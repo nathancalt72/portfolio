@@ -264,8 +264,12 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .grid-item.is-film .thumb-sound::before { content: 'cliquer pour le son'; }
 html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for sound'; }
 .grid-item.is-film.is-open .thumb-sound { opacity: 0; }
-.grid-item-desc { display: none; padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
-  font-weight: 300; color: var(--fg); max-width: 60ch; }
+/* width:0 + min-width:100% keeps the text out of the tile's intrinsic sizing —
+   otherwise the paragraph, not the media, would decide how wide the tile is and
+   the block would run past the video. */
+.grid-item-desc { display: none; box-sizing: border-box; width: 0; min-width: 100%;
+  padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
+  font-weight: 300; color: var(--fg); }
 .grid-item.is-open .grid-item-desc { display: block; }
 .grid-item.has-gallery .thumb::after { content: attr(data-count); position: absolute; right: 8px; bottom: 8px;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
