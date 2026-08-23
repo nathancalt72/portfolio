@@ -835,7 +835,8 @@ const projectGroups = [
         title:{fr:'Site internet', en:'Website'},
         desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l'accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l'iPhone 15 Pro.",
               en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
-        video:'projects/cit-video/toutain-video.webm', poster:'projects/cit-video/poster.jpg'},
+        video:'projects/cit-video/preview.mp4', film:'projects/cit-video/film.mp4',
+        poster:'projects/cit-video/poster.jpg'},
        {ratio:'square', label:'social media',
         title:{fr:'Social media', en:'Social media'},
         desc:{fr:"Contenus éditoriaux pour les réseaux sociaux de la marque.",
@@ -894,9 +895,11 @@ projectList.innerHTML = projectGroups.map(group => {
     const grid = p.thumbs.map((t, gi) => {
       const o = typeof t === 'string' ? { ratio: t } : t;
       const gal = o.desc ? galleries.push(o) - 1 : -1;
-      // A film plays right in the band — silent loop until it is clicked open.
+      // The band shows a short silent loop; the full film is only fetched if the
+      // tile is clicked, which is why it sits in a data attribute.
       const inner = o.video
-        ? `<video autoplay muted loop playsinline preload="metadata" poster="${esc(o.poster || '')}" src="${esc(o.video)}"></video>
+        ? `<video autoplay muted loop playsinline preload="metadata" poster="${esc(o.poster || '')}"
+             src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}></video>
            <span class="thumb-sound">${'—'}</span>`
         : o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
@@ -1119,6 +1122,15 @@ document.addEventListener('click', e => {
     const opening = !item.classList.contains('is-open');
     item.classList.toggle('is-open', opening);
     if (film) {
+      // Swap the looping teaser for the full cut, and back again on close.
+      // Compare the attribute, not currentSrc: the latter only catches up once
+      // the browser has re-run resource selection, so the swap back never fired.
+      const want = opening ? film.dataset.film : film.dataset.preview;
+      if (want && film.getAttribute('src') !== want) {
+        film.src = want;
+        film.load();
+      }
+      film.loop = !opening;
       film.muted = !opening;
       film.controls = opening;
       const pr = film.play(); if (pr) pr.catch(function () {});
