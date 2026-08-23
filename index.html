@@ -187,17 +187,25 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project-header, .project-content {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
 }
-.project-header { align-items: baseline; padding: 14px 0; cursor: none; }
+.project-header { align-items: baseline; padding: 9px 0; cursor: none; }
 .pcol { padding-left: 12px; padding-right: 18px; min-width: 0; }
 .pcol-4 { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.project-num { font-family: var(--mono); font-size: 10px; color: var(--fg-muted);
-  letter-spacing: .1em; margin-right: 10px; }
-.project-name { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .02em;
+/* Name and description run across the first two columns so they do not wrap
+   early and thicken the row — the reference keeps both to a single band. The
+   spacer column then has nothing left to do, and the last two are pinned so
+   the wider first cell cannot push them out of the grid. */
+.project-header .pcol:first-child, .project-content .pcol:first-child { grid-column: 1 / 3; }
+.project-header .pcol:nth-child(2), .project-content .pcol:nth-child(2) { display: none; }
+.project-header .pcol:nth-child(3), .project-content .pcol:nth-child(3) { grid-column: 3; }
+.project-header .pcol:nth-child(4), .project-content .pcol:nth-child(4) { grid-column: 4; }
+.project-num { font-family: var(--mono); font-size: 11px; color: var(--fg-muted);
+  letter-spacing: .06em; margin-right: 12px; }
+.project-name { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .02em;
   text-transform: lowercase; transition: color .3s; }
 .project-header:hover .project-name { color: var(--green-deep); }
-.project-tags { font-family: var(--mono); font-size: 13px; color: var(--fg); letter-spacing: .02em;
+.project-tags { font-family: var(--mono); font-size: 12px; color: var(--fg); letter-spacing: .02em;
   text-transform: lowercase; }
-.project-year { font-family: var(--mono); font-size: 13px; color: var(--fg); letter-spacing: .02em; }
+.project-year { font-family: var(--mono); font-size: 12px; color: var(--fg); letter-spacing: .02em; }
 /* Open rows invert, the way the reference marks the active project */
 .project.is-open .project-header { background: var(--fg); }
 .project.is-open .project-name,
@@ -219,9 +227,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   opacity: 0; transform: translateY(22px);
   transition: opacity .55s ease, transform .65s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content { opacity: 1; transform: none; transition-delay: .1s; }
-.project-content { padding: 18px 0 26px; }
-.project-desc { font-size: 14px; line-height: 1.75; font-weight: 300; min-height: 1.75em; }
-.project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 13px; line-height: 1.9;
+.project-content { padding: 14px 0 22px; }
+.project-desc { font-size: 13px; line-height: 1.62; font-weight: 300; min-height: 1.62em; max-width: 62ch; }
+.project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 12px; line-height: 1.72;
   color: var(--fg); letter-spacing: .01em; }
 .project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; }
 .project-meta-value a:hover { border-color: var(--gold); }
@@ -383,6 +391,12 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
   /* Four columns are too tight to read here: name and year on one line, the
      rest of the metadata stacked underneath. */
+  /* Undo the desktop pinning at matching specificity — a plain .pcol reset loses
+     to :nth-child, leaving those fixed tracks to conjure extra columns here and
+     crush the description down to a few pixels. */
+  .project-header .pcol:first-child, .project-content .pcol:first-child,
+  .project-header .pcol:nth-child(3), .project-content .pcol:nth-child(3),
+  .project-header .pcol:nth-child(4), .project-content .pcol:nth-child(4) { grid-column: auto; }
   .project-header { grid-template-columns: 1fr auto; }
   .project-header .pcol:nth-child(2), .project-header .pcol:nth-child(3) { display: none; }
   .project-content { grid-template-columns: 1fr 1fr; }
@@ -774,7 +788,7 @@ function renderCaps() {
 const projectGroups = [
   { key: 'pro', items: [
     {title:{fr:'Alternance Carrosserie Toutain', en:'Carrosserie Toutain apprenticeship'},
-     tags:{fr:'Identité, Signalétique, Web, Social media, Print', en:'Identity, Signage, Web, Social media, Print'}, year:'2024–2026',
+     tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026',
      desc:{fr:"Alternance à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication — de la charte graphique à la signalétique du site, en passant par le web et les réseaux sociaux. Le périmètre couvrait aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
            en:"Apprenticeship at Carrosserie Industrielle Toutain, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
      client:'Carrosserie Toutain · HLSolutions', site:'https://sastoutain.com/', credits:'Nathan Charlot',
