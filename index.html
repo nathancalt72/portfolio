@@ -288,7 +288,13 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* A film gets the full width rather than the cover-plus-grid split */
 .lb.film .lb-body { grid-template-columns: 1fr; }
 .lb.film .lb-cover { position: static; }
+.film-wrap { position: relative; cursor: none; }
 .lb-film { display: block; width: 100%; max-height: 78vh; background: var(--fg); }
+.film-sound { position: absolute; left: 14px; bottom: 14px; pointer-events: none;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: lowercase;
+  color: var(--bg); background: var(--green-deep); border: none; padding: 6px 11px;
+  transition: opacity .3s ease; }
+.film-wrap.sound-on .film-sound { opacity: 0; }
 .sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
   overflow: hidden; transition: border-color .25s; }
 .sheet:hover { border-color: var(--green-deep); }
@@ -1007,9 +1013,18 @@ function lbOpen(g) {
   // grid split. preload="none" so opening the entry does not pull megabytes.
   if (g.video) {
     lbCounter.textContent = '';
-    lbCover.innerHTML = `<video class="lb-film" controls playsinline preload="none"
-        poster="${esc(g.poster || '')}" src="${esc(g.video)}"></video>`;
+    // Loops silently on open; the first click turns the sound on and hands over
+    // to the native controls.
+    lbCover.innerHTML = `<div class="film-wrap">
+        <video class="lb-film" autoplay muted loop playsinline preload="metadata"
+          poster="${esc(g.poster || '')}" src="${esc(g.video)}"></video>
+        <button class="film-sound" type="button">${currentLang === 'fr' ? 'cliquer pour le son' : 'click for sound'}</button>
+      </div>`;
     lbRest.innerHTML = '';
+    const film = lbCover.querySelector('.lb-film');
+    const kick = () => { const pr = film.play(); if (pr) pr.catch(function () {}); };
+    kick();
+    film.addEventListener('loadeddata', kick, { once: true });
   } else {
     lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
     lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
@@ -1041,6 +1056,18 @@ function zoomShow(i) {
 function zoomClose() { lbZoom.classList.remove('open'); }
 
 lb.addEventListener('click', e => {
+  // First click on a silent loop turns the sound on and reveals the controls.
+  const wrap = e.target.closest('.film-wrap');
+  if (wrap) {
+    const film = wrap.querySelector('.lb-film');
+    if (film.muted) {
+      film.muted = false;
+      film.controls = true;
+      wrap.classList.add('sound-on');
+      const pr = film.play(); if (pr) pr.catch(function () {});
+    }
+    return;
+  }
   const sheet = e.target.closest('.sheet');
   if (sheet) zoomShow(+sheet.dataset.at);
 });
