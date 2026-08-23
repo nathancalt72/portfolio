@@ -678,7 +678,7 @@ const projectGroups = [
      tags:{fr:'Identité, Signalétique, Web, Social media, Print', en:'Identity, Signage, Web, Social media, Print'}, year:'2024–2026',
      desc:{fr:"Alternance à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication — de la charte graphique à la signalétique du site, en passant par le web et les réseaux sociaux. Le périmètre couvrait aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
            en:"Apprenticeship at Carrosserie Industrielle Toutain, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
-     client:'Carrosserie Toutain · HLSolutions', site:'—', credits:'Nathan Charlot',
+     client:'Carrosserie Toutain · HLSolutions', site:'https://sastoutain.com/', credits:'Nathan Charlot',
      works:[
        {name:{fr:'Charte graphique', en:'Brand guidelines'},
         desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Construction du système visuel complet autour de cet existant.",
@@ -727,6 +727,10 @@ const projectGroups = [
 
 const projectList = document.getElementById('projectList');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+// A site field holding a URL renders as a link, labelled by its bare domain.
+const siteCell = s => /^https?:\/\//.test(s)
+  ? `<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>`
+  : esc(s);
 let projectIndex = 0;
 projectList.innerHTML = projectGroups.map(group => {
   const rows = group.items.map((p, n) => {
@@ -753,7 +757,7 @@ projectList.innerHTML = projectGroups.map(group => {
             <div>
               <div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div>
             </div>
-            <div class="project-meta-value">${p.client}<br>${p.site}<br>${p.credits}</div>
+            <div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div>
           </div>
           ${p.works ? `<ol class="sub-works">${p.works.map(w => `
             <li class="sub-work">
