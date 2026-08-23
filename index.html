@@ -267,7 +267,6 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
 .grid-item-desc { display: none; padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
   font-weight: 300; color: var(--fg); max-width: 60ch; }
 .grid-item.is-open .grid-item-desc { display: block; }
-.grid-item.is-open .grid-item-tag { color: var(--green-deep); }
 .grid-item.has-gallery .thumb::after { content: attr(data-count); position: absolute; right: 8px; bottom: 8px;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
   background: var(--green-deep); padding: 3px 7px; }
@@ -345,8 +344,6 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   .lb-nav { width: 34px; height: 34px; }
   .lb-zoom-close { right: 12px; } .lb-zoom-counter { left: 16px; }
 }
-.grid-item-tag { padding: 8px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: .04em;
-  color: var(--fg-muted); border-top: 1px solid var(--border); background: var(--bg); }
 
 /* ═══════════════════════════════════════
    APPROACH (about)
@@ -914,7 +911,6 @@ projectList.innerHTML = projectGroups.map(group => {
       return `
       <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}${count}>${inner}</div>
-        <div class="grid-item-tag">${o.label ? esc(o.label) : group.key + '_' + num + String(gi+1).padStart(2,'0') + '.jpg'}</div>
         ${desc}
       </div>`;
     }).join('');
