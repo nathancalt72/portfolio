@@ -221,8 +221,8 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project-plus::before { content: '+'; }
 .project.is-open .project-plus { color: var(--bg); transform: rotate(45deg); }
 
-/* Opening runs on one eased curve, and the contents slide up behind it in
-   sequence — text first, then the deliverables, then the visuals. */
+/* Only the write-up collapses now; the band of visuals below stays put. The
+   panel opens on one eased curve with the text sliding up behind it. */
 .project-content_wrapper { display: grid; grid-template-rows: 0fr;
   transition: grid-template-rows .75s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content_wrapper { grid-template-rows: 1fr; }
@@ -231,7 +231,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   opacity: 0; transform: translateY(22px);
   transition: opacity .55s ease, transform .65s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content { opacity: 1; transform: none; transition-delay: .1s; }
-.project-content { padding: 14px 0 22px; }
+.project-content { padding: 14px 0 12px; }
 .project-desc { font-size: 13px; line-height: 1.62; font-weight: 300; min-height: 1.62em; max-width: 62ch; }
 .project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 12px; line-height: 1.72;
   color: var(--fg); letter-spacing: .01em; }
@@ -242,13 +242,16 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    not fit alongside wraps to the next line rather than opening a sideways
    scroll. */
 .project-grid { display: flex; flex-wrap: wrap; gap: 1px; background: var(--border);
-  align-items: flex-start; }
-/* --d staggers each visual, so the band glides in rather than snapping as a block */
-.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
-  opacity: 0; transform: translateY(38px);
-  transition: opacity .7s ease var(--d, 0ms),
-              transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms); }
-.grid-item.in { opacity: 1; transform: translateY(0); }
+  align-items: flex-start; margin: 12px 0 10px; }
+/* The band belongs to the row, not to the panel that opens under it, so the
+   visuals are visible by default and their entrance is a pure animation laid
+   over that: however it goes, they settle back to the natural state and cannot
+   be left hidden. The script arms it only on a page that is actually being
+   looked at, so nothing sits half-animated in a background tab. --d staggers
+   each visual so the band glides in rather than snapping as a block. */
+.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto; }
+.project-grid.animate .grid-item { animation: item-in .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms) backwards; }
+@keyframes item-in { from { opacity: 0; transform: translateY(38px); } }
 .thumb { position: relative; height: 238px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
 .thumb.landscape { aspect-ratio: 4/3; }
 .thumb.portrait { aspect-ratio: 3/4; }
@@ -963,9 +966,9 @@ projectList.innerHTML = projectGroups.map(group => {
             <div class="pcol"><div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div></div>
             <div class="pcol"><div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
           </div>
-          <div class="project-grid">${grid}</div>
         </div>
       </div>
+      <div class="project-grid">${grid}</div>
     </div>`;
   }).join('');
   return `
@@ -1014,7 +1017,7 @@ function playLoop(v) {
    for a tab that opened in the background and never revisit the decision, so a
    tile can sit on its poster from the moment the visitor first looks at it. */
 function resumeLoops() {
-  document.querySelectorAll('.project.is-open .grid-item video').forEach(v => {
+  document.querySelectorAll('.grid-item video').forEach(v => {
     if (v.paused && v.muted) playLoop(v);
   });
 }
@@ -1043,45 +1046,26 @@ function watchLoop(v) {
 }
 document.querySelectorAll('.grid-item video').forEach(watchLoop);
 
+/* Arm the band's entrance only once there is someone to see it. Animations do
+   not tick in a background tab, and one held at its first keyframe would leave
+   the visuals invisible — the one thing the band must never be. */
+function armBands() {
+  if (document.hidden) return;
+  document.removeEventListener('visibilitychange', armBands);
+  document.querySelectorAll('.project-grid').forEach(g => g.classList.add('animate'));
+}
+document.addEventListener('visibilitychange', armBands);
+armBands();
+
 document.querySelectorAll('.project-header').forEach(header => {
   header.addEventListener('click', () => {
     const project = header.closest('.project');
-    const wasOpen = project.classList.contains('is-open');
+    // Only the write-up answers to the header now; the visuals below are always
+    // on screen and keep looping either way.
+    if (!project.classList.contains('is-open')) scrambleIn(project.querySelector('.project-desc'));
     project.classList.toggle('is-open');
-    const items = project.querySelectorAll('.grid-item');
-    if (wasOpen) {
-      // Reset so the visuals glide in again next time, without the open stagger
-      // dragging the fade-out out behind the collapsing panel.
-      items.forEach(item => { item.style.transitionDelay = '0ms'; item.classList.remove('in'); });
-      // Nothing is on screen any more; stop decoding.
-      project.querySelectorAll('.grid-item video').forEach(v => v.pause());
-    } else {
-      scrambleIn(project.querySelector('.project-desc'));
-      // The autoplay attribute is unreliable for a video that loaded inside a
-      // collapsed row with no height, so start them once the row is open.
-      project.querySelectorAll('.grid-item video').forEach(playLoop);
-      // Set directly rather than waiting a frame: the items have been sitting in
-      // their hidden state since the last close, so there is already something to
-      // transition from — and rAF does not fire while the page is hidden.
-      items.forEach(item => { item.style.transitionDelay = ''; item.classList.add('in'); });
-    }
   });
 });
-
-/* auto-open first project once scrolled into view */
-(function () {
-  const firstHeader = document.querySelector('.project-header');
-  if (!firstHeader) return;
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        obs.disconnect();
-        if (!firstHeader.closest('.project').classList.contains('is-open')) firstHeader.click();
-      }
-    });
-  }, { rootMargin: '0px 0px -25% 0px', threshold: 0 });
-  obs.observe(firstHeader);
-})();
 
 /* ── DOCUMENT VIEWER ──
    Two levels: an overview of every page, and a zoom layer over it. */
