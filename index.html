@@ -234,7 +234,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .project-content { padding: 14px 0 12px; }
 .project-desc { font-size: 13px; line-height: 1.62; font-weight: 300; min-height: 1.62em; max-width: 62ch; }
 .project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 12px; line-height: 1.72;
-  color: var(--fg); letter-spacing: .01em; }
+  color: var(--fg); letter-spacing: .01em; overflow-wrap: break-word; }
 .project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; }
 .project-meta-value a:hover { border-color: var(--gold); }
 
@@ -875,7 +875,7 @@ const projectGroups = [
      tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'2024',
      desc:{fr:"Motion design pour les réseaux sociaux et miniatures YouTube, réalisé lors d'un stage d'avril à mai 2024 dans cette startup de courtage en assurance de prêts.",
            en:"Social media motion design and YouTube thumbnails, made over a two-month internship in the spring of 2024 at this loan-insurance brokerage startup."},
-     client:'Ma Nouvelle Assurance', site:'https://www.manouvelleassurance.fr/', credits:'Nathan Charlot',
+     client:'Ma Nouvelle Assurance', site:'—', credits:'Nathan Charlot',
      thumbs:[
        {ratio:'landscape', ar:'16/9', label:'loi lemoine', src:'projects/mna-lemoine/poster.jpg',
         title:{fr:'Loi Lemoine', en:'The Lemoine law'},
@@ -897,29 +897,22 @@ const projectGroups = [
      ]},
   ]},
   { key: 'school', items: [
-    {title:{fr:'Vidéo de mémoire', en:'Thesis film'},
-     tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2026',
-     desc:{fr:"Mémoire de fin de mastère stratégies de communication et de marketing, option direction artistique. Le film en est la restitution : écriture, direction artistique et motion design.",
-           en:"Final thesis for a master's in communication and marketing strategy, art direction track. The film is how it was presented: writing, art direction and motion design."},
+    {title:{fr:'Mastère marketing & communication (majeur direction artistique)', en:'Master’s in marketing & communication (art direction major)'},
+     tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026',
+     desc:{fr:"Deux ans de mastère marketing et communication, majeur direction artistique. Le mémoire de fin d'études y côtoie les travaux de cours, du projet de groupe au film d'auteur.",
+           en:"Two years of a master's in marketing and communication, art direction major. The final thesis sits alongside the coursework, from group projects to a film of my own."},
      client:'CESACOM', site:'—', credits:'Nathan Charlot',
      thumbs:[
        {ratio:'landscape', ar:'16/9', label:'vidéo de mémoire', src:'projects/ces-memoire/poster.jpg',
         title:{fr:'Vidéo de mémoire', en:'Thesis film'},
-        desc:{fr:"Le film part de la promesse de l'IA générative — une campagne responsable prête en deux secondes — pour poser la question que le métier esquive : ce que cela coûte à la planète, et pourquoi presque personne ne le mesure. Il nomme cet angle mort, puis se referme sur deux leviers : une charte IA et la formation.",
-              en:"The film starts from the promise of generative AI — a responsible campaign ready in two seconds — to ask the question the industry sidesteps: what it costs the planet, and why almost nobody measures it. It names that blind spot, then closes on two levers: an AI charter, and training."},
+        desc:{fr:"Vidéo de mémoire de fin d'études, dont j'ai signé l'écriture, la direction artistique et le motion design. Elle part de la promesse de l'IA générative — une campagne responsable prête en deux secondes — pour poser la question que le métier esquive : ce que cela coûte à la planète, et pourquoi presque personne ne le mesure. Elle nomme cet angle mort, puis se referme sur deux leviers : une charte IA et la formation.",
+              en:"My final thesis film, written, art directed and animated by me. It starts from the promise of generative AI — a responsible campaign ready in two seconds — to ask the question the industry sidesteps: what it costs the planet, and why almost nobody measures it. It names that blind spot, then closes on two levers: an AI charter, and training."},
         video:'projects/ces-memoire/loop.mp4', film:'projects/ces-memoire/film.mp4',
         poster:'projects/ces-memoire/poster.jpg'},
-     ]},
-    {title:{fr:'Bienvenue aux 7 Merveilles du Monde', en:'Welcome to the 7 Wonders of the World'},
-     tags:{fr:'Motion design', en:'Motion design'}, year:'2025-2026',
-     desc:{fr:"Projet de groupe du cours photo et vidéo du mastère : une marque de voyage fictive, ROLL OUT, envoie sa mascotte globe faire le tour des sept merveilles du monde. J'ai réalisé l'intégralité du motion design de cette vidéo.",
-           en:"A group project from the master's photography and video course: ROLL OUT, an invented travel brand, sends its globe mascot around the seven wonders of the world. The motion design on this film is entirely mine."},
-     client:'CESACOM', site:'—', credits:'Nathan Charlot · motion design',
-     thumbs:[
        {ratio:'landscape', ar:'16/9', label:'7 merveilles du monde', src:'projects/ces-merveilles/poster.jpg',
-        title:{fr:'Les 7 merveilles', en:'The 7 wonders'},
-        desc:{fr:"Chichén Itzá, la Grande Muraille de Chine, le Taj Mahal, le Colisée, le Christ Rédempteur, Petra, le Machu Picchu : chaque merveille a son décor en illustration à plat et sa notice, et la mascotte passe de l'une à l'autre. Le film se referme sur un au revoir en plusieurs langues.",
-              en:"Chichén Itzá, the Great Wall of China, the Taj Mahal, the Colosseum, Christ the Redeemer, Petra, Machu Picchu: each wonder gets its own flat-illustrated set and a short note, with the mascot travelling from one to the next. The film signs off with a goodbye in several languages."},
+        title:{fr:'Bienvenue aux 7 Merveilles du Monde', en:'Welcome to the 7 Wonders of the World'},
+        desc:{fr:"Projet de groupe du cours photo et vidéo : une marque de voyage fictive, ROLL OUT, envoie sa mascotte globe faire le tour des sept merveilles. Chacune a son décor en illustration à plat et sa notice — Chichén Itzá, la Grande Muraille, le Taj Mahal, le Colisée, le Christ Rédempteur, Petra, le Machu Picchu — et le film se referme sur un au revoir en plusieurs langues. J'ai réalisé l'intégralité du motion design.",
+              en:"A group project from the photography and video course: ROLL OUT, an invented travel brand, sends its globe mascot around the seven wonders. Each gets its own flat-illustrated set and a short note — Chichén Itzá, the Great Wall, the Taj Mahal, the Colosseum, Christ the Redeemer, Petra, Machu Picchu — and the film signs off with a goodbye in several languages. The motion design is entirely mine."},
         video:'projects/ces-merveilles/loop.mp4', film:'projects/ces-merveilles/film.mp4',
         poster:'projects/ces-merveilles/poster.jpg'},
      ]},
