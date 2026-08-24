@@ -830,7 +830,7 @@ const projectGroups = [
         title:{fr:'Plaquette commerciale', en:'Sales brochure'},
         desc:{fr:"Plaquette commerciale présentant les deux gammes de la carrosserie — véhicules utilitaires légers et poids-lourds — avec leurs types de caisses : fourgon, plsc, savoyarde, benne, plateau, porteur remorque.",
               en:"Sales brochure covering the two ranges — light commercial vehicles and heavy goods — with their body types: van, curtain-side, tarpaulin, tipper, flatbed, drawbar."},
-        video:'projects/cit-plaquette/plaquette.webm', silent:true},
+        video:'projects/cit-plaquette/loop.mp4', silent:true},
 
        {ratio:'landscape', ar:'2400/1697', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
         title:{fr:'Charte graphique', en:'Brand guidelines'},
@@ -846,21 +846,21 @@ const projectGroups = [
         title:{fr:'Site internet', en:'Website'},
         desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l'accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l'iPhone 15 Pro.",
               en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
-        video:'projects/cit-video/preview.mp4', film:'projects/cit-video/film.mp4',
+        video:'projects/cit-video/loop.mp4', film:'projects/cit-video/film.mp4',
         poster:'projects/cit-video/poster.jpg'},
        {ratio:'square', ar:'1300/1150', label:'post recrutement',
         src:'projects/cit-social/thumb.jpg', poster:'projects/cit-social/thumb.jpg',
         title:{fr:'Post recrutement', en:'Recruitment post'},
         desc:{fr:"Post LinkedIn pour la Carrosserie Toutain : recrutement d'un technicien BE dessinateur développement, en CDI à La Flèche.",
               en:"LinkedIn post for Carrosserie Toutain: hiring a design-office draughtsman on a permanent contract in La Flèche."},
-        video:'projects/cit-social/recrutement.mp4', silent:true},
+        video:'projects/cit-social/loop.mp4', silent:true},
 
        {ratio:'portrait', ar:'900/1080', label:'vœux 2026',
         src:'projects/hl-social/thumb.jpg', poster:'projects/hl-social/thumb.jpg',
         title:{fr:'Vœux 2026', en:'New year 2026'},
         desc:{fr:"Vœux de bonne année pour le compte LinkedIn de HLSolutions.",
               en:"New year greetings for the HLSolutions LinkedIn account."},
-        video:'projects/hl-social/voeux-2026.mp4', silent:true},
+        video:'projects/hl-social/loop.mp4', silent:true},
        {ratio:'landscape', ar:'16/9', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
         title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
         desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
@@ -994,6 +994,20 @@ function scrambleIn(el) {
   tick();
 }
 
+/* Nudge a tile video into its silent loop. Retries on loadeddata, because a
+   play() issued before there is any data to show is simply dropped. */
+function playLoop(v) {
+  if (!v) return;
+  v.muted = true;
+  const go = () => { const p = v.play(); if (p) p.catch(function () {}); };
+  go();
+  if (v.readyState < 2) v.addEventListener('loadeddata', go, { once: true });
+}
+// A first interaction lifts any autoplay block the policy applied earlier.
+document.addEventListener('pointerdown', () => {
+  document.querySelectorAll('.project.is-open .grid-item video').forEach(v => { if (v.paused && v.muted) playLoop(v); });
+}, { once: true });
+
 document.querySelectorAll('.project-header').forEach(header => {
   header.addEventListener('click', () => {
     const project = header.closest('.project');
@@ -1004,8 +1018,13 @@ document.querySelectorAll('.project-header').forEach(header => {
       // Reset so the visuals glide in again next time, without the open stagger
       // dragging the fade-out out behind the collapsing panel.
       items.forEach(item => { item.style.transitionDelay = '0ms'; item.classList.remove('in'); });
+      // Nothing is on screen any more; stop decoding.
+      project.querySelectorAll('.grid-item video').forEach(v => v.pause());
     } else {
       scrambleIn(project.querySelector('.project-desc'));
+      // The autoplay attribute is unreliable for a video that loaded inside a
+      // collapsed row with no height, so start them once the row is open.
+      project.querySelectorAll('.grid-item video').forEach(playLoop);
       // Set directly rather than waiting a frame: the items have been sitting in
       // their hidden state since the last close, so there is already something to
       // transition from — and rAF does not fire while the page is hidden.
