@@ -253,7 +253,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* Visuals sit at a common height and keep their own ratio; anything that will
    not fit alongside wraps to the next line rather than opening a sideways
    scroll. */
-.project-grid { display: flex; flex-wrap: wrap; gap: 1px; background: var(--border);
+.project-grid { display: flex; flex-wrap: wrap; gap: 1px;
   align-items: flex-start; margin: 0 0 10px; }
 /* The band belongs to the row, not to the panel that opens under it, so the
    visuals are visible by default and their entrance is a pure animation laid
@@ -261,7 +261,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    be left hidden. The script arms it only on a page that is actually being
    looked at, so nothing sits half-animated in a background tab. --d staggers
    each visual so the band glides in rather than snapping as a block. */
-.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto; }
+/* The hairline between visuals is drawn by each tile into the gap beside it,
+   rather than by a background behind the whole band — that background filled
+   the rest of the row with a solid block wherever the tiles stopped short. */
+.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
+  box-shadow: 1px 0 0 var(--border), 0 1px 0 var(--border); }
 .project-grid.animate .grid-item { animation: item-in .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms) backwards; }
 @keyframes item-in { from { opacity: 0; transform: translateY(38px); } }
 .thumb { position: relative; height: 238px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
