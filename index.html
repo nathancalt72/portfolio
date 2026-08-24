@@ -910,11 +910,19 @@ const projectGroups = [
         video:'projects/ces-memoire/loop.mp4', film:'projects/ces-memoire/film.mp4',
         poster:'projects/ces-memoire/poster.jpg'},
      ]},
-    {title:{fr:'Titre du projet', en:'Project title'},
-     tags:{fr:'Montage, Post-prod', en:'Editing, Post-production'}, year:'—',
-     desc:{fr:'Description du projet. À remplacer.', en:'Project description. To be replaced.'},
-     client:'—', site:'—', credits:'Nathan Charlot',
-     thumbs:['landscape','landscape','portrait','square']},
+    {title:{fr:'Bienvenue aux 7 Merveilles du Monde', en:'Welcome to the 7 Wonders of the World'},
+     tags:{fr:'Motion design', en:'Motion design'}, year:'2025-2026',
+     desc:{fr:"Projet de groupe du cours photo et vidéo du mastère : une marque de voyage fictive, ROLL OUT, envoie sa mascotte globe faire le tour des sept merveilles du monde. J'ai réalisé l'intégralité du motion design de cette vidéo.",
+           en:"A group project from the master's photography and video course: ROLL OUT, an invented travel brand, sends its globe mascot around the seven wonders of the world. The motion design on this film is entirely mine."},
+     client:'CESACOM', site:'—', credits:'Nathan Charlot · motion design',
+     thumbs:[
+       {ratio:'landscape', ar:'16/9', label:'7 merveilles du monde', src:'projects/ces-merveilles/poster.jpg',
+        title:{fr:'Les 7 merveilles', en:'The 7 wonders'},
+        desc:{fr:"Chichén Itzá, la Grande Muraille de Chine, le Taj Mahal, le Colisée, le Christ Rédempteur, Petra, le Machu Picchu : chaque merveille a son décor en illustration à plat et sa notice, et la mascotte passe de l'une à l'autre. Le film se referme sur un au revoir en plusieurs langues.",
+              en:"Chichén Itzá, the Great Wall of China, the Taj Mahal, the Colosseum, Christ the Redeemer, Petra, Machu Picchu: each wonder gets its own flat-illustrated set and a short note, with the mascot travelling from one to the next. The film signs off with a goodbye in several languages."},
+        video:'projects/ces-merveilles/loop.mp4', film:'projects/ces-merveilles/film.mp4',
+        poster:'projects/ces-merveilles/poster.jpg'},
+     ]},
   ]},
   { key: 'personal', items: [
     {title:{fr:'Titre du projet', en:'Project title'},
@@ -1072,6 +1080,17 @@ function armBands() {
   if (document.hidden) return;
   document.removeEventListener('visibilitychange', armBands);
   document.querySelectorAll('.project-grid').forEach(g => g.classList.add('animate'));
+  // A page can report itself visible and still not be compositing — a window
+  // off screen, a throttled tab — which parks the animation on its first
+  // keyframe for good. No entrance is worth a blank band, so drop it from any
+  // band that has not landed well after the longest stagger should have.
+  setTimeout(function () {
+    document.querySelectorAll('.project-grid.animate').forEach(g => {
+      const stuck = [...g.querySelectorAll('.grid-item')]
+        .some(i => getComputedStyle(i).opacity !== '1');
+      if (stuck) g.classList.remove('animate');
+    });
+  }, 3000);
 }
 document.addEventListener('visibilitychange', armBands);
 armBands();
