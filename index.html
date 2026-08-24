@@ -279,6 +279,10 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
   font-weight: 300; color: var(--fg); }
 .grid-item.is-open .grid-item-desc { display: block; }
+.grid-item-link { display: inline-block; margin-top: 10px; font-family: var(--mono);
+  font-size: 11px; letter-spacing: .06em; text-transform: lowercase; color: var(--gold);
+  text-decoration: none; border-bottom: 1px solid transparent; }
+.grid-item-link:hover { border-color: var(--gold); }
 .grid-item.has-gallery .thumb::after { content: attr(data-count); position: absolute; right: 8px; bottom: 8px;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
   background: var(--green-deep); padding: 3px 7px; }
@@ -949,6 +953,13 @@ const projectGroups = [
               en:"A group project from the photography and video course: ROLL OUT, an invented travel brand, sends its globe mascot around the seven wonders. Each gets its own flat-illustrated set and a short note — Chichén Itzá, the Great Wall, the Taj Mahal, the Colosseum, Christ the Redeemer, Petra, Machu Picchu — and the film signs off with a goodbye in several languages. The motion design is entirely mine."},
         video:'projects/ces-merveilles/loop.mp4', film:'projects/ces-merveilles/film.mp4',
         poster:'projects/ces-merveilles/poster.jpg'},
+       {ratio:'landscape', ar:'16/9', label:'à feu doux', src:'projects/ces-podcast/poster.jpg',
+        title:{fr:'À Feu Doux — générique', en:'À Feu Doux — opening titles'},
+        desc:{fr:"Podcast inventé de A à Z en groupe de quatre, avec une semaine pour livrer un épisode. Sujet libre : ce sera la santé mentale chez les jeunes, prise « à feu doux » — une cocotte qui mijote sur sa flamme, dont le titre s'échappe en vapeur. J'ai réalisé le générique, et pris part au branding, à l'idée et au tournage.",
+              en:"A podcast invented from nothing, four of us, one week to deliver an episode. The subject was ours to choose: mental health among young people, taken gently — à feu doux — as a pot simmering over its flame, the title rising out of it like steam. I made the opening titles, and had a hand in the branding, the idea and the shoot."},
+        video:'projects/ces-podcast/loop.mp4', silent:true,
+        link:{href:'https://www.youtube.com/watch?v=FQ6ZWMKPxck',
+              fr:'épisode complet sur youtube (30 min)', en:'full episode on youtube (30 min)'}},
      ]},
   ]},
   { key: 'personal', items: [
@@ -992,9 +1003,15 @@ projectList.innerHTML = projectGroups.map(group => {
       const count = o.video ? ' data-count="vidéo"'
         : o.images ? ` data-count="${pageCount(o.images.length)}"` : '';
       // A film expands in place, so its write-up has to live in the tile — there
-      // is no panel to carry it.
+      // is no panel to carry it. The text sits in its own element rather than
+      // straight in the block, because the language switch replaces textContent
+      // and would wipe out any link beside it.
       const desc = o.video && o.desc
-        ? `<div class="grid-item-desc" data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</div>`
+        ? `<div class="grid-item-desc">` +
+          `<span data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</span>` +
+          (o.link ? `<a class="grid-item-link" href="${esc(o.link.href)}" target="_blank" rel="noopener noreferrer"
+             data-fr="${esc(o.link.fr)}" data-en="${esc(o.link.en)}">${o.link.en}</a>` : '') +
+          `</div>`
         : '';
       return `
       <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
@@ -1251,6 +1268,8 @@ document.addEventListener('keydown', e => {
 document.addEventListener('click', e => {
   const item = e.target.closest('.grid-item');
   if (!item) return;
+  // A link inside a tile is its own destination; do not also toggle the tile.
+  if (e.target.closest('a')) return;
 
   // A film stays its own size and simply turns its sound on, rather than
   // resizing or opening a panel. Clicking again puts it back to a silent loop.
