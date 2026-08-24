@@ -261,6 +261,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* contain, never cover: a visual is shown whole. Tiles carry the media's own
    ratio so there is nothing to letterbox. */
 .thumb img, .thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* Two sides of the same sheet: the second is stacked over the first and fades
+   in on hover, rather than swapping the src, which would flash the first time
+   while the other side is still being fetched. */
+.thumb-alt { opacity: 0; transition: opacity .4s ease; }
+.grid-item:hover .thumb-alt { opacity: 1; }
 .grid-item.is-film .thumb-sound { position: absolute; left: 8px; bottom: 8px; z-index: 2;
   font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: lowercase;
   color: var(--bg); background: var(--green-deep); padding: 3px 7px; transition: opacity .3s; }
@@ -903,7 +908,7 @@ const projectGroups = [
            en:"Two years of a master's in marketing and communication, art direction major. The final thesis sits alongside the coursework, from group projects to a film of my own."},
      client:'CESACOM', site:'—', credits:'Nathan Charlot',
      thumbs:[
-       {ratio:'portrait', ar:'1643/2301', src:'projects/ces-abstrait/thumb.jpg', label:'l’abstrait contemporain',
+       {ratio:'landscape', ar:'1723/850', src:'projects/ces-abstrait/thumb.jpg', hover:'projects/ces-abstrait/thumb-hover.jpg', label:'l’abstrait contemporain',
         title:{fr:'L’Abstrait Contemporain', en:'L’Abstrait Contemporain'},
         desc:{fr:"Exercice de PAO : bâtir l’identité graphique d’une marque, puis la décliner en affiche et en dépliant. L’Abstrait Contemporain est une exposition inventée pour l’occasion, posée à l’Ancienne Halle des Subsistances à Lyon. La statuaire classique y passe au tamis du noir, du blanc et d’un seul rouge, avec Wornas au titrage et IBM Plex Mono pour le texte. La charte, l’affiche et les deux faces du dépliant sont réunies ici.",
               en:"A desktop-publishing brief: build a brand’s visual identity, then carry it onto a poster and a leaflet. L’Abstrait Contemporain is an exhibition invented for the exercise, set at the Ancienne Halle des Subsistances in Lyon. Classical statuary is put through black, white and a single red, with Wornas for titling and IBM Plex Mono for text. The guidelines, the poster and both sides of the leaflet are gathered here."},
@@ -957,7 +962,8 @@ projectList.innerHTML = projectGroups.map(group => {
              src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
            ${o.silent ? '' : '<span class="thumb-sound">—</span>'}`
         : o.src
-        ? `<img src="${esc(o.src)}" alt="" loading="lazy">`
+        ? `<img src="${esc(o.src)}" alt="" loading="lazy">` +
+          (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}" alt="" loading="lazy">` : '')
         : `<div class="thumb-label">[ img ]</div>`;
       const count = o.video ? ' data-count="vidéo"'
         : o.images ? ` data-count="${pageCount(o.images.length)}"` : '';
