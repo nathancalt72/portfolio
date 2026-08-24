@@ -180,16 +180,15 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em;
   text-transform: lowercase; color: var(--green-deep); }
 .cat-count { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-/* A category can carry a line about itself, and a marker for where the work
-   actually lives. Kept to one measure so it reads as a note, not a preamble. */
+/* A category can carry a line about itself, and a figure worth stating plainly.
+   Kept to one measure so it reads as a note, not a preamble. */
 .cat-note { display: flex; align-items: flex-start; justify-content: space-between;
   gap: 40px; padding: 0 0 20px; }
 .cat-note-text { margin: 0; max-width: 62ch; font-size: 13px; line-height: 1.7;
   font-weight: 300; color: var(--fg); }
-.cat-stat { display: flex; align-items: center; gap: 9px; flex-shrink: 0;
-  font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: var(--green-deep); }
-.cat-stat svg { width: 15px; height: 15px; display: block; flex-shrink: 0; }
-.cat-views { white-space: nowrap; }
+.cat-stat { margin: 0; flex-shrink: 0; align-self: flex-end;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
+  color: var(--green-deep); white-space: nowrap; }
 @media (max-width: 700px) {
   .cat-note { flex-direction: column; gap: 14px; }
 }
@@ -978,7 +977,7 @@ const projectGroups = [
   { key: 'personal',
     note:{fr:"Le montage avant le métier : ce que je fais quand personne ne le commande. Des fan edits depuis 2019, des images que je tourne pour le souvenir, et des compositions photo tirées du quotidien.",
           en:"Editing before it was the job: what I make when nobody has asked for it. Fan edits since 2019, footage shot to keep, and photo compositions drawn from everyday life."},
-    social:true,
+    views:{fr:'plus de 3,5 M de vues cumulées', en:'over 3.5M views in total'},
     items: [
     {title:{fr:'Fan edits', en:'Fan edits'},
      tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026',
@@ -1005,17 +1004,6 @@ const projectList = document.getElementById('projectList');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const pageCount = n => String(n).padStart(2, '0') + (n > 1 ? ' pages' : ' page');
 // A site field holding a URL renders as a link, labelled by its bare domain.
-/* Drawn here rather than fetched: the page carries no external assets, and a
-   monoline pair sits with the rest of the interface. Not the official marks. */
-const icoInstagram = `<svg viewBox="0 0 24 24" role="img" aria-label="Instagram">
-  <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
-  <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor"/></svg>`;
-const icoTiktok = `<svg viewBox="0 0 24 24" role="img" aria-label="TikTok">
-  <path d="M13.4 3v11.6a3.4 3.4 0 1 1-2.9-3.36" fill="none" stroke="currentColor"
-    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M13.4 3c.35 2.7 2 4.35 4.7 4.6" fill="none" stroke="currentColor"
-    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const siteCell = s => /^https?:\/\//.test(s)
   ? `<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>`
   : esc(s);
@@ -1092,10 +1080,7 @@ projectList.innerHTML = projectGroups.map(group => {
     </div>
     ${group.note ? `<div class="cat-note">
       <p class="cat-note-text" data-fr="${esc(group.note.fr)}" data-en="${esc(group.note.en)}">${group.note.en}</p>
-      ${group.social ? `<div class="cat-stat">
-        ${icoInstagram}${icoTiktok}
-        ${group.views ? `<span class="cat-views" data-fr="${esc(group.views.fr)}" data-en="${esc(group.views.en)}">${group.views.en}</span>` : ''}
-      </div>` : ''}
+      ${group.views ? `<p class="cat-stat" data-fr="${esc(group.views.fr)}" data-en="${esc(group.views.en)}">${group.views.en}</p>` : ''}
     </div>` : ''}
     ${rows}
   </div>`;
