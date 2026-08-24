@@ -282,7 +282,16 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    keeps its picture instead of baring an empty frame. It also survives a paused
    video, which the poster attribute does not — that only shows before the first
    frame lands. */
-.thumb-poster { z-index: 1; transition: opacity .35s ease; }
+/* Thumbnails rest in black and cream, so a band of unrelated work reads as one
+   surface instead of a scatter of palettes. The sepia/saturate pair was picked
+   by measuring: light tones land on #f6eddc, a shade off the page's own cream,
+   while blacks stay black. Real colour returns under the cursor. */
+.thumb img { filter: grayscale(1) sepia(.9) saturate(.35) brightness(1.05);
+  /* Both transitions live here: this selector outranks .thumb-poster and
+     .thumb-alt, and would otherwise strip the fades they declare. */
+  transition: filter .45s ease, opacity .35s ease; }
+.thumb-poster { z-index: 1; }
+.grid-item:hover .thumb img, .grid-item.is-open .thumb img { filter: none; }
 .grid-item.is-playing .thumb-poster { opacity: 0; }
 /* Two sides of the same sheet: the second is stacked over the first and fades
    in on hover, rather than swapping the src, which would flash the first time
