@@ -1008,6 +1008,27 @@ document.addEventListener('pointerdown', () => {
   document.querySelectorAll('.project.is-open .grid-item video').forEach(v => { if (v.paused && v.muted) playLoop(v); });
 }, { once: true });
 
+/* A media element whose fetch fails latches into an error state and never
+   retries by itself, so the tile stays frozen on its poster for good. Reload
+   the source a few times, backing off, before giving up on it. */
+function watchLoop(v) {
+  let tries = 0;
+  v.addEventListener('error', () => {
+    if (tries >= 3) return;
+    tries++;
+    setTimeout(() => {
+      const src = v.getAttribute('src');
+      if (!src) return;
+      v.removeAttribute('src');
+      v.load();
+      v.setAttribute('src', src);
+      v.load();
+      playLoop(v);
+    }, 500 * tries);
+  });
+}
+document.querySelectorAll('.grid-item video').forEach(watchLoop);
+
 document.querySelectorAll('.project-header').forEach(header => {
   header.addEventListener('click', () => {
     const project = header.closest('.project');
