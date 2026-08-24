@@ -1003,10 +1003,17 @@ function playLoop(v) {
   go();
   if (v.readyState < 2) v.addEventListener('loadeddata', go, { once: true });
 }
-// A first interaction lifts any autoplay block the policy applied earlier.
-document.addEventListener('pointerdown', () => {
-  document.querySelectorAll('.project.is-open .grid-item video').forEach(v => { if (v.paused && v.muted) playLoop(v); });
-}, { once: true });
+/* Restart whatever should be looping but is not. Browsers hold back autoplay
+   for a tab that opened in the background and never revisit the decision, so a
+   tile can sit on its poster from the moment the visitor first looks at it. */
+function resumeLoops() {
+  document.querySelectorAll('.project.is-open .grid-item video').forEach(v => {
+    if (v.paused && v.muted) playLoop(v);
+  });
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) resumeLoops(); });
+window.addEventListener('focus', resumeLoops);
+document.addEventListener('pointerdown', resumeLoops, { once: true });
 
 /* A media element whose fetch fails latches into an error state and never
    retries by itself, so the tile stays frozen on its poster for good. Reload
