@@ -664,6 +664,12 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
 <script>
 const applyLangHooks = [];
 
+/* A refresh should land at the top. Left alone, the browser puts the visitor
+   back where they were, which drops them mid-band while the curtain is still
+   opening. Skipped when the URL names a section, so the nav links still work. */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if (!location.hash) window.scrollTo(0, 0);
+
 /* ── SWISS 12-COL GRID TOGGLE (shift+G) ── */
 window.addEventListener('keydown', e => {
   if (e.shiftKey && e.key.toLowerCase() === 'g') {
@@ -682,6 +688,9 @@ window.addEventListener('keydown', e => {
       setTimeout(function () {
         pt.classList.add('hidden');
         document.body.classList.remove('no-scroll-transition');
+        // The scroll was locked until now, so a restored offset could only take
+        // effect here; put it back to the top once more.
+        if (!location.hash) window.scrollTo(0, 0);
         // Unlocking the scroll can change the available width; re-fit the headline.
         window.dispatchEvent(new Event('resize'));
       }, 650);
