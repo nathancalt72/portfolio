@@ -908,11 +908,11 @@ function renderCaps() {
    accordions survive a language switch. */
 const projectGroups = [
   { key: 'pro', items: [
-    {title:{fr:'Alternance Carrosserie Toutain', en:'Carrosserie Toutain apprenticeship'},
+    {title:{fr:'Alternance Carrosserie Toutain', en:'Toutain - Industrial Bodywork apprenticeship'},
      tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026',
      desc:{fr:"Alternance à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication — de la charte graphique à la signalétique du site, en passant par le web et les réseaux sociaux. Le périmètre couvrait aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
-           en:"Apprenticeship at Carrosserie Industrielle Toutain, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
-     client:'Carrosserie Toutain · HLSolutions', site:'https://sastoutain.com/', credits:'Nathan Charlot',
+           en:"Apprenticeship at Toutain - Industrial Bodywork, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
+     client:{fr:'Carrosserie Toutain · HLSolutions', en:'Toutain - Industrial Bodywork · HLSolutions'}, site:'https://sastoutain.com/', credits:'Nathan Charlot',
      // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
        {file:'toutain1.gif', ratio:'portrait', ar:'1080/1400', label:'plaquette commerciale',
@@ -942,7 +942,7 @@ const projectGroups = [
         src:'projects/cit-social/thumb.jpg', poster:'projects/cit-social/thumb.jpg',
         title:{fr:'Post recrutement', en:'Recruitment post'},
         desc:{fr:"Post LinkedIn pour la Carrosserie Toutain : recrutement d'un technicien BE dessinateur développement, en CDI à La Flèche.",
-              en:"LinkedIn post for Carrosserie Toutain: hiring a design-office draughtsman on a permanent contract in La Flèche."},
+              en:"LinkedIn post for Toutain - Industrial Bodywork: hiring a design-office draughtsman on a permanent contract in La Flèche."},
         video:'projects/cit-social/loop.mp4', silent:true},
 
        {file:'toutain6.mp4', ratio:'portrait', ar:'900/1080', label:'vœux 2026',
@@ -1126,6 +1126,11 @@ const projectGroups = [
 const projectList = document.getElementById('projectList');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const pageCount = n => String(n).padStart(2, '0') + (n > 1 ? ' pages' : ' page');
+// A client can carry both languages, for a name that is worth translating.
+// Plain strings still work, and stay as they are in either language.
+const clientCell = c => (c && typeof c === 'object')
+  ? `<span data-fr="${esc(c.fr)}" data-en="${esc(c.en)}">${esc(c.en)}</span>`
+  : esc(c);
 // A site field holding a URL renders as a link, labelled by its bare domain.
 const siteCell = s => /^https?:\/\//.test(s)
   ? `<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>`
@@ -1191,7 +1196,7 @@ projectList.innerHTML = projectGroups.map(group => {
             <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}" data-done="1">${p.desc.en}</p></div>
             <div class="pcol"></div>
             <div class="pcol"><div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div></div>
-            <div class="pcol"><div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
+            <div class="pcol"><div class="project-meta-value">${clientCell(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
           </div>
         </div>
       </div>
