@@ -300,12 +300,6 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    while the other side is still being fetched. */
 .thumb-alt { opacity: 0; transition: opacity .4s ease; }
 .grid-item:hover .thumb-alt { opacity: 1; }
-.grid-item.is-film .thumb-sound { position: absolute; left: 8px; bottom: 8px; z-index: 2;
-  font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: lowercase;
-  color: var(--bg); background: var(--green-deep); padding: 3px 7px; transition: opacity .3s; }
-.grid-item.is-film .thumb-sound::before { content: 'cliquer pour le son'; }
-html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for sound'; }
-.grid-item.is-film.is-open .thumb-sound { opacity: 0; }
 /* width:0 + min-width:100% keeps the text out of the tile's intrinsic sizing —
    otherwise the paragraph, not the media, would decide how wide the tile is and
    the block would run past the video. */
@@ -317,9 +311,6 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   font-size: 11px; letter-spacing: .06em; text-transform: lowercase; color: var(--gold);
   text-decoration: none; border-bottom: 1px solid transparent; }
 .grid-item-link:hover { border-color: var(--gold); }
-.grid-item.has-gallery .thumb::after { content: attr(data-count); position: absolute; right: 8px; bottom: 8px;
-  font-family: var(--mono); font-size: 9px; letter-spacing: .1em; color: var(--bg);
-  background: var(--green-deep); padding: 3px 7px; }
 
 /* ── DOCUMENT VIEWER ──
    The whole document at a glance, and it has to hold in the window: the panel
@@ -376,10 +367,6 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   overflow: hidden; transition: border-color .25s; }
 .sheet:hover { border-color: var(--green-deep); }
 .sheet img { display: block; width: 100%; height: auto; }
-.sheet-num { position: absolute; left: 0; bottom: 0; font-family: var(--mono); font-size: 9px;
-  letter-spacing: .1em; color: var(--bg); background: var(--green-deep); padding: 3px 7px;
-  opacity: 0; transition: opacity .25s; }
-.sheet:hover .sheet-num { opacity: 1; }
 
 /* Zoom layer, on top of the overview */
 .lb-zoom { position: fixed; inset: 0; z-index: 310;
@@ -1137,14 +1124,11 @@ projectList.innerHTML = projectGroups.map(group => {
       const inner = o.video
         ? `<video muted loop playsinline preload="none"
              src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
-           ${o.poster ? `<img class="thumb-poster" src="${esc(o.poster)}" alt="" loading="lazy">` : ''}
-           ${o.silent ? '' : '<span class="thumb-sound">—</span>'}`
+           ${o.poster ? `<img class="thumb-poster" src="${esc(o.poster)}" alt="" loading="lazy">` : ''}`
         : o.src
         ? `<img src="${esc(o.src)}" alt="" loading="lazy">` +
           (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}" alt="" loading="lazy">` : '')
         : `<div class="thumb-label">[ img ]</div>`;
-      const count = o.video ? ' data-count="vidéo"'
-        : o.images ? ` data-count="${pageCount(o.images.length)}"` : '';
       // A film expands in place, so its write-up has to live in the tile — there
       // is no panel to carry it. The text sits in its own element rather than
       // straight in the block, because the language switch replaces textContent
@@ -1158,7 +1142,7 @@ projectList.innerHTML = projectGroups.map(group => {
         : '';
       return `
       <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
-        <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}${count}>${inner}</div>
+        <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${desc}
       </div>`;
     }).join('');
@@ -1332,7 +1316,6 @@ function lbOpen(g) {
   const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
       <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
-      <span class="sheet-num">${String(i + 1).padStart(2, '0')}</span>
     </div>`;
   // A film takes the whole width and plays in place; pages keep the cover-plus-
   // grid split. preload="none" so opening the entry does not pull megabytes.
