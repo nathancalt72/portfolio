@@ -178,7 +178,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* --pad is what the project rows cancel out to reach the viewport edges */
 #work { --pad: 40px; padding: 90px var(--pad) 40px; }
 .work-tag_wrapper { margin-bottom: 30px; }
-.cat-group + .cat-group { margin-top: 54px; }
+/* A wide breath between the three kinds of work, a narrower one between the
+   projects inside a kind. */
+.cat-group + .cat-group { margin-top: 130px; }
+.project + .project { margin-top: 30px; }
 .cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
 .cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em;
   text-transform: lowercase; color: var(--green-deep); }
@@ -256,7 +259,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* Visuals sit at a common height and keep their own ratio; anything that will
    not fit alongside wraps to the next line rather than opening a sideways
    scroll. */
-.project-grid { display: flex; flex-wrap: wrap; gap: 1px;
+.project-grid { display: flex; flex-wrap: wrap; gap: 14px;
   align-items: flex-start; margin: 0 0 10px; }
 /* The band belongs to the row, not to the panel that opens under it, so the
    visuals are visible by default and their entrance is a pure animation laid
@@ -264,11 +267,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    be left hidden. The script arms it only on a page that is actually being
    looked at, so nothing sits half-animated in a background tab. --d staggers
    each visual so the band glides in rather than snapping as a block. */
-/* The hairline between visuals is drawn by each tile into the gap beside it,
-   rather than by a background behind the whole band — that background filled
-   the rest of the row with a solid block wherever the tiles stopped short. */
-.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto;
-  box-shadow: 1px 0 0 var(--border), 0 1px 0 var(--border); }
+.grid-item { position: relative; background: var(--bg); cursor: none; flex: 0 0 auto; }
+/* The format is named under each visual, the way the reference labels its
+   files: enough for the visitor to know whether a tile will move. */
+.thumb-file { display: block; padding: 7px 0 0; font-family: var(--mono);
+  font-size: 10px; letter-spacing: .08em; color: var(--fg-muted); }
 .project-grid.animate .grid-item { animation: item-in .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms) backwards; }
 @keyframes item-in { from { opacity: 0; transform: translateY(38px); } }
 .thumb { position: relative; height: 238px; background: repeating-linear-gradient(135deg, var(--panel) 0, var(--panel) 6px, var(--bg) 6px, var(--bg) 12px); }
@@ -1144,6 +1147,11 @@ projectList.innerHTML = projectGroups.map(group => {
       // is no panel to carry it. The text sits in its own element rather than
       // straight in the block, because the language switch replaces textContent
       // and would wipe out any link beside it.
+      // Names the format under the tile: the video if there is one, otherwise
+      // the page behind it, falling back to the still itself.
+      const fileOf = o.video || (o.images && o.images[0]) || o.src || '';
+      const ext = fileOf ? '.' + fileOf.split('.').pop().toLowerCase() : '';
+      const fileTag = ext ? `<span class="thumb-file">${esc(ext)}</span>` : '';
       const desc = o.video && o.desc
         ? `<div class="grid-item-desc">` +
           `<span data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</span>` +
@@ -1154,11 +1162,12 @@ projectList.innerHTML = projectGroups.map(group => {
       return `
       <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
+        ${fileTag}
         ${desc}
       </div>`;
     }).join('');
     return `
-    <div class="project" data-index="${idx}">
+    <div class="project is-open" data-index="${idx}">
       <div class="project-header">
         <span class="pcol">
           <span class="project-num">${num}</span>
@@ -1171,7 +1180,7 @@ projectList.innerHTML = projectGroups.map(group => {
       <div class="project-content_wrapper">
         <div class="project-content_inner">
           <div class="project-content">
-            <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}"></p></div>
+            <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}" data-done="1">${p.desc.en}</p></div>
             <div class="pcol"></div>
             <div class="pcol"><div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div></div>
             <div class="pcol"><div class="project-meta-value">${esc(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
@@ -1287,9 +1296,11 @@ armBands();
 document.querySelectorAll('.project-header').forEach(header => {
   header.addEventListener('click', () => {
     const project = header.closest('.project');
-    // Only the write-up answers to the header now; the visuals below are always
-    // on screen and keep looping either way.
-    if (!project.classList.contains('is-open')) scrambleIn(project.querySelector('.project-desc'));
+    const desc = project.querySelector('.project-desc');
+    // Open from the start; closing clears the scramble flag so the write-up
+    // types itself back in the next time the title is clicked.
+    if (project.classList.contains('is-open')) delete desc.dataset.done;
+    else scrambleIn(desc);
     project.classList.toggle('is-open');
   });
 });
