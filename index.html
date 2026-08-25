@@ -581,7 +581,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 <!-- ═══ HERO ═══ -->
 <section id="hero">
   <div class="hero-inner">
-    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">motion designer &amp; editor. based in france — <span class="mark">open</span> to impact-driven projects, 2026.</h1>
+    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Creative, motion designer junior &amp; social media editor. based in france — <span class="mark">open to work with you</span>, 2026.</h1>
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
   </div>
 </section>
@@ -790,9 +790,12 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 /* ── HERO AUTO-FIT HEADLINE ── */
 (function () {
   const h1 = document.getElementById('heroTitle');
-  function resizeText() {
-    const container = h1.parentElement;
-    const containerWidth = container.offsetWidth;
+  // Both wordings are measured and the smaller size wins, so the headline keeps
+  // one size and one weight across the two languages: switching FR/EN must not
+  // reflow the first thing a visitor reads.
+  let variants = null;
+  function largestThatFits() {
+    const containerWidth = h1.parentElement.offsetWidth;
     const isMobile = window.innerWidth < 768;
     const targetHeight = window.innerHeight * (isMobile ? .37 : .44);
     let size = 20;
@@ -800,11 +803,27 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     while (h1.scrollHeight < targetHeight && h1.scrollWidth <= containerWidth + 1 && size < 260) {
       size++; h1.style.fontSize = size + 'px';
     }
-    size--; h1.style.fontSize = size + 'px';
+    return size - 1;
+  }
+  function resizeText() {
+    if (!variants) { h1.style.fontSize = largestThatFits() + 'px'; return; }
+    const keep = h1.innerHTML;
+    let smallest = Infinity;
+    variants.forEach(function (html) {
+      h1.innerHTML = html;
+      smallest = Math.min(smallest, largestThatFits());
+    });
+    h1.innerHTML = keep;
+    h1.style.fontSize = smallest + 'px';
   }
   window.addEventListener('load', resizeText);
   window.addEventListener('resize', resizeText);
-  applyLangHooks.push(resizeText);
+  // Registered as a hook rather than reading the dictionary directly: this runs
+  // only from applyLang, by which time the translations exist.
+  applyLangHooks.push(function () {
+    variants = [translations.fr.hero_title, translations.en.hero_title];
+    resizeText();
+  });
   // Fit against real metrics: on `load` the webfont may still be swapping, which
   // sizes the headline off the fallback and can cost it a whole line. `ready`
   // alone can resolve before the face is applied, so await the face itself too.
@@ -1504,7 +1523,7 @@ if (hamburger) {
 const translations = {
   fr: {
     nav_work: 'travail', nav_about: 'à propos', nav_contact: 'contact',
-    hero_title: 'motion designer &amp; monteur. basé en france — <span class="mark">à l\'écoute</span> de projets à impact, 2026.',
+    hero_title: 'Créatif, motion designer junior et monteur. Basé en France et <span class="mark">prêt à collaborer avec vous</span>, 2026.',
     hero_scroll: 'défiler',
     work_label: 'projets',
     lb_close: 'fermer',
@@ -1523,7 +1542,7 @@ const translations = {
   },
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
-    hero_title: 'motion designer &amp; editor. based in france — <span class="mark">open</span> to impact-driven projects, 2026.',
+    hero_title: 'Creative, motion designer junior &amp; social media editor. based in france — <span class="mark">open to work with you</span>, 2026.',
     hero_scroll: 'scroll',
     work_label: 'projects',
     lb_close: 'close',
