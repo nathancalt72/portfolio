@@ -156,10 +156,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    HERO
 ═══════════════════════════════════════ */
-/* The headline sits at the foot of the first screen, where it meets the ascii
-   backdrop, which is bottom-aligned too. */
-#hero { position: relative; min-height: 88vh; display: flex; flex-direction: column;
-  justify-content: flex-end; padding: 40px 40px 40px; }
+/* The section ends exactly at the fold so the headline can sit on it. The nav
+   is in flow above, so its measured height comes out of the calculation. */
+#hero { position: relative; min-height: calc(100vh - var(--nav-h, 64px));
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 40px 40px 20px; }
 .hero-inner { position: relative; z-index: 1; width: 100%; }
 
 /* Reference sets weight 400, line-height 102% and indents the first line by one
@@ -169,7 +170,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   text-indent: 25%; min-width: 100%; }
 .title-h1 .mark { color: var(--green-deep); }
 .scroll-down-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
-  color: var(--fg-muted); margin-top: 40px; }
+  color: var(--fg-muted); margin-top: 16px; }
 
 /* ═══════════════════════════════════════
    WORK — ACCORDION
@@ -658,6 +659,16 @@ const applyLangHooks = [];
    opening. Skipped when the URL names a section, so the nav links still work. */
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 if (!location.hash) window.scrollTo(0, 0);
+
+/* Feed the nav's real height to the hero, so the first screen ends exactly at
+   the fold whatever the breakpoint does to the bar. */
+function setNavHeight() {
+  const nav = document.querySelector('nav');
+  if (nav) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+}
+setNavHeight();
+window.addEventListener('resize', setNavHeight);
+window.addEventListener('load', setNavHeight);
 
 /* ── SWISS 12-COL GRID TOGGLE (shift+G) ── */
 window.addEventListener('keydown', e => {
