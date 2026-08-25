@@ -156,8 +156,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    HERO
 ═══════════════════════════════════════ */
-#hero { position: relative; min-height: 88vh; display: flex; flex-direction: column; justify-content: center;
-  padding: 40px 40px 0; }
+/* The headline sits at the foot of the first screen, where it meets the ascii
+   backdrop, which is bottom-aligned too. */
+#hero { position: relative; min-height: 88vh; display: flex; flex-direction: column;
+  justify-content: flex-end; padding: 40px 40px 40px; }
 .hero-inner { position: relative; z-index: 1; width: 100%; }
 
 /* Reference sets weight 400, line-height 102% and indents the first line by one
@@ -519,7 +521,7 @@ html[lang="en"] .grid-item.is-film .thumb-sound::before { content: 'click for so
   nav { height: 56px; padding: 0 18px; }
   .nav-short { display: inline; } .nav-long { display: none; }
   .lang-switcher { margin-left: auto; margin-right: 14px; }
-  #hero { padding: 88px 18px 0; }
+  #hero { padding: 88px 18px 28px; }
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 30px; }
   .thumb { height: 154px; }
