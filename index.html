@@ -1007,7 +1007,7 @@ const projectGroups = [
      tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026',
      desc:{fr:"Deux ans de mastère marketing et communication, majeur direction artistique. Le mémoire de fin d'études y côtoie les travaux de cours, du projet de groupe au film d'auteur.",
            en:"Two years of a master's in marketing and communication, art direction major. The final thesis sits alongside the coursework, from group projects to a film of my own."},
-     client:'CESACOM', site:'—', credits:'Nathan Charlot',
+     client:'CESACOM', site:'https://www.cesacom.fr/', credits:'Nathan Charlot',
      thumbs:[
        {file:'brochure.pdf', ratio:'landscape', ar:'1723/850', src:'projects/ces-abstrait/verso.jpg', hover:'projects/ces-abstrait/recto.jpg', label:'l’abstrait contemporain',
         title:{fr:'L’Abstrait Contemporain', en:'L’Abstrait Contemporain'},
@@ -1044,7 +1044,7 @@ const projectGroups = [
      tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026',
      desc:{fr:"Le montage a commencé là, en 2019, du côté du spectateur : les fan edits, ces courts montages bâtis autour de personnages de fiction, de célébrités, de voitures — de à peu près tout. J'ai fini par en faire, sur plusieurs comptes Instagram et TikTok. Le format est devenu depuis un langage à part entière, que les marques emploient pour mettre en avant un produit ou un service.",
            en:"Editing started here, in 2019, on the watching side: fan edits, short cuts built around fictional characters, celebrities, cars — around just about anything. I ended up making them myself, across several Instagram and TikTok accounts. The form has since become a language of its own, one brands now use to put a product or a service across."},
-     client:'—', site:'—', credits:'Nathan Charlot',
+     credits:'Nathan Charlot',
      thumbs:[
        {file:'edit1.mp4', ratio:'square', ar:'1/1', label:'le jeu de la dame', src:'projects/edit-queens-gambit/poster.jpg',
         title:{fr:'Le Jeu de la dame', en:'The Queen’s Gambit'},
@@ -1075,7 +1075,7 @@ const projectGroups = [
      tags:{fr:'Tournage, Montage', en:'Shooting, Editing'}, year:'—',
      desc:{fr:"Des images que je tourne moi-même et que je monte pour ce qu'elles sont : des souvenirs, et un terrain où chercher une esthétique sans commande ni cahier des charges.",
            en:"Footage I shoot myself and cut for what it is: memories, and a place to look for an aesthetic with no brief and no client."},
-     client:'—', site:'—', credits:'Nathan Charlot',
+     credits:'Nathan Charlot',
      thumbs:[
        {file:'perso1.mp4', ratio:'portrait', ar:'9/16', label:'balade', src:'projects/clip-balade/poster.jpg',
         title:{fr:'Balade', en:'Walk'},
@@ -1106,7 +1106,7 @@ const projectGroups = [
      tags:{fr:'Photographie, Composition', en:'Photography, Composition'}, year:'—',
      desc:{fr:"Des compositions souvent abstraites, assemblées à partir de photos prises au fil des jours.",
            en:"Compositions, often abstract, assembled from photographs taken day to day."},
-     client:'—', site:'—', credits:'Nathan Charlot',
+     credits:'Nathan Charlot',
      thumbs:[
        {file:'picedit1.jpg', ratio:'landscape', ar:'16/9', label:'teen wolf', src:'projects/photo-teenwolf/thumb.jpg',
         title:{fr:'Teen Wolf', en:'Teen Wolf'},
@@ -1159,6 +1159,15 @@ const galleries = [];
 projectList.innerHTML = projectGroups.map(group => {
   const rows = group.items.map((p, n) => {
     const num = String(n + 1).padStart(2, '0');
+    // Only the fields a project actually has: personal work answers to no
+    // client and lives at no address, so those lines are absent rather than
+    // filled with a dash.
+    const metaRows = [];
+    if (p.client) metaRows.push(['pm_client', clientCell(p.client)]);
+    if (p.site) metaRows.push(['pm_site', siteCell(p.site)]);
+    if (p.credits) metaRows.push(['pm_credits', esc(p.credits)]);
+    const metaLabels = metaRows.map(r => `<span data-i18n="${r[0]}"></span>`).join('<br>');
+    const metaValues = metaRows.map(r => r[1]).join('<br>');
     const idx = projectIndex++;
     // A thumb is either a bare ratio string (placeholder) or a deliverable: a
     // label, a write-up, and optionally the pages behind it. Anything carrying a
@@ -1214,8 +1223,8 @@ projectList.innerHTML = projectGroups.map(group => {
           <div class="project-content">
             <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}" data-done="1">${p.desc.en}</p></div>
             <div class="pcol"></div>
-            <div class="pcol"><div class="project-meta-label" data-i18n="pm_client_label">client:<br>site:<br>credits:</div></div>
-            <div class="pcol"><div class="project-meta-value">${clientCell(p.client)}<br>${siteCell(p.site)}<br>${esc(p.credits)}</div></div>
+            <div class="pcol"><div class="project-meta-label">${metaLabels}</div></div>
+            <div class="pcol"><div class="project-meta-value">${metaValues}</div></div>
           </div>
         </div>
       </div>
@@ -1528,7 +1537,7 @@ const translations = {
     work_label: 'projets',
     lb_close: 'fermer',
     cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
-    pm_client_label: 'client :<br>site :<br>crédits :',
+    pm_client: 'client :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
     approach_lead: 'le mouvement,<br>comme <span class="mark">langage</span>.',
     approach_body: '<p>Étudiant en M2 Communication, je me spécialise dans le motion design et le montage — deux disciplines que j\'aborde comme une seule écriture : donner du rythme à une idée jusqu\'à ce qu\'elle tienne debout à l\'image.</p><p>Je suis aujourd\'hui en quête de projets portés par des entreprises à fort impact environnemental, où le fond compte autant que la forme.</p>',
@@ -1547,7 +1556,7 @@ const translations = {
     work_label: 'projects',
     lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
-    pm_client_label: 'client:<br>site:<br>credits:',
+    pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
     approach_lead: 'motion,<br>as <span class="mark">language</span>.',
     approach_body: '<p>M2 Communication student, I specialize in motion design and video editing — two disciplines I treat as a single act of writing: giving rhythm to an idea until it stands on its own on screen.</p><p>I\'m currently looking for projects driven by companies with a strong environmental impact, where substance matters as much as form.</p>',
