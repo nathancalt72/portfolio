@@ -425,31 +425,33 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    APPROACH (about)
 ═══════════════════════════════════════ */
-/* One screen, bottom-aligned: the statement on the left, the story on the right.
-   Everything above them is left empty on purpose — the ascii backdrop shows through,
-   the way the reference spread carries a photograph there. */
-#approach { border-top: 1px solid var(--border); min-height: 100vh; padding: 34px 40px;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto 1fr; column-gap: 60px; align-items: end; }
-.approach-top { grid-column: 1 / -1; display: flex; align-items: baseline;
+/* The reference spread, kept literal: the statement runs from the top of the left
+   column downwards, the pull-quote sits under it, and the small justified columns
+   land at the bottom right. The upper right is left empty — that is where the
+   spread carries its photograph, and here the ascii backdrop shows through. */
+#approach { border-top: 1px solid var(--border); min-height: 100vh; padding: 34px 40px 40px;
+  display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: auto 1fr;
+  column-gap: 26px; }
+.approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
   justify-content: space-between; gap: 20px; }
-/* Sized by whichever axis runs out first, so three lines of it always land on screen. */
-.approach-display { grid-column: 1; grid-row: 2; align-self: end;
-  font-family: var(--display); font-weight: 700; text-transform: uppercase;
-  color: var(--green-deep); font-size: clamp(38px, min(9vw, 30vh), 168px);
+.approach-left { grid-column: 1 / 6; grid-row: 2; align-self: start; padding-top: 22px; }
+/* Sized by script from the column it stands in — see ABOUT HEADLINE AUTO-FIT.
+   The clamp below is only what a visitor without javascript gets. */
+.approach-display { font-family: var(--display); font-weight: 700; text-transform: uppercase;
+  white-space: nowrap; color: var(--green-deep); font-size: clamp(34px, min(6.6vw, 19vh), 150px);
   line-height: .84; letter-spacing: -.02em; }
-.approach-side { grid-column: 2; grid-row: 2; align-self: end; padding-bottom: 4px; }
-.approach-body { columns: 2; column-gap: 34px; }
-.approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
-  text-align: justify; hyphens: auto; }
-.approach-body p + p { margin-top: 13px; }
-.approach-quote { position: relative; margin: 0 0 26px; padding: 0 0 0 26px;
+.approach-quote { position: relative; margin: 34px 0 0; padding: 0 0 0 26px;
   font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
   line-height: 2.1; letter-spacing: .2em; word-spacing: .5em; color: var(--green-deep);
-  max-width: 40ch; text-transform: lowercase; }
+  max-width: 34ch; text-transform: lowercase; }
 .approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
+.approach-body { grid-column: 6 / 13; grid-row: 2; align-self: end;
+  columns: 2; column-gap: 32px; }
+.approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
+  text-align: justify; hyphens: auto; }
+.approach-body p + p { margin-top: 13px; }
 .approach-status { display: flex; align-items: center; gap: 10px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
 
@@ -506,10 +508,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   #work { --pad: 22px; padding: 70px var(--pad) 34px; }
   /* Stacked: the one-screen grid stops paying for itself once the columns go. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 34px;
-    min-height: 0; align-items: start; padding-top: 60px; padding-bottom: 60px; }
-  .approach-display, .approach-side { grid-column: 1; grid-row: auto; }
-  .approach-display { font-size: clamp(38px, 11vw, 76px); }
-  .approach-side { padding-bottom: 0; }
+    min-height: 0; padding-top: 60px; padding-bottom: 60px; }
+  .approach-left, .approach-body { grid-column: 1; grid-row: auto; align-self: start; }
+  .approach-left { padding-top: 0; }
+  .approach-display { font-size: clamp(38px, 12vw, 84px); }
   .approach-body { columns: 1; }
   .approach-body p { font-size: 14px; line-height: 1.8; }
   .cap-grid { grid-template-columns: 1fr; }
@@ -626,15 +628,15 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
       <span class="approach-status-text" data-i18n="approach_status">available · france</span>
     </div>
   </div>
-  <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT MORE<br>ABOUT ME</h2>
-  <div class="approach-side">
-    <div class="approach-quote reveal reveal-delay-1" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
-    <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
+  <div class="approach-left">
+    <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT<br>MORE<br>ABOUT ME</h2>
+    <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
+  </div>
+  <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
       <p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p>
       <p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>
       <p>In 2024, I decided to reconnect the creative side with the digital one. A master's in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p>
       <p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>
-    </div>
   </div>
 </section>
 
@@ -853,6 +855,70 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   if (document.fonts) {
     document.fonts.load('400 100px "Space Grotesk"').then(resizeText).catch(function () {});
     document.fonts.ready.then(function () { requestAnimationFrame(resizeText); });
+  }
+})();
+
+
+/* ── ABOUT HEADLINE AUTO-FIT ──
+   Sized from the column it stands in rather than from the viewport: the grid's
+   gaps are fixed pixels, so a vw formula drifts away from the column at other
+   widths and the longest line wraps. Both wordings are measured and the smaller
+   size wins, so fr and en print the statement at exactly one size. */
+(function () {
+  const el = document.querySelector('.approach-display');
+  if (!el) return;
+  let variants = null;
+  // Measured on a detached copy, never on the element itself: a line box is
+  // clipped to its container, so an overflowing line reads back as exactly the
+  // column width and the fit silently becomes a no-op. Absolute + max-content
+  // is the only geometry that reports the true width of the longest line.
+  const probe = document.createElement('div');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;' +
+    'white-space:nowrap;width:max-content;pointer-events:none;';
+  document.body.appendChild(probe);
+  function widestAt100(html) {
+    const cs = getComputedStyle(el);
+    const size = parseFloat(cs.fontSize) || 100;
+    const spacing = parseFloat(cs.letterSpacing); // NaN when 'normal'
+    probe.style.fontFamily = cs.fontFamily;
+    probe.style.fontWeight = cs.fontWeight;
+    probe.style.fontStyle = cs.fontStyle;
+    probe.style.textTransform = cs.textTransform;
+    probe.style.fontSize = '100px';
+    probe.style.letterSpacing = (spacing ? spacing * 100 / size : 0) + 'px';
+    probe.innerHTML = html;
+    const range = document.createRange();
+    range.selectNodeContents(probe);
+    const rects = range.getClientRects();
+    let w = 0;
+    for (let i = 0; i < rects.length; i++) w = Math.max(w, rects[i].width);
+    return w;
+  }
+  function largestThatFits(html) {
+    const box = el.parentElement.clientWidth;
+    const w = widestAt100(html);
+    if (!box || !w) return 34;
+    const lines = html.split(/<br\s*\/?>/i).length;
+    // What the pull-quote, the top row and the section's padding leave behind.
+    const byHeight = (window.innerHeight - 206) / (lines * .84);
+    return Math.max(30, Math.min(100 * box / w, byHeight, 168));
+  }
+  function resizeAbout() {
+    const wordings = variants || [el.innerHTML];
+    let smallest = Infinity;
+    wordings.forEach(function (html) { smallest = Math.min(smallest, largestThatFits(html)); });
+    el.style.fontSize = smallest + 'px';
+  }
+  window.addEventListener('load', resizeAbout);
+  window.addEventListener('resize', resizeAbout);
+  applyLangHooks.push(function () {
+    variants = [translations.fr.approach_display, translations.en.approach_display];
+    resizeAbout();
+  });
+  if (document.fonts) {
+    document.fonts.load('700 100px "Space Grotesk"').then(resizeAbout).catch(function () {});
+    document.fonts.ready.then(function () { requestAnimationFrame(resizeAbout); });
   }
 })();
 
@@ -1562,7 +1628,7 @@ const translations = {
     cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
     pm_client: 'client :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
-    approach_display: 'UN PETIT<br>PEU PLUS<br>SUR MOI',
+    approach_display: 'UN PETIT<br>PEU<br>PLUS<br>SUR MOI',
     approach_body: '<p>Le déclic s\'est fait en 2019. En plein lycée, je suis passé du côté digital de la création et le montage est devenu une manière de m\'ouvrir au monde. Découvrir, publier, entretenir une communauté sur les réseaux : c\'est là que j\'ai commencé à me construire un langage visuel, et c\'est ce qui m\'a mené vers mes études.</p><p>J\'ai commencé par les langues. Une appétence présente depuis le collège, une attirance pour les cultures étrangères, et l\'idée que la langue est le médium qui les porte le mieux. D\'où une licence LEA, anglais et espagnol, parcours commerce international.</p><p>En 2024, j\'ai décidé de reconnecter la création et le digital. Un mastère marketing et communication, en alternance dans une carrosserie industrielle en Sarthe. Deux ans à construire une identité visuelle pour une entreprise qui n\'en avait pas, et à la faire vivre partout où elle pouvait aller : animations After Effects, vidéos, plaquettes, refonte du site, jusqu\'aux panneaux de signalétique sur le site. Une image qu\'on imprime sur un panneau, on la regarde autrement.</p><p>Ce que je cherche maintenant, ce sont des projets vidéo, animation et produit portés par des structures engagées sur les enjeux environnementaux. C\'est la direction que je veux donner à la suite.</p>',
     approach_quote: 'chercher le geste juste plutôt que l\'effet.',
     approach_status: 'disponible · france',
@@ -1581,7 +1647,7 @@ const translations = {
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
-    approach_display: 'A LITTLE<br>BIT MORE<br>ABOUT ME',
+    approach_display: 'A LITTLE<br>BIT<br>MORE<br>ABOUT ME',
     approach_body: '<p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p><p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p><p>In 2024, I decided to reconnect the creative side with the digital one. A master\'s in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p><p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>',
     approach_quote: 'reaching for the right gesture, not the effect.',
     approach_status: 'available · france',
