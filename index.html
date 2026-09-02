@@ -434,7 +434,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
   justify-content: space-between; gap: 20px; }
-.approach-left { grid-column: 1 / 6; grid-row: 2; align-self: start; padding-top: 22px; }
+/* min-width:0 or the nowrap headline sets the track's floor: the column would grow
+   to the longest line, the fitter would size to that grown column, and the two would
+   never come back down — a phone loses the right edge of the statement. */
+.approach-left { grid-column: 1 / 6; grid-row: 2; align-self: start; padding-top: 22px;
+  min-width: 0; }
 /* Sized by script from the column it stands in — see ABOUT HEADLINE AUTO-FIT.
    The clamp below is only what a visitor without javascript gets. */
 .approach-display { font-family: var(--display); font-weight: 700; text-transform: uppercase;
@@ -448,7 +452,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
 .approach-body { grid-column: 6 / 13; grid-row: 2; align-self: end;
-  columns: 2; column-gap: 32px; }
+  min-width: 0; columns: 2; column-gap: 32px; }
 .approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
   text-align: justify; hyphens: auto; }
 .approach-body p + p { margin-top: 13px; }
