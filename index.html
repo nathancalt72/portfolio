@@ -660,11 +660,16 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
              discs into one shape; fractal noise displaces its edge, which is where the
              odd, unrepeatable outline comes from; the flood/tile/dilate quartet is the
              standard svg way to quantise that outline onto a coarse grid. -->
-        <filter id="apGoo" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+        <!-- The region is pinned to the picture rather than to the discs' bounding box. It
+               therefore stops changing every frame, which lets the browser keep the noise
+               tile instead of regenerating it — and it holds the noise field still in the
+               image, so drifting through it redraws the outline. -->
+        <filter id="apGoo" filterUnits="userSpaceOnUse" x="0" y="0" width="1000" height="587"
+          color-interpolation-filters="sRGB">
           <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="apBlur"/>
           <feColorMatrix in="apBlur" type="matrix"
             values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="apGooed"/>
-          <feTurbulence type="fractalNoise" baseFrequency="0.011 0.017" numOctaves="3"
+          <feTurbulence type="fractalNoise" baseFrequency="0.011 0.017" numOctaves="2"
             seed="7" result="apNoise"/>
           <feDisplacementMap in="apGooed" in2="apNoise" scale="78"
             xChannelSelector="R" yChannelSelector="G" result="apWobble"/>
@@ -1014,30 +1019,41 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // the moment it stops — which is exactly when the blob should shrink back.
   let lead = { x: 500, y: 293 }, speed = 0;
 
-  function frame() {
+  function frame(now) {
+    const time = now / 1000;
     open += (want - open) * .14;
-    let moving = Math.abs(want - open) > .002;
     for (let i = 0; i < discs.length; i++) {
       const p = pos[i];
-      const dx = target.x - p.x, dy = target.y - p.y;
-      if (Math.abs(dx) > .1 || Math.abs(dy) > .1) moving = true;
-      p.x += dx * ease[i];
-      p.y += dy * ease[i];
+      p.x += (target.x - p.x) * ease[i];
+      p.y += (target.y - p.y) * ease[i];
     }
+    // Read before the drift is added: the drift is movement too, and counted here it
+    // would hold the blob open at its travelling size for as long as the mouse stays.
     const step = Math.hypot(pos[0].x - lead.x, pos[0].y - lead.y);
     lead.x = pos[0].x; lead.y = pos[0].y;
     speed += (step - speed) * .22;
-    if (speed > .15) moving = true;
-    // Still a coin at rest, half the picture at a sweep — the range in the reference
-    // scene is wide, and a narrow one reads as a wobble rather than a reaction.
+    // Still a coin at rest, a third of the picture at a sweep — the range in the
+    // reference scene is wide, and a narrow one reads as a wobble, not a reaction.
     const grow = open * (1 + Math.min(speed / 12, 3.4));
     for (let i = 0; i < discs.length; i++) {
-      discs[i].setAttribute('cx', pos[i].x.toFixed(1));
-      discs[i].setAttribute('cy', pos[i].y.toFixed(1));
-      discs[i].setAttribute('r', (radii[i] * grow).toFixed(1));
+      // Each disc keeps its own slow orbit and its own breath, on periods that do not
+      // divide into one another, so the whole never falls into a visible loop. The
+      // noise field is fixed in the picture, so drifting even a few units through it
+      // redraws the outline — which is what keeps the blob alive once the hand stops.
+      const dx = Math.sin(time * (.92 + i * .17) + i * 2.1) * (5 + i * 2.0);
+      const dy = Math.cos(time * (.71 + i * .23) + i * 1.3) * (4 + i * 1.7);
+      const breath = 1 + Math.sin(time * (.83 + i * .11) + i * .9) * .11;
+      discs[i].setAttribute('cx', (pos[i].x + dx).toFixed(1));
+      discs[i].setAttribute('cy', (pos[i].y + dy).toFixed(1));
+      discs[i].setAttribute('r', (radii[i] * grow * breath).toFixed(1));
     }
-    if (moving) requestAnimationFrame(frame);
-    else running = false;
+    // Runs for as long as anything shows: the drift has no end of its own, so the
+    // loop is stopped by the blob closing, not by the discs coming to rest.
+    if (open > .002) requestAnimationFrame(frame);
+    else {
+      running = false;
+      for (let i = 0; i < discs.length; i++) discs[i].setAttribute('r', 0);
+    }
   }
   function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
 
