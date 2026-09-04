@@ -451,8 +451,25 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
-.approach-body { grid-column: 6 / 13; grid-row: 2; align-self: end;
-  min-width: 0; columns: 2; column-gap: 32px; }
+/* The right column of the spread: portrait on top, columns underneath. */
+.approach-right { grid-column: 6 / 13; grid-row: 2; min-width: 0;
+  display: flex; flex-direction: column; justify-content: flex-end; }
+/* flex-basis 0, not auto: with a basis of auto the portrait would report its own
+   aspect ratio as the column's content height, the grid row would grow to hold it
+   and the section would run past the fold. At 0 it only takes the space the text
+   leaves over, so the section still ends on one screen whatever the window's height. */
+.approach-photo { position: relative; flex: 1 1 0%; min-height: 96px;
+  margin: 0 0 26px; overflow: hidden; background: var(--panel); }
+.approach-photo img { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 42%; display: block; }
+/* The duotone lies on top and is punched through by a disc that follows the
+   pointer. The fade is carried by opacity rather than by the radius, so the
+   effect needs no registered custom property to animate. */
+.approach-photo .ap-duo { opacity: 0; transition: opacity .28s ease;
+  -webkit-mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%); }
+.approach-photo.is-lit .ap-duo { opacity: 1; }
+.approach-body { flex: 0 0 auto; min-width: 0; columns: 2; column-gap: 32px; }
 .approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
   text-align: justify; hyphens: auto; }
 .approach-body p + p { margin-top: 13px; }
@@ -513,9 +530,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   /* Stacked: the one-screen grid stops paying for itself once the columns go. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 34px;
     min-height: 0; padding-top: 60px; padding-bottom: 60px; }
-  .approach-left, .approach-body { grid-column: 1; grid-row: auto; align-self: start; }
+  .approach-left, .approach-right { grid-column: 1; grid-row: auto; align-self: start; }
   .approach-left { padding-top: 0; }
   .approach-display { font-size: clamp(38px, 12vw, 84px); }
+  /* Stacked, there is no leftover space to grow into: give the portrait a shape. */
+  .approach-photo { flex: 0 0 auto; aspect-ratio: 16 / 9; margin-bottom: 30px; }
   .approach-body { columns: 1; }
   .approach-body p { font-size: 14px; line-height: 1.8; }
   .cap-grid { grid-template-columns: 1fr; }
@@ -636,11 +655,17 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
     <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT<br>MORE<br>ABOUT ME</h2>
     <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
   </div>
-  <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
+  <div class="approach-right">
+    <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
+      <img class="ap-color" src="about/portrait.jpg" alt="Nathan Charlot" loading="lazy" decoding="async">
+      <img class="ap-duo" src="about/portrait-duo.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async">
+    </figure>
+    <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
       <p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p>
       <p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>
       <p>In 2024, I decided to reconnect the creative side with the digital one. A master's in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p>
       <p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>
+    </div>
   </div>
 </section>
 
@@ -924,6 +949,32 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     document.fonts.load('700 100px "Space Grotesk"').then(resizeAbout).catch(function () {});
     document.fonts.ready.then(function () { requestAnimationFrame(resizeAbout); });
   }
+})();
+
+/* ── ABOUT PORTRAIT ──
+   The duotone is revealed through a disc that tracks the pointer. Positions are
+   written once per frame: mousemove fires far more often than the screen paints,
+   and each write invalidates the mask. */
+(function () {
+  const fig = document.getElementById('aboutPhoto');
+  if (!fig) return;
+  // A finger has no hover: on touch the portrait simply stays in colour.
+  if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+  let px = 0, py = 0, queued = false;
+  function paint() {
+    queued = false;
+    fig.style.setProperty('--mx', px + 'px');
+    fig.style.setProperty('--my', py + 'px');
+  }
+  function track(e) {
+    const r = fig.getBoundingClientRect();
+    px = e.clientX - r.left;
+    py = e.clientY - r.top;
+    if (!queued) { queued = true; requestAnimationFrame(paint); }
+  }
+  fig.addEventListener('mouseenter', function (e) { track(e); paint(); fig.classList.add('is-lit'); });
+  fig.addEventListener('mousemove', track);
+  fig.addEventListener('mouseleave', function () { fig.classList.remove('is-lit'); });
 })();
 
 /* ── ASCII BACKDROP ──
