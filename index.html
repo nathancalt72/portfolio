@@ -186,7 +186,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    WORK — ACCORDION
 ═══════════════════════════════════════ */
 /* --pad is what the project rows cancel out to reach the viewport edges */
-#work { --pad: 40px; padding: 90px var(--pad) 40px; }
+/* The bottom padding is deliberately large: it is the pause between the work and
+   the page that talks about the person who made it. */
+#work { --pad: 40px; padding: 90px var(--pad) 150px; }
 .work-tag_wrapper { margin-bottom: 30px; }
 /* A wide breath between the three kinds of work, a narrower one between the
    projects inside a kind. */
@@ -429,7 +431,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    photograph, the columns break apart — one under the picture, one lower and further
    left — and the pull-quote tucks in beside them. Height is whatever the content
    comes to; this section is no longer held to a single screen. */
-#approach { border-top: 1px solid var(--border); padding: 40px 40px 70px;
+#approach { border-top: 1px solid var(--border); padding: 110px 40px 70px;
   display: grid; grid-template-columns: repeat(12, 1fr);
   grid-template-rows: auto auto auto; column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
@@ -524,11 +526,11 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
-  #work { --pad: 22px; padding: 70px var(--pad) 34px; }
+  #work { --pad: 22px; padding: 70px var(--pad) 80px; }
   /* Stacked: with nothing beside it the statement has nothing to lie across, and the
      indents that hold the block together on a page only unbalance it in one column. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
-    padding-top: 60px; padding-bottom: 60px; }
+    padding-top: 76px; padding-bottom: 60px; }
   .approach-display, .approach-photo, .approach-quote,
   .approach-body-a, .approach-body-b {
     grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch;
@@ -573,9 +575,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   .lang-switcher { margin-left: auto; margin-right: 14px; }
   #hero { padding: 88px 18px 28px; }
   .title-h1 { font-size: 32px; }
-  #work { --pad: 18px; padding: 60px var(--pad) 30px; }
+  #work { --pad: 18px; padding: 60px var(--pad) 64px; }
   .thumb { height: 154px; }
-  #approach { padding: 60px 18px; }
+  #approach { padding: 64px 18px 60px; }
   .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
   #footer { padding: 20px 18px; }
