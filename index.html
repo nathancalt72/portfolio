@@ -454,9 +454,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .approach-photo { position: relative; grid-column: 6 / 13; grid-row: 2;
   align-self: start; z-index: 1; width: 100%; aspect-ratio: 1000 / 587; margin: 0; }
 .approach-photo svg { display: block; width: 100%; height: 100%; }
-/* The second column sits under the picture, in the same band as the statement's
-   lower lines — the spread staggers its two columns rather than pairing them. */
-.approach-body-b { grid-column: 9 / 13; grid-row: 2; align-self: end; min-width: 0; }
+/* The two columns are staggered rather than paired, as the spread staggers its own.
+   The opening half takes the higher slot, under the picture: it is the one the eye
+   reaches first, so it has to be the one the story starts with. */
+.approach-body-a { grid-column: 9 / 13; grid-row: 2; align-self: end; min-width: 0; }
 .approach-quote { position: relative; grid-column: 1 / 4; grid-row: 3; align-self: start;
   margin: 54px 0 0; padding: 0 0 0 26px;
   font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
@@ -465,7 +466,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
-.approach-body-a { grid-column: 4 / 8; grid-row: 3; align-self: start; min-width: 0;
+.approach-body-b { grid-column: 4 / 8; grid-row: 3; align-self: start; min-width: 0;
   margin-top: 54px; }
 .approach-body-a p, .approach-body-b p { font-size: 12px; line-height: 1.65;
   font-weight: 300; color: var(--fg); text-align: justify; hyphens: auto; }
@@ -704,9 +705,9 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
       </g>
     </svg>
   </figure>
+  <div class="approach-body-a reveal reveal-delay-2" data-i18n-html="approach_body_a"></div>
   <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
   <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
-  <div class="approach-body-a reveal reveal-delay-2" data-i18n-html="approach_body_a"></div>
 </section>
 
 <!-- ═══ CAPABILITIES ═══ -->
@@ -959,7 +960,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // The one thing the statement must not run into is the column standing beside it.
   // That column's position comes from the grid, never from the statement, so reading
   // it back is not circular.
-  const rightCol = document.querySelector('.approach-body-b');
+  const rightCol = document.querySelector('.approach-body-a');
   function resizeAbout() {
     let box = el.clientWidth;
     if (rightCol && window.matchMedia('(min-width: 901px)').matches) {
