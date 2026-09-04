@@ -425,47 +425,34 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    APPROACH (about)
 ═══════════════════════════════════════ */
-/* The reference spread, kept literal: the statement runs from the top of the left
-   column downwards, the pull-quote sits under it, and the small justified columns
-   land at the bottom right. The upper right is left empty — that is where the
-   spread carries its photograph, and here the ascii backdrop shows through. */
+/* Two bands, not two columns. A 1280x600 window — which is what a 1920 screen at
+   150% actually gives — is a 2.3:1 canvas, far flatter than the 1.6:1 spread. Set
+   as columns, the text was 590px wide, needed 330 of the 512 available, and left
+   the portrait a 262px stamp. Across the full width it needs half that, and the
+   picture gets the room back. */
 #approach { border-top: 1px solid var(--border); min-height: 100vh; padding: 34px 40px 40px;
-  display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: auto 1fr;
-  column-gap: 26px; }
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
   justify-content: space-between; gap: 20px; }
-/* The statement runs across two thirds of the page and passes IN FRONT of the
-   portrait, the way the spread's headline crosses its photograph — that overlap is
-   the whole composition. It is therefore a layer, not a column: it claims columns
-   1-9, sits above the picture, and lets the pointer through to it.
+/* The statement is a layer, not a column: it claims columns 1-8 and passes in front
+   of the portrait, the way the spread's headline crosses its photograph. The pointer
+   goes through it so the picture underneath still answers the mouse.
    min-width:0 as well, or the nowrap line would set the track's floor and a phone
    would lose the right edge of the statement. */
-.approach-left { grid-column: 1 / 9; grid-row: 2; align-self: start; padding-top: 22px;
-  min-width: 0; z-index: 2; pointer-events: none; }
-.approach-quote { pointer-events: auto; }
-/* Sized by script from the column it stands in — see ABOUT HEADLINE AUTO-FIT.
-   The clamp below is only what a visitor without javascript gets. */
-.approach-display { font-family: var(--display); font-weight: 700; text-transform: uppercase;
+.approach-display { grid-column: 1 / 8; grid-row: 2; align-self: start; min-width: 0;
+  margin-top: 24px; z-index: 2; pointer-events: none;
+  font-family: var(--display); font-weight: 700; text-transform: uppercase;
   white-space: nowrap; color: var(--green-deep); font-size: clamp(34px, min(6.6vw, 19vh), 150px);
   line-height: .84; letter-spacing: -.02em; }
-.approach-quote { position: relative; margin: 34px 0 0; padding: 0 0 0 26px;
-  font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
-  line-height: 2.1; letter-spacing: .2em; word-spacing: .5em; color: var(--green-deep);
-  max-width: 34ch; text-transform: lowercase; }
-.approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
-  font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
-  letter-spacing: 0; color: var(--green-light); }
-/* Portrait and columns share the right of the page. It starts at column 5, under
-   the tail of the statement, so the green type crosses it. */
-.approach-right { grid-column: 5 / 13; grid-row: 2; min-width: 0; z-index: 1;
-  display: grid; grid-template-rows: minmax(0, 1fr) auto; }
-/* The frame carries the picture's own ratio and is driven by the height the columns
-   leave it, so the whole photograph shows: nothing is cropped and the section still
-   ends on one screen. contain is the safety net for the case where max-width bites
-   and the box comes out taller than the ratio — it letterboxes, it never crops. */
-.approach-photo { position: relative; grid-row: 1; justify-self: end;
-  aspect-ratio: 1000 / 587; max-width: 100%; min-height: 96px;
-  margin: 0 0 26px; overflow: hidden; }
+/* The frame carries the picture's own ratio and its height is the band's, so the
+   whole photograph shows: nothing is cropped, and the section still ends on one
+   screen. contain is the safety net for when max-width bites and the box comes out
+   taller than the ratio — it letterboxes, it never crops. */
+.approach-photo { position: relative; grid-column: 5 / 13; grid-row: 2;
+  align-self: start; justify-self: end; z-index: 1;
+  height: 100%; aspect-ratio: 1000 / 587; max-width: 100%; min-height: 96px;
+  margin: 0; overflow: hidden; }
 .approach-photo img { position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: contain; object-position: center; display: block; }
 /* The duotone lies on top and is punched through by a disc that follows the
@@ -475,13 +462,20 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   -webkit-mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%);
           mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%); }
 .approach-photo.is-lit .ap-duo { opacity: 1; }
-/* Inset from the left of its own column so the columns never run into the tail
-   of the statement lying across them. */
-.approach-body { grid-row: 2; min-width: 0; margin-left: 26%;
-  columns: 2; column-gap: 40px; }
-.approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
+.approach-quote { position: relative; grid-column: 1 / 4; grid-row: 3; align-self: start;
+  margin: 30px 0 0; padding: 0 0 0 26px;
+  font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
+  line-height: 2.1; letter-spacing: .2em; word-spacing: .5em; color: var(--green-deep);
+  max-width: 34ch; text-transform: lowercase; }
+.approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
+  font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
+  letter-spacing: 0; color: var(--green-light); }
+/* Three narrow measures across the width of the page, as the spread sets its own. */
+.approach-body { grid-column: 4 / 13; grid-row: 3; align-self: start; min-width: 0;
+  margin: 30px 0 0; columns: 3; column-gap: 30px; }
+.approach-body p { font-size: 11.5px; line-height: 1.6; font-weight: 300; color: var(--fg);
   text-align: justify; hyphens: auto; }
-.approach-body p + p { margin-top: 13px; }
+.approach-body p + p { margin-top: 11px; }
 .approach-status { display: flex; align-items: center; gap: 10px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
 
@@ -536,17 +530,17 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 34px; }
-  /* Stacked: the one-screen grid stops paying for itself once the columns go, and
-     with nothing beside it the statement has nothing left to lie across. */
-  #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 34px;
+  /* Stacked: with nothing beside it the statement has nothing left to lie across,
+     and the three measures are far too narrow to hold a line. */
+  #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
     min-height: 0; padding-top: 60px; padding-bottom: 60px; }
-  .approach-left, .approach-right { grid-column: 1; grid-row: auto; align-self: start; }
-  .approach-left { padding-top: 0; z-index: auto; pointer-events: auto; }
-  .approach-right { display: block; }
-  .approach-display { font-size: clamp(38px, 12vw, 84px); }
-  /* Stacked, the picture spans the column and keeps its own ratio. */
-  .approach-photo { justify-self: stretch; margin-bottom: 30px; }
-  .approach-body { margin-left: 0; columns: 1; }
+  .approach-display, .approach-photo, .approach-quote, .approach-body {
+    grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch; }
+  .approach-display { margin-top: 0; z-index: auto; pointer-events: auto;
+    font-size: clamp(38px, 12vw, 84px); }
+  .approach-photo { height: auto; max-width: 100%; }
+  .approach-quote { margin-top: 0; }
+  .approach-body { margin-top: 0; columns: 1; }
   .approach-body p { font-size: 14px; line-height: 1.8; }
   .cap-grid { grid-template-columns: 1fr; }
   .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
@@ -662,21 +656,17 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
       <span class="approach-status-text" data-i18n="approach_status">available · france</span>
     </div>
   </div>
-  <div class="approach-left">
-    <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT<br>MORE<br>ABOUT ME</h2>
-    <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
-  </div>
-  <div class="approach-right">
-    <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
-      <img class="ap-color" src="about/portrait.jpg" alt="Nathan Charlot" loading="lazy" decoding="async">
-      <img class="ap-duo" src="about/portrait-duo.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async">
-    </figure>
-    <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
-      <p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p>
-      <p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>
-      <p>In 2024, I decided to reconnect the creative side with the digital one. A master's in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p>
-      <p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>
-    </div>
+  <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT MORE<br>ABOUT ME</h2>
+  <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
+    <img class="ap-color" src="about/portrait.jpg" alt="Nathan Charlot" loading="lazy" decoding="async">
+    <img class="ap-duo" src="about/portrait-duo.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async">
+  </figure>
+  <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
+  <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
+    <p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p>
+    <p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>
+    <p>In 2024, I decided to reconnect the creative side with the digital one. A master's in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p>
+    <p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>
   </div>
 </section>
 
@@ -935,26 +925,24 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     for (let i = 0; i < rects.length; i++) w = Math.max(w, rects[i].width);
     return w;
   }
-  // The statement's layer reaches under the columns, so its own box is not the
-  // limit — the left edge of the text is. That edge comes from the grid and from a
-  // percentage margin, never from the statement, so reading it back is not circular.
-  function availableWidth() {
-    const parent = el.parentElement;
-    let box = parent.clientWidth;
-    const body = document.querySelector('.approach-body');
-    if (body && window.matchMedia('(min-width: 901px)').matches) {
-      const room = body.getBoundingClientRect().left - parent.getBoundingClientRect().left - 56;
+  // Two limits, both read off elements the statement cannot move. Width: the left
+  // edge of the portrait, which it must not run past. Height: the band itself,
+  // measured on the portrait, since the band refuses to grow for its content and an
+  // oversized statement would simply spill out of it unnoticed.
+  const photo = document.querySelector('.approach-photo');
+  function largestThatFits(html) {
+    let box = el.clientWidth;
+    let band = window.innerHeight * .5;
+    if (photo && window.matchMedia('(min-width: 901px)').matches) {
+      const pr = photo.getBoundingClientRect();
+      band = pr.height;
+      const room = pr.left - el.getBoundingClientRect().left - 56;
       if (room > 120) box = Math.min(box, room);
     }
-    return box;
-  }
-  function largestThatFits(html) {
-    const box = availableWidth();
     const w = widestAt100(html);
     if (!box || !w) return 34;
     const lines = html.split(/<br\s*\/?>/i).length;
-    // What the pull-quote, the top row and the section's padding leave behind.
-    const byHeight = (window.innerHeight - 206) / (lines * .84);
+    const byHeight = (band - 26) / (lines * .84);
     return Math.max(30, Math.min(100 * box / w, byHeight, 240));
   }
   function resizeAbout() {
@@ -1707,7 +1695,7 @@ const translations = {
     cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
     pm_client: 'client :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
-    approach_display: 'UN PETIT<br>PEU<br>PLUS<br>SUR MOI',
+    approach_display: 'UN PETIT<br>PEU PLUS<br>SUR MOI',
     approach_body: '<p>Le déclic s\'est fait en 2019. En plein lycée, je suis passé du côté digital de la création et le montage est devenu une manière de m\'ouvrir au monde. Découvrir, publier, entretenir une communauté sur les réseaux : c\'est là que j\'ai commencé à me construire un langage visuel, et c\'est ce qui m\'a mené vers mes études.</p><p>J\'ai commencé par les langues. Une appétence présente depuis le collège, une attirance pour les cultures étrangères, et l\'idée que la langue est le médium qui les porte le mieux. D\'où une licence LEA, anglais et espagnol, parcours commerce international.</p><p>En 2024, j\'ai décidé de reconnecter la création et le digital. Un mastère marketing et communication, en alternance dans une carrosserie industrielle en Sarthe. Deux ans à construire une identité visuelle pour une entreprise qui n\'en avait pas, et à la faire vivre partout où elle pouvait aller : animations After Effects, vidéos, plaquettes, refonte du site, jusqu\'aux panneaux de signalétique sur le site. Une image qu\'on imprime sur un panneau, on la regarde autrement.</p><p>Ce que je cherche maintenant, ce sont des projets vidéo, animation et produit portés par des structures engagées sur les enjeux environnementaux. C\'est la direction que je veux donner à la suite.</p>',
     approach_quote: 'chercher le geste juste plutôt que l\'effet.',
     approach_status: 'disponible · france',
@@ -1726,7 +1714,7 @@ const translations = {
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
-    approach_display: 'A LITTLE<br>BIT<br>MORE<br>ABOUT ME',
+    approach_display: 'A LITTLE<br>BIT MORE<br>ABOUT ME',
     approach_body: '<p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p><p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p><p>In 2024, I decided to reconnect the creative side with the digital one. A master\'s in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p><p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>',
     approach_quote: 'reaching for the right gesture, not the effect.',
     approach_status: 'available · france',
