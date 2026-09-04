@@ -1061,7 +1061,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // shows; as the hand picks up, the 96-pixel copy fades in over it, then the
     // 44-pixel one over that — so the blocks appear, then coarsen, then vanish again
     // when the hand stops. Two adjacent levels are always cross-fading, never popping.
-    const grain = Math.min(speed / 7, 1) * 2;
+    const grain = Math.min(speed / 16, 1) * 2;
     layers[1].setAttribute('opacity', Math.max(0, Math.min(1, 1 - Math.abs(grain - 1))).toFixed(3));
     layers[2].setAttribute('opacity', Math.max(0, Math.min(1, grain - 1)).toFixed(3));
     for (let i = 0; i < discs.length; i++) {
