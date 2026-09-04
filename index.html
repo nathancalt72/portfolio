@@ -689,12 +689,19 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
         </mask>
       </defs>
       <image id="apColor" width="1000" height="587" preserveAspectRatio="xMidYMid slice"></image>
-      <!-- The reveal is a coarse copy blown back up, not the full-resolution duotone:
-           browsers upscale with nearest-neighbour under image-rendering, so the grid is
-           real pixels rather than a filter imitating them. 84 across the picture puts a
-           block every 11.9 viewBox units, the cell size the reference scene uses. -->
-      <image id="apDuo" width="1000" height="587" preserveAspectRatio="xMidYMid slice"
-        mask="url(#apBlob)" style="image-rendering: -moz-crisp-edges; image-rendering: pixelated"></image>
+      <!-- Three copies of the duotone at three resolutions, all cut by the same blob.
+           The smooth one is the base; the two coarse ones are the same picture reduced
+           to 96 and 44 pixels across and blown back up, which browsers do with nearest
+           neighbour under image-rendering — so the grid is real pixels, not a filter
+           imitating them. Their opacity is driven by how fast the hand is moving, which
+           is what makes the grain appear and coarsen with speed and vanish at rest. -->
+      <g mask="url(#apBlob)">
+        <image id="apDuo0" width="1000" height="587" preserveAspectRatio="xMidYMid slice"></image>
+        <image id="apDuo1" width="1000" height="587" preserveAspectRatio="xMidYMid slice" opacity="0"
+          style="image-rendering: -moz-crisp-edges; image-rendering: pixelated"></image>
+        <image id="apDuo2" width="1000" height="587" preserveAspectRatio="xMidYMid slice" opacity="0"
+          style="image-rendering: -moz-crisp-edges; image-rendering: pixelated"></image>
+      </g>
     </svg>
   </figure>
   <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
@@ -992,20 +999,23 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 (function () {
   const fig = document.getElementById('aboutPhoto');
   const colour = document.getElementById('apColor');
-  const duo = document.getElementById('apDuo');
+  const layers = ['apDuo0', 'apDuo1', 'apDuo2'].map(function (id) { return document.getElementById(id); });
   const group = document.getElementById('apBlobG');
-  if (!fig || !colour || !duo || !group) return;
+  if (!fig || !colour || !group || layers.some(function (l) { return !l; })) return;
 
   // The photograph is 145 kB and the section sits far below the fold, so it is fetched
   // once the section approaches. <image> has no lazy attribute, hence the observer.
+  const sources = ['about/portrait-duo-soft.jpg', 'about/portrait-duo-px1.png', 'about/portrait-duo-px2.png'];
   let art = false;
+  function put(el, href) {
+    el.setAttributeNS('http://www.w3.org/1999/xlink', 'href', href);
+    el.setAttribute('href', href);
+  }
   function loadArt() {
     if (art) return;
     art = true;
-    colour.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait.jpg');
-    colour.setAttribute('href', 'about/portrait.jpg');
-    duo.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait-duo-px.png');
-    duo.setAttribute('href', 'about/portrait-duo-px.png');
+    put(colour, 'about/portrait.jpg');
+    layers.forEach(function (el, i) { put(el, sources[i]); });
   }
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(function (entries) {
@@ -1047,6 +1057,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // Still a coin at rest, a third of the picture at a sweep — the range in the
     // reference scene is wide, and a narrow one reads as a wobble, not a reaction.
     const grow = open * (1 + Math.min(speed / 12, 3.4));
+    // The grain rides the same speed reading as the size. At rest only the smooth copy
+    // shows; as the hand picks up, the 96-pixel copy fades in over it, then the
+    // 44-pixel one over that — so the blocks appear, then coarsen, then vanish again
+    // when the hand stops. Two adjacent levels are always cross-fading, never popping.
+    const grain = Math.min(speed / 7, 1) * 2;
+    layers[1].setAttribute('opacity', Math.max(0, Math.min(1, 1 - Math.abs(grain - 1))).toFixed(3));
+    layers[2].setAttribute('opacity', Math.max(0, Math.min(1, grain - 1)).toFixed(3));
     for (let i = 0; i < discs.length; i++) {
       // Each disc keeps its own orbit and its own breath, on periods that do not
       // divide into one another, so the whole never falls into a visible loop. The
@@ -1065,6 +1082,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     else {
       running = false;
       for (let i = 0; i < discs.length; i++) discs[i].setAttribute('r', 0);
+      layers[1].setAttribute('opacity', 0);
+      layers[2].setAttribute('opacity', 0);
     }
   }
   function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
