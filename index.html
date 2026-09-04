@@ -668,11 +668,13 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
             seed="7" result="apNoise"/>
           <feDisplacementMap in="apGooed" in2="apNoise" scale="78"
             xChannelSelector="R" yChannelSelector="G" result="apWobble"/>
-          <feFlood x="0" y="0" width="1" height="1" flood-color="#fff" result="apDot"/>
-          <feComposite in="apDot" width="14" height="14" result="apCell"/>
-          <feTile in="apCell" result="apGrid"/>
-          <feComposite in="apWobble" in2="apGrid" operator="in" result="apSampled"/>
-          <feMorphology in="apSampled" operator="dilate" radius="7"/>
+          <!-- The spread's Pixelate stands for a hard, quantised edge. The usual svg
+               recipe for it — flood, tile, sample, dilate — renders nothing at all here
+               (measured: zero opaque pixels), so the same job is done by a morphological
+               close. Its kernel is rectangular, which squares off the corners the noise
+               has just roughed up. -->
+          <feMorphology in="apWobble" operator="erode" radius="5" result="apTight"/>
+          <feMorphology in="apTight" operator="dilate" radius="11"/>
         </filter>
         <mask id="apBlob" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="587">
           <g id="apBlobG" filter="url(#apGoo)" fill="#fff">
@@ -1028,7 +1030,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     if (speed > .15) moving = true;
     // Still a coin at rest, half the picture at a sweep — the range in the reference
     // scene is wide, and a narrow one reads as a wobble rather than a reaction.
-    const grow = open * (1 + Math.min(speed / 13, 2.6));
+    const grow = open * (1 + Math.min(speed / 12, 3.4));
     for (let i = 0; i < discs.length; i++) {
       discs[i].setAttribute('cx', pos[i].x.toFixed(1));
       discs[i].setAttribute('cy', pos[i].y.toFixed(1));
