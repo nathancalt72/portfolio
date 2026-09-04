@@ -942,7 +942,9 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     const w = widestAt100(html);
     if (!box || !w) return 34;
     const lines = html.split(/<br\s*\/?>/i).length;
-    const byHeight = (band - 26) / (lines * .84);
+    // 24px of margin above it, plus a little slack: overshoot here spills out of a
+    // band that refuses to grow, and pushes the section past the fold.
+    const byHeight = (band - 34) / (lines * .84);
     return Math.max(30, Math.min(100 * box / w, byHeight, 240));
   }
   function resizeAbout() {
@@ -950,6 +952,17 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     let smallest = Infinity;
     wordings.forEach(function (html) { smallest = Math.min(smallest, largestThatFits(html)); });
     el.style.fontSize = smallest + 'px';
+  }
+  // The band's height follows the columns, which settle late — web fonts, then the
+  // lazy portrait. Watching the frame catches every one of those without polling.
+  if (window.ResizeObserver && photo) {
+    let lastBand = 0;
+    new ResizeObserver(function () {
+      const h = photo.getBoundingClientRect().height;
+      if (Math.abs(h - lastBand) < 1) return;
+      lastBand = h;
+      resizeAbout();
+    }).observe(photo);
   }
   window.addEventListener('load', resizeAbout);
   window.addEventListener('resize', resizeAbout);
