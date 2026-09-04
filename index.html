@@ -1036,13 +1036,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // reference scene is wide, and a narrow one reads as a wobble, not a reaction.
     const grow = open * (1 + Math.min(speed / 12, 3.4));
     for (let i = 0; i < discs.length; i++) {
-      // Each disc keeps its own slow orbit and its own breath, on periods that do not
+      // Each disc keeps its own orbit and its own breath, on periods that do not
       // divide into one another, so the whole never falls into a visible loop. The
       // noise field is fixed in the picture, so drifting even a few units through it
       // redraws the outline — which is what keeps the blob alive once the hand stops.
-      const dx = Math.sin(time * (.92 + i * .17) + i * 2.1) * (5 + i * 2.0);
-      const dy = Math.cos(time * (.71 + i * .23) + i * 1.3) * (4 + i * 1.7);
-      const breath = 1 + Math.sin(time * (.83 + i * .11) + i * .9) * .11;
+      const dx = Math.sin(time * (2.25 + i * .41) + i * 2.1) * (5 + i * 2.0);
+      const dy = Math.cos(time * (1.74 + i * .56) + i * 1.3) * (4 + i * 1.7);
+      const breath = 1 + Math.sin(time * (2.03 + i * .27) + i * .9) * .11;
       discs[i].setAttribute('cx', (pos[i].x + dx).toFixed(1));
       discs[i].setAttribute('cy', (pos[i].y + dy).toFixed(1));
       discs[i].setAttribute('r', (radii[i] * grow * breath).toFixed(1));
