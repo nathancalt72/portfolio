@@ -425,57 +425,51 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 /* ═══════════════════════════════════════
    APPROACH (about)
 ═══════════════════════════════════════ */
-/* Two bands, not two columns. A 1280x600 window — which is what a 1920 screen at
-   150% actually gives — is a 2.3:1 canvas, far flatter than the 1.6:1 spread. Set
-   as columns, the text was 590px wide, needed 330 of the 512 available, and left
-   the portrait a 262px stamp. Across the full width it needs half that, and the
-   picture gets the room back. */
-#approach { border-top: 1px solid var(--border); min-height: 100vh; padding: 34px 40px 40px;
+/* The spread, laid out as it is: the statement runs down the left in front of the
+   photograph, the columns break apart — one under the picture, one lower and further
+   left — and the pull-quote tucks in beside them. Height is whatever the content
+   comes to; this section is no longer held to a single screen. */
+#approach { border-top: 1px solid var(--border); padding: 40px 40px 70px;
   display: grid; grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 26px; }
+  grid-template-rows: auto auto auto; column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
-  justify-content: space-between; gap: 20px; }
-/* The statement is a layer, not a column: it claims columns 1-8 and passes in front
-   of the portrait, the way the spread's headline crosses its photograph. The pointer
-   goes through it so the picture underneath still answers the mouse.
-   min-width:0 as well, or the nowrap line would set the track's floor and a phone
-   would lose the right edge of the statement. */
-.approach-display { grid-column: 1 / 8; grid-row: 2; align-self: start; min-width: 0;
-  margin-top: 24px; z-index: 2; pointer-events: none;
+  justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+/* A layer, not a column: it claims columns 1-9 and passes in front of the portrait,
+   the way the spread's headline crosses its photograph. The pointer goes through it
+   so the picture underneath still answers the mouse. min-width:0 as well, or the
+   nowrap lines would set the track's floor and a phone would lose their right edge. */
+.approach-display { grid-column: 1 / 9; grid-row: 2; align-self: start; min-width: 0;
+  z-index: 2; pointer-events: none;
   font-family: var(--display); font-weight: 700; text-transform: uppercase;
-  white-space: nowrap; color: var(--green-deep); font-size: clamp(34px, min(6.6vw, 19vh), 150px);
+  color: var(--green-deep); font-size: clamp(34px, 11vw, 150px);
   line-height: .84; letter-spacing: -.02em; }
-/* The frame carries the picture's own ratio and its height is the band's, so the
-   whole photograph shows: nothing is cropped, and the section still ends on one
-   screen. contain is the safety net for when max-width bites and the box comes out
-   taller than the ratio — it letterboxes, it never crops. */
-.approach-photo { position: relative; grid-column: 5 / 13; grid-row: 2;
-  align-self: start; justify-self: end; z-index: 1;
-  height: 100%; aspect-ratio: 1000 / 587; max-width: 100%; min-height: 96px;
-  margin: 0; overflow: hidden; }
-.approach-photo img { position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: contain; object-position: center; display: block; }
-/* The duotone lies on top and is punched through by a disc that follows the
-   pointer. The fade is carried by opacity rather than by the radius, so the
-   effect needs no registered custom property to animate. */
-.approach-photo .ap-duo { opacity: 0; transition: opacity .28s ease;
-  -webkit-mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%);
-          mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%); }
-.approach-photo.is-lit .ap-duo { opacity: 1; }
+/* Each line carries its own indent — the spread sets its headline adrift rather than
+   flush left, and the ragged left edge is most of what makes it read as one. */
+.approach-display i { display: block; font-style: normal; white-space: nowrap; }
+.approach-display .in1 { margin-left: .85em; }
+.approach-display .in2 { margin-left: 2.05em; }
+.approach-display .in3 { margin-left: 2.55em; }
+.approach-display .in4 { margin-left: 3.15em; }
+/* The frame carries the picture's own ratio, so the whole photograph shows. */
+.approach-photo { position: relative; grid-column: 6 / 13; grid-row: 2;
+  align-self: start; z-index: 1; width: 100%; aspect-ratio: 1000 / 587; margin: 0; }
+.approach-photo svg { display: block; width: 100%; height: 100%; }
+/* The second column sits under the picture, in the same band as the statement's
+   lower lines — the spread staggers its two columns rather than pairing them. */
+.approach-body-b { grid-column: 9 / 13; grid-row: 2; align-self: end; min-width: 0; }
 .approach-quote { position: relative; grid-column: 1 / 4; grid-row: 3; align-self: start;
-  margin: 30px 0 0; padding: 0 0 0 26px;
+  margin: 54px 0 0; padding: 0 0 0 26px;
   font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
   line-height: 2.1; letter-spacing: .2em; word-spacing: .5em; color: var(--green-deep);
   max-width: 34ch; text-transform: lowercase; }
 .approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
-/* Three narrow measures across the width of the page, as the spread sets its own. */
-.approach-body { grid-column: 4 / 13; grid-row: 3; align-self: start; min-width: 0;
-  margin: 30px 0 0; columns: 3; column-gap: 30px; }
-.approach-body p { font-size: 11.5px; line-height: 1.6; font-weight: 300; color: var(--fg);
-  text-align: justify; hyphens: auto; }
-.approach-body p + p { margin-top: 11px; }
+.approach-body-a { grid-column: 4 / 8; grid-row: 3; align-self: start; min-width: 0;
+  margin-top: 54px; }
+.approach-body-a p, .approach-body-b p { font-size: 12px; line-height: 1.65;
+  font-weight: 300; color: var(--fg); text-align: justify; hyphens: auto; }
+.approach-body-a p + p, .approach-body-b p + p { margin-top: 12px; }
 .approach-status { display: flex; align-items: center; gap: 10px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
 
@@ -530,18 +524,19 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 34px; }
-  /* Stacked: with nothing beside it the statement has nothing left to lie across,
-     and the three measures are far too narrow to hold a line. */
+  /* Stacked: with nothing beside it the statement has nothing to lie across, and the
+     indents that hold the block together on a page only unbalance it in one column. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
-    min-height: 0; padding-top: 60px; padding-bottom: 60px; }
-  .approach-display, .approach-photo, .approach-quote, .approach-body {
-    grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch; }
-  .approach-display { margin-top: 0; z-index: auto; pointer-events: auto;
-    font-size: clamp(38px, 12vw, 84px); }
-  .approach-photo { height: auto; max-width: 100%; }
-  .approach-quote { margin-top: 0; }
-  .approach-body { margin-top: 0; columns: 1; }
-  .approach-body p { font-size: 14px; line-height: 1.8; }
+    padding-top: 60px; padding-bottom: 60px; }
+  .approach-display, .approach-photo, .approach-quote,
+  .approach-body-a, .approach-body-b {
+    grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch;
+    margin-top: 0; }
+  .approach-display { z-index: auto; pointer-events: auto; font-size: clamp(38px, 12vw, 84px); }
+  .approach-display .in1, .approach-display .in2,
+  .approach-display .in3, .approach-display .in4 { margin-left: 0; }
+  .approach-top { margin-bottom: 0; }
+  .approach-body-a p, .approach-body-b p { font-size: 14px; line-height: 1.8; }
   .cap-grid { grid-template-columns: 1fr; }
   .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
   /* Four columns are too tight to read here: name and year on one line, the
@@ -656,18 +651,31 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
       <span class="approach-status-text" data-i18n="approach_status">available · france</span>
     </div>
   </div>
-  <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display">A LITTLE<br>BIT MORE<br>ABOUT ME</h2>
+  <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display"><i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i></h2>
   <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
-    <img class="ap-color" src="about/portrait.jpg" alt="Nathan Charlot" loading="lazy" decoding="async">
-    <img class="ap-duo" src="about/portrait-duo.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async">
+    <svg viewBox="0 0 1000 587" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Nathan Charlot">
+      <defs>
+        <!-- Blur, then a steep alpha ramp: overlapping discs melt into one another
+             instead of reading as a string of circles. -->
+        <filter id="apGoo" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="apBlur"/>
+          <feColorMatrix in="apBlur" type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11"/>
+        </filter>
+        <mask id="apBlob" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="587">
+          <g id="apBlobG" filter="url(#apGoo)" fill="#fff">
+            <circle r="0"></circle><circle r="0"></circle><circle r="0"></circle>
+            <circle r="0"></circle><circle r="0"></circle>
+          </g>
+        </mask>
+      </defs>
+      <image id="apColor" width="1000" height="587" preserveAspectRatio="xMidYMid slice"></image>
+      <image id="apDuo" width="1000" height="587" preserveAspectRatio="xMidYMid slice" mask="url(#apBlob)"></image>
+    </svg>
   </figure>
+  <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
   <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
-  <div class="approach-body reveal reveal-delay-2" data-i18n-html="approach_body">
-    <p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p>
-    <p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>
-    <p>In 2024, I decided to reconnect the creative side with the digital one. A master's in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p>
-    <p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>
-  </div>
+  <div class="approach-body-a reveal reveal-delay-2" data-i18n-html="approach_body_a"></div>
 </section>
 
 <!-- ═══ CAPABILITIES ═══ -->
@@ -848,7 +856,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // Both wordings are measured and the smaller size wins, so the headline keeps
   // one size and one weight across the two languages: switching FR/EN must not
   // reflow the first thing a visitor reads.
-  let variants = null, bodyVariants = null;
+  let variants = null;
   function largestThatFits() {
     const containerWidth = h1.parentElement.offsetWidth;
     const isMobile = window.innerWidth < 768;
@@ -889,74 +897,42 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 })();
 
 
-/* ── ABOUT HEADLINE AUTO-FIT ──
-   Sized from the column it stands in rather than from the viewport: the grid's
-   gaps are fixed pixels, so a vw formula drifts away from the column at other
-   widths and the longest line wraps. Both wordings are measured and the smaller
-   size wins, so fr and en print the statement at exactly one size. */
+/* ── ABOUT STATEMENT AUTO-FIT ──
+   Sized from the space it stands in rather than from the viewport: the grid's gaps
+   are fixed pixels, so a vw formula drifts away from the tracks at other widths and
+   the longest line wraps. Both wordings are measured and the smaller size wins, so
+   fr and en print the statement at exactly one size. */
 (function () {
   const el = document.querySelector('.approach-display');
   if (!el) return;
-  let variants = null, bodyVariants = null;
-  // Measured on a detached copy, never on the element itself: a line box is
-  // clipped to its container, so an overflowing line reads back as exactly the
-  // column width and the fit silently becomes a no-op. Absolute + max-content
-  // is the only geometry that reports the true width of the longest line.
+  let variants = null;
+  // Measured on a detached copy carrying the same class, never on the element
+  // itself: a line box is clipped to its container, so an overflowing line reads
+  // back as exactly the track width and the fit silently becomes a no-op. Absolute
+  // + max-content is the only geometry that reports the block's true width — and it
+  // takes the per-line indents into account, which a line-by-line reading would not.
   const probe = document.createElement('div');
+  probe.className = 'approach-display';
   probe.setAttribute('aria-hidden', 'true');
   probe.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;' +
-    'white-space:nowrap;width:max-content;pointer-events:none;';
+    'width:max-content;pointer-events:none;margin:0;font-size:100px;';
   document.body.appendChild(probe);
   function widestAt100(html) {
-    const cs = getComputedStyle(el);
-    const size = parseFloat(cs.fontSize) || 100;
-    const spacing = parseFloat(cs.letterSpacing); // NaN when 'normal'
-    probe.style.fontFamily = cs.fontFamily;
-    probe.style.fontWeight = cs.fontWeight;
-    probe.style.fontStyle = cs.fontStyle;
-    probe.style.textTransform = cs.textTransform;
-    probe.style.fontSize = '100px';
-    probe.style.letterSpacing = (spacing ? spacing * 100 / size : 0) + 'px';
     probe.innerHTML = html;
-    const range = document.createRange();
-    range.selectNodeContents(probe);
-    const rects = range.getClientRects();
-    let w = 0;
-    for (let i = 0; i < rects.length; i++) w = Math.max(w, rects[i].width);
-    return w;
+    return probe.getBoundingClientRect().width;
   }
-  // Two limits, both read off things the statement cannot move. Width: the left edge
-  // of the portrait, which it must not run past. Height: the band, which refuses to
-  // grow for its content, so an oversized statement would quietly spill out of it.
-  const photo = document.querySelector('.approach-photo');
-  const bodyEl = document.querySelector('.approach-body');
-  // The band is what the columns leave over — and the french columns run some 7%
-  // longer than the english. Measuring only the wording on screen would hand each
-  // language a different band and so a different size. Both are laid out on a
-  // detached copy of the real element and the taller one sets the band for both.
-  function bandHeight() {
-    if (!photo) return window.innerHeight * .5;
-    const seen = photo.getBoundingClientRect().height;
-    if (!bodyVariants || !bodyEl || !bodyEl.clientWidth) return seen;
-    const clone = bodyEl.cloneNode(false);
-    clone.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;' +
-      'pointer-events:none;margin:0;width:' + bodyEl.clientWidth + 'px;';
-    document.body.appendChild(clone);
-    let worst = 0;
-    bodyVariants.forEach(function (html) {
-      clone.innerHTML = html;
-      worst = Math.max(worst, clone.getBoundingClientRect().height);
-    });
-    clone.remove();
-    const now = bodyEl.getBoundingClientRect().height;
-    return seen - Math.max(0, worst - now);
+  function lineCount(html) {
+    const tagged = html.match(/<i[\s>]/gi);
+    return tagged ? tagged.length : html.split(/<br\s*\/?>/i).length;
   }
+  // The one thing the statement must not run into is the column standing beside it.
+  // That column's position comes from the grid, never from the statement, so reading
+  // it back is not circular.
+  const rightCol = document.querySelector('.approach-body-b');
   function resizeAbout() {
-    const wide = window.matchMedia('(min-width: 901px)').matches;
-    const band = wide ? bandHeight() : window.innerHeight * .5;
     let box = el.clientWidth;
-    if (wide && photo) {
-      const room = photo.getBoundingClientRect().left - el.getBoundingClientRect().left - 56;
+    if (rightCol && window.matchMedia('(min-width: 901px)').matches) {
+      const room = rightCol.getBoundingClientRect().left - el.getBoundingClientRect().left - 46;
       if (room > 120) box = Math.min(box, room);
     }
     if (!box) return;
@@ -964,29 +940,17 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     (variants || [el.innerHTML]).forEach(function (html) {
       const w = widestAt100(html);
       if (!w) return;
-      const lines = html.split(/<br\s*\/?>/i).length;
-      // 24px of margin above the statement, plus a little slack.
-      smallest = Math.min(smallest, 100 * box / w, (band - 34) / (lines * .84));
+      // Six lines of it is a tall block; keep it from running away on a big monitor.
+      smallest = Math.min(smallest, 100 * box / w,
+        window.innerHeight * 1.45 / (lineCount(html) * .84));
     });
     if (smallest === Infinity) return;
-    el.style.fontSize = Math.max(30, Math.min(smallest, 240)) + 'px';
-  }
-  // The band's height follows the columns, which settle late — web fonts, then the
-  // lazy portrait. Watching the frame catches every one of those without polling.
-  if (window.ResizeObserver && photo) {
-    let lastBand = 0;
-    new ResizeObserver(function () {
-      const h = photo.getBoundingClientRect().height;
-      if (Math.abs(h - lastBand) < 1) return;
-      lastBand = h;
-      resizeAbout();
-    }).observe(photo);
+    el.style.fontSize = Math.max(30, Math.min(smallest, 260)) + 'px';
   }
   window.addEventListener('load', resizeAbout);
   window.addEventListener('resize', resizeAbout);
   applyLangHooks.push(function () {
     variants = [translations.fr.approach_display, translations.en.approach_display];
-    bodyVariants = [translations.fr.approach_body, translations.en.approach_body];
     resizeAbout();
   });
   if (document.fonts) {
@@ -996,29 +960,79 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 })();
 
 /* ── ABOUT PORTRAIT ──
-   The duotone is revealed through a disc that tracks the pointer. Positions are
-   written once per frame: mousemove fires far more often than the screen paints,
-   and each write invalidates the mask. */
+   The duotone shows through a blob that chases the pointer. Five discs follow at
+   different rates and the gooey filter welds them into one shape, so the blob
+   stretches into a comet when the hand moves fast and settles round when it stops.
+   Everything is written once per frame: mousemove fires far more often than the
+   screen paints, and each write invalidates the mask. */
 (function () {
   const fig = document.getElementById('aboutPhoto');
-  if (!fig) return;
+  const colour = document.getElementById('apColor');
+  const duo = document.getElementById('apDuo');
+  const group = document.getElementById('apBlobG');
+  if (!fig || !colour || !duo || !group) return;
+
+  // The two files are a third of a megabyte and the section is far below the fold,
+  // so they are fetched only once it comes into view. <image> has no lazy attribute.
+  function loadArt() {
+    colour.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait.jpg');
+    colour.setAttribute('href', 'about/portrait.jpg');
+    duo.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait-duo.jpg');
+    duo.setAttribute('href', 'about/portrait-duo.jpg');
+  }
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { loadArt(); io.disconnect(); }
+    }, { rootMargin: '400px' });
+    io.observe(fig);
+  } else loadArt();
+
   // A finger has no hover: on touch the portrait simply stays in colour.
   if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
-  let px = 0, py = 0, queued = false;
-  function paint() {
-    queued = false;
-    fig.style.setProperty('--mx', px + 'px');
-    fig.style.setProperty('--my', py + 'px');
+
+  const discs = [].slice.call(group.children);
+  const radii = [74, 60, 47, 36, 26];   // viewBox units, the box is 1000 wide
+  const ease  = [.30, .20, .145, .105, .075];
+  const pos = discs.map(function () { return { x: 500, y: 293 }; });
+  let target = { x: 500, y: 293 }, open = 0, want = 0, running = false;
+
+  function frame() {
+    open += (want - open) * .14;
+    let moving = Math.abs(want - open) > .002;
+    for (let i = 0; i < discs.length; i++) {
+      const p = pos[i];
+      const dx = target.x - p.x, dy = target.y - p.y;
+      if (Math.abs(dx) > .1 || Math.abs(dy) > .1) moving = true;
+      p.x += dx * ease[i];
+      p.y += dy * ease[i];
+      discs[i].setAttribute('cx', p.x.toFixed(1));
+      discs[i].setAttribute('cy', p.y.toFixed(1));
+      discs[i].setAttribute('r', (radii[i] * open).toFixed(1));
+    }
+    if (moving) requestAnimationFrame(frame);
+    else running = false;
   }
+  function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
+
   function track(e) {
     const r = fig.getBoundingClientRect();
-    px = e.clientX - r.left;
-    py = e.clientY - r.top;
-    if (!queued) { queued = true; requestAnimationFrame(paint); }
+    if (!r.width || !r.height) return;
+    // Client pixels into the 1000x587 viewBox the mask is drawn in.
+    target.x = (e.clientX - r.left) / r.width * 1000;
+    target.y = (e.clientY - r.top) / r.height * 587;
+    kick();
   }
-  fig.addEventListener('mouseenter', function (e) { track(e); paint(); fig.classList.add('is-lit'); });
+  fig.addEventListener('mouseenter', function (e) {
+    const r = fig.getBoundingClientRect();
+    target.x = (e.clientX - r.left) / r.width * 1000;
+    target.y = (e.clientY - r.top) / r.height * 587;
+    // Start the discs where the pointer entered, so the blob grows there rather
+    // than flying in from wherever it was last left.
+    pos.forEach(function (p) { p.x = target.x; p.y = target.y; });
+    want = 1; kick();
+  });
   fig.addEventListener('mousemove', track);
-  fig.addEventListener('mouseleave', function () { fig.classList.remove('is-lit'); });
+  fig.addEventListener('mouseleave', function () { want = 0; kick(); });
 })();
 
 /* ── ASCII BACKDROP ──
@@ -1727,8 +1741,9 @@ const translations = {
     cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
     pm_client: 'client :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
-    approach_display: 'UN PETIT<br>PEU PLUS<br>SUR MOI',
-    approach_body: '<p>Le déclic s\'est fait en 2019. En plein lycée, je suis passé du côté digital de la création et le montage est devenu une manière de m\'ouvrir au monde. Découvrir, publier, entretenir une communauté sur les réseaux : c\'est là que j\'ai commencé à me construire un langage visuel, et c\'est ce qui m\'a mené vers mes études.</p><p>J\'ai commencé par les langues. Une appétence présente depuis le collège, une attirance pour les cultures étrangères, et l\'idée que la langue est le médium qui les porte le mieux. D\'où une licence LEA, anglais et espagnol, parcours commerce international.</p><p>En 2024, j\'ai décidé de reconnecter la création et le digital. Un mastère marketing et communication, en alternance dans une carrosserie industrielle en Sarthe. Deux ans à construire une identité visuelle pour une entreprise qui n\'en avait pas, et à la faire vivre partout où elle pouvait aller : animations After Effects, vidéos, plaquettes, refonte du site, jusqu\'aux panneaux de signalétique sur le site. Une image qu\'on imprime sur un panneau, on la regarde autrement.</p><p>Ce que je cherche maintenant, ce sont des projets vidéo, animation et produit portés par des structures engagées sur les enjeux environnementaux. C\'est la direction que je veux donner à la suite.</p>',
+    approach_display: '<i>UN</i><i class="in2">PETIT</i><i class="in1">PEU</i><i class="in3">PLUS</i><i class="in4">SUR</i><i>MOI</i>',
+    approach_body_a: '<p>Le déclic s\'est fait en 2019. En plein lycée, je suis passé du côté digital de la création et le montage est devenu une manière de m\'ouvrir au monde. Découvrir, publier, entretenir une communauté sur les réseaux : c\'est là que j\'ai commencé à me construire un langage visuel, et c\'est ce qui m\'a mené vers mes études.</p><p>J\'ai commencé par les langues. Une appétence présente depuis le collège, une attirance pour les cultures étrangères, et l\'idée que la langue est le médium qui les porte le mieux. D\'où une licence LEA, anglais et espagnol, parcours commerce international.</p>',
+    approach_body_b: '<p>En 2024, j\'ai décidé de reconnecter la création et le digital. Un mastère marketing et communication, en alternance dans une carrosserie industrielle en Sarthe. Deux ans à construire une identité visuelle pour une entreprise qui n\'en avait pas, et à la faire vivre partout où elle pouvait aller : animations After Effects, vidéos, plaquettes, refonte du site, jusqu\'aux panneaux de signalétique sur le site. Une image qu\'on imprime sur un panneau, on la regarde autrement.</p><p>Ce que je cherche maintenant, ce sont des projets vidéo, animation et produit portés par des structures engagées sur les enjeux environnementaux. C\'est la direction que je veux donner à la suite.</p>',
     approach_quote: 'chercher le geste juste plutôt que l\'effet.',
     approach_status: 'disponible · france',
     cap_motion_title: 'motion', cap_motion_desc: 'Animation, direction artistique et mise en mouvement d\'une idée.',
@@ -1746,8 +1761,9 @@ const translations = {
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
-    approach_display: 'A LITTLE<br>BIT MORE<br>ABOUT ME',
-    approach_body: '<p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p><p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p><p>In 2024, I decided to reconnect the creative side with the digital one. A master\'s in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p><p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>',
+    approach_display: '<i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i>',
+    approach_body_a: '<p>It clicked in 2019. Still in high school, I moved over to the digital side of making things, and editing became a way of opening myself to the world. Discovering, posting, keeping a community alive on social platforms: that is where I started building a visual language of my own, and it is what led me to my studies.</p><p>I began with languages. A taste for them since middle school, a pull towards foreign cultures, and the idea that language is the medium that carries them best. Hence a degree in applied foreign languages — English and Spanish, international trade.</p>',
+    approach_body_b: '<p>In 2024, I decided to reconnect the creative side with the digital one. A master\'s in marketing and communication, on a work-study contract with an industrial bodywork company in the Sarthe. Two years spent building a visual identity for a company that had none, and taking it everywhere it could go: After Effects animations, videos, brochures, a website rebuild, right down to the signage on site. An image printed on a sign is an image you look at differently.</p><p>What I am looking for now are video, animation and product projects driven by organisations committed to environmental issues. That is the direction I want to give what comes next.</p>',
     approach_quote: 'reaching for the right gesture, not the effect.',
     approach_status: 'available · france',
     cap_motion_title: 'motion', cap_motion_desc: 'Animation, art direction and putting an idea into movement.',
@@ -1782,8 +1798,19 @@ function applyLang(lang) {
   renderCaps();
   applyLangHooks.forEach(fn => fn());
 }
-document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', () => { applyLang(btn.dataset.lang); localStorage.setItem('lang', btn.dataset.lang); } ); });
-applyLang(localStorage.getItem('lang') === 'fr' ? 'fr' : 'en');
+/* Reading localStorage throws outright where site data is blocked — a private
+   window, a strict privacy setting, an embedded viewer. Unguarded it took the whole
+   remainder of the script with it, and the page came up half built: the dictionary
+   never applied, every section below this line dead. The preference is a
+   convenience; losing it must cost nothing else. */
+function rememberedLang() {
+  try { return localStorage.getItem('lang'); } catch (e) { return null; }
+}
+function rememberLang(lang) {
+  try { localStorage.setItem('lang', lang); } catch (e) { /* nothing to do */ }
+}
+document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', () => { applyLang(btn.dataset.lang); rememberLang(btn.dataset.lang); } ); });
+applyLang(rememberedLang() === 'fr' ? 'fr' : 'en');
 
 /* ── CLICK EFFECT ── */
 document.addEventListener('click', function (e) {
