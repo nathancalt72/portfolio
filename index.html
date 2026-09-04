@@ -996,9 +996,12 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   const group = document.getElementById('apBlobG');
   if (!fig || !colour || !duo || !group) return;
 
-  // The two files are a third of a megabyte and the section is far below the fold,
-  // so they are fetched only once it comes into view. <image> has no lazy attribute.
+  // The photograph is 145 kB and the section sits far below the fold, so it is fetched
+  // once the section approaches. <image> has no lazy attribute, hence the observer.
+  let art = false;
   function loadArt() {
+    if (art) return;
+    art = true;
     colour.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait.jpg');
     colour.setAttribute('href', 'about/portrait.jpg');
     duo.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait-duo-px.png');
@@ -1009,6 +1012,10 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       if (entries.some(function (e) { return e.isIntersecting; })) { loadArt(); io.disconnect(); }
     }, { rootMargin: '400px' });
     io.observe(fig);
+    // The observer has been seen to stay silent — a document that never gets painted,
+    // an embedded viewer. Saving a few kilobytes is not worth the portrait never
+    // appearing at all, so it loads anyway a moment later whatever happens.
+    setTimeout(loadArt, 5000);
   } else loadArt();
 
   // A finger has no hover: on touch the portrait simply stays in colour.
@@ -1071,6 +1078,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     kick();
   }
   fig.addEventListener('mouseenter', function (e) {
+    loadArt();
     const r = fig.getBoundingClientRect();
     target.x = (e.clientX - r.left) / r.width * 1000;
     target.y = (e.clientY - r.top) / r.height * 587;
