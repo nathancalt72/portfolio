@@ -655,12 +655,24 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
     <svg viewBox="0 0 1000 587" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Nathan Charlot">
       <defs>
-        <!-- Blur, then a steep alpha ramp: overlapping discs melt into one another
-             instead of reading as a string of circles. -->
-        <filter id="apGoo" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+        <!-- The reference scene stacks Circle → FBM → Pixelate → Duotone, and this
+             chain follows it in order. Blur then a steep alpha ramp welds the trailing
+             discs into one shape; fractal noise displaces its edge, which is where the
+             odd, unrepeatable outline comes from; the flood/tile/dilate quartet is the
+             standard svg way to quantise that outline onto a coarse grid. -->
+        <filter id="apGoo" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
           <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="apBlur"/>
           <feColorMatrix in="apBlur" type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11"/>
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="apGooed"/>
+          <feTurbulence type="fractalNoise" baseFrequency="0.011 0.017" numOctaves="3"
+            seed="7" result="apNoise"/>
+          <feDisplacementMap in="apGooed" in2="apNoise" scale="78"
+            xChannelSelector="R" yChannelSelector="G" result="apWobble"/>
+          <feFlood x="0" y="0" width="1" height="1" flood-color="#fff" result="apDot"/>
+          <feComposite in="apDot" width="14" height="14" result="apCell"/>
+          <feTile in="apCell" result="apGrid"/>
+          <feComposite in="apWobble" in2="apGrid" operator="in" result="apSampled"/>
+          <feMorphology in="apSampled" operator="dilate" radius="7"/>
         </filter>
         <mask id="apBlob" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="587">
           <g id="apBlobG" filter="url(#apGoo)" fill="#fff">
@@ -991,10 +1003,14 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
 
   const discs = [].slice.call(group.children);
-  const radii = [74, 60, 47, 36, 26];   // viewBox units, the box is 1000 wide
+  const radii = [30, 25, 20, 15, 11];   // viewBox units at rest; the box is 1000 wide
   const ease  = [.30, .20, .145, .105, .075];
   const pos = discs.map(function () { return { x: 500, y: 293 }; });
   let target = { x: 500, y: 293 }, open = 0, want = 0, running = false;
+  // Speed is read off the lead disc rather than off the raw pointer: it already
+  // carries the easing, so it climbs while the hand travels and decays on its own
+  // the moment it stops — which is exactly when the blob should shrink back.
+  let lead = { x: 500, y: 293 }, speed = 0;
 
   function frame() {
     open += (want - open) * .14;
@@ -1005,9 +1021,18 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       if (Math.abs(dx) > .1 || Math.abs(dy) > .1) moving = true;
       p.x += dx * ease[i];
       p.y += dy * ease[i];
-      discs[i].setAttribute('cx', p.x.toFixed(1));
-      discs[i].setAttribute('cy', p.y.toFixed(1));
-      discs[i].setAttribute('r', (radii[i] * open).toFixed(1));
+    }
+    const step = Math.hypot(pos[0].x - lead.x, pos[0].y - lead.y);
+    lead.x = pos[0].x; lead.y = pos[0].y;
+    speed += (step - speed) * .22;
+    if (speed > .15) moving = true;
+    // Still a coin at rest, half the picture at a sweep — the range in the reference
+    // scene is wide, and a narrow one reads as a wobble rather than a reaction.
+    const grow = open * (1 + Math.min(speed / 13, 2.6));
+    for (let i = 0; i < discs.length; i++) {
+      discs[i].setAttribute('cx', pos[i].x.toFixed(1));
+      discs[i].setAttribute('cy', pos[i].y.toFixed(1));
+      discs[i].setAttribute('r', (radii[i] * grow).toFixed(1));
     }
     if (moving) requestAnimationFrame(frame);
     else running = false;
@@ -1029,6 +1054,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // Start the discs where the pointer entered, so the blob grows there rather
     // than flying in from wherever it was last left.
     pos.forEach(function (p) { p.x = target.x; p.y = target.y; });
+    lead.x = target.x; lead.y = target.y; speed = 0;
     want = 1; kick();
   });
   fig.addEventListener('mousemove', track);
