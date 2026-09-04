@@ -848,7 +848,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // Both wordings are measured and the smaller size wins, so the headline keeps
   // one size and one weight across the two languages: switching FR/EN must not
   // reflow the first thing a visitor reads.
-  let variants = null;
+  let variants = null, bodyVariants = null;
   function largestThatFits() {
     const containerWidth = h1.parentElement.offsetWidth;
     const isMobile = window.innerWidth < 768;
@@ -897,7 +897,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 (function () {
   const el = document.querySelector('.approach-display');
   if (!el) return;
-  let variants = null;
+  let variants = null, bodyVariants = null;
   // Measured on a detached copy, never on the element itself: a line box is
   // clipped to its container, so an overflowing line reads back as exactly the
   // column width and the fit silently becomes a no-op. Absolute + max-content
@@ -925,33 +925,51 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     for (let i = 0; i < rects.length; i++) w = Math.max(w, rects[i].width);
     return w;
   }
-  // Two limits, both read off elements the statement cannot move. Width: the left
-  // edge of the portrait, which it must not run past. Height: the band itself,
-  // measured on the portrait, since the band refuses to grow for its content and an
-  // oversized statement would simply spill out of it unnoticed.
+  // Two limits, both read off things the statement cannot move. Width: the left edge
+  // of the portrait, which it must not run past. Height: the band, which refuses to
+  // grow for its content, so an oversized statement would quietly spill out of it.
   const photo = document.querySelector('.approach-photo');
-  function largestThatFits(html) {
-    let box = el.clientWidth;
-    let band = window.innerHeight * .5;
-    if (photo && window.matchMedia('(min-width: 901px)').matches) {
-      const pr = photo.getBoundingClientRect();
-      band = pr.height;
-      const room = pr.left - el.getBoundingClientRect().left - 56;
-      if (room > 120) box = Math.min(box, room);
-    }
-    const w = widestAt100(html);
-    if (!box || !w) return 34;
-    const lines = html.split(/<br\s*\/?>/i).length;
-    // 24px of margin above it, plus a little slack: overshoot here spills out of a
-    // band that refuses to grow, and pushes the section past the fold.
-    const byHeight = (band - 34) / (lines * .84);
-    return Math.max(30, Math.min(100 * box / w, byHeight, 240));
+  const bodyEl = document.querySelector('.approach-body');
+  // The band is what the columns leave over — and the french columns run some 7%
+  // longer than the english. Measuring only the wording on screen would hand each
+  // language a different band and so a different size. Both are laid out on a
+  // detached copy of the real element and the taller one sets the band for both.
+  function bandHeight() {
+    if (!photo) return window.innerHeight * .5;
+    const seen = photo.getBoundingClientRect().height;
+    if (!bodyVariants || !bodyEl || !bodyEl.clientWidth) return seen;
+    const clone = bodyEl.cloneNode(false);
+    clone.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;' +
+      'pointer-events:none;margin:0;width:' + bodyEl.clientWidth + 'px;';
+    document.body.appendChild(clone);
+    let worst = 0;
+    bodyVariants.forEach(function (html) {
+      clone.innerHTML = html;
+      worst = Math.max(worst, clone.getBoundingClientRect().height);
+    });
+    clone.remove();
+    const now = bodyEl.getBoundingClientRect().height;
+    return seen - Math.max(0, worst - now);
   }
   function resizeAbout() {
-    const wordings = variants || [el.innerHTML];
+    const wide = window.matchMedia('(min-width: 901px)').matches;
+    const band = wide ? bandHeight() : window.innerHeight * .5;
+    let box = el.clientWidth;
+    if (wide && photo) {
+      const room = photo.getBoundingClientRect().left - el.getBoundingClientRect().left - 56;
+      if (room > 120) box = Math.min(box, room);
+    }
+    if (!box) return;
     let smallest = Infinity;
-    wordings.forEach(function (html) { smallest = Math.min(smallest, largestThatFits(html)); });
-    el.style.fontSize = smallest + 'px';
+    (variants || [el.innerHTML]).forEach(function (html) {
+      const w = widestAt100(html);
+      if (!w) return;
+      const lines = html.split(/<br\s*\/?>/i).length;
+      // 24px of margin above the statement, plus a little slack.
+      smallest = Math.min(smallest, 100 * box / w, (band - 34) / (lines * .84));
+    });
+    if (smallest === Infinity) return;
+    el.style.fontSize = Math.max(30, Math.min(smallest, 240)) + 'px';
   }
   // The band's height follows the columns, which settle late — web fonts, then the
   // lazy portrait. Watching the frame catches every one of those without polling.
@@ -968,6 +986,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   window.addEventListener('resize', resizeAbout);
   applyLangHooks.push(function () {
     variants = [translations.fr.approach_display, translations.en.approach_display];
+    bodyVariants = [translations.fr.approach_body, translations.en.approach_body];
     resizeAbout();
   });
   if (document.fonts) {
