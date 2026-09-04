@@ -689,7 +689,12 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
         </mask>
       </defs>
       <image id="apColor" width="1000" height="587" preserveAspectRatio="xMidYMid slice"></image>
-      <image id="apDuo" width="1000" height="587" preserveAspectRatio="xMidYMid slice" mask="url(#apBlob)"></image>
+      <!-- The reveal is a coarse copy blown back up, not the full-resolution duotone:
+           browsers upscale with nearest-neighbour under image-rendering, so the grid is
+           real pixels rather than a filter imitating them. 84 across the picture puts a
+           block every 11.9 viewBox units, the cell size the reference scene uses. -->
+      <image id="apDuo" width="1000" height="587" preserveAspectRatio="xMidYMid slice"
+        mask="url(#apBlob)" style="image-rendering: -moz-crisp-edges; image-rendering: pixelated"></image>
     </svg>
   </figure>
   <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
@@ -996,8 +1001,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   function loadArt() {
     colour.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait.jpg');
     colour.setAttribute('href', 'about/portrait.jpg');
-    duo.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait-duo.jpg');
-    duo.setAttribute('href', 'about/portrait-duo.jpg');
+    duo.setAttributeNS('http://www.w3.org/1999/xlink', 'href', 'about/portrait-duo-px.png');
+    duo.setAttribute('href', 'about/portrait-duo-px.png');
   }
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(function (entries) {
