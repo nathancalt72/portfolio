@@ -434,11 +434,15 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
   justify-content: space-between; gap: 20px; }
-/* min-width:0 or the nowrap headline sets the track's floor: the column would grow
-   to the longest line, the fitter would size to that grown column, and the two would
-   never come back down — a phone loses the right edge of the statement. */
-.approach-left { grid-column: 1 / 6; grid-row: 2; align-self: start; padding-top: 22px;
-  min-width: 0; }
+/* The statement runs across two thirds of the page and passes IN FRONT of the
+   portrait, the way the spread's headline crosses its photograph — that overlap is
+   the whole composition. It is therefore a layer, not a column: it claims columns
+   1-9, sits above the picture, and lets the pointer through to it.
+   min-width:0 as well, or the nowrap line would set the track's floor and a phone
+   would lose the right edge of the statement. */
+.approach-left { grid-column: 1 / 9; grid-row: 2; align-self: start; padding-top: 22px;
+  min-width: 0; z-index: 2; pointer-events: none; }
+.approach-quote { pointer-events: auto; }
 /* Sized by script from the column it stands in — see ABOUT HEADLINE AUTO-FIT.
    The clamp below is only what a visitor without javascript gets. */
 .approach-display { font-family: var(--display); font-weight: 700; text-transform: uppercase;
@@ -451,14 +455,15 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 .approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
   font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
   letter-spacing: 0; color: var(--green-light); }
-/* The right column of the spread: portrait on top, columns underneath. */
-.approach-right { grid-column: 6 / 13; grid-row: 2; min-width: 0;
-  display: flex; flex-direction: column; justify-content: space-between; }
-/* flex-basis 0, not auto: with a basis of auto the portrait would report its own
-   aspect ratio as the column's content height, the grid row would grow to hold it
-   and the section would run past the fold. At 0 it only takes the space the text
-   leaves over, so the section still ends on one screen whatever the window's height. */
-.approach-photo { position: relative; flex: 1 1 0%; min-height: 96px; max-height: 60vh;
+/* Portrait and columns share the right of the page. It starts at column 5, under
+   the tail of the statement, so the green type crosses it. */
+.approach-right { grid-column: 5 / 13; grid-row: 2; min-width: 0; z-index: 1;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+/* A row of minmax(0,1fr), not the picture's own ratio: left to declare its shape it
+   would report that height as the column's content, the grid row would grow to hold
+   it and the section would run past the fold. Here it takes only what the columns
+   leave over, so the section still ends on one screen at any window height. */
+.approach-photo { position: relative; grid-row: 1; min-height: 96px; max-height: 60vh;
   margin: 0 0 26px; overflow: hidden; background: var(--panel); }
 .approach-photo img { position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: center 42%; display: block; }
@@ -469,7 +474,10 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   -webkit-mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%);
           mask-image: radial-gradient(circle 130px at var(--mx, 50%) var(--my, 50%), #000 52%, rgba(0,0,0,0) 100%); }
 .approach-photo.is-lit .ap-duo { opacity: 1; }
-.approach-body { flex: 0 0 auto; min-width: 0; columns: 2; column-gap: 32px; }
+/* Inset from the left of its own column so the columns never run into the tail
+   of the statement lying across them. */
+.approach-body { grid-row: 2; min-width: 0; margin-left: 26%;
+  columns: 2; column-gap: 40px; }
 .approach-body p { font-size: 12.5px; line-height: 1.62; font-weight: 300; color: var(--fg);
   text-align: justify; hyphens: auto; }
 .approach-body p + p { margin-top: 13px; }
@@ -527,15 +535,17 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 34px; }
-  /* Stacked: the one-screen grid stops paying for itself once the columns go. */
+  /* Stacked: the one-screen grid stops paying for itself once the columns go, and
+     with nothing beside it the statement has nothing left to lie across. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 34px;
     min-height: 0; padding-top: 60px; padding-bottom: 60px; }
   .approach-left, .approach-right { grid-column: 1; grid-row: auto; align-self: start; }
-  .approach-left { padding-top: 0; }
+  .approach-left { padding-top: 0; z-index: auto; pointer-events: auto; }
+  .approach-right { display: block; }
   .approach-display { font-size: clamp(38px, 12vw, 84px); }
   /* Stacked, there is no leftover space to grow into: give the portrait a shape. */
-  .approach-photo { flex: 0 0 auto; aspect-ratio: 16 / 9; margin-bottom: 30px; }
-  .approach-body { columns: 1; }
+  .approach-photo { aspect-ratio: 16 / 9; max-height: none; margin-bottom: 30px; }
+  .approach-body { margin-left: 0; columns: 1; }
   .approach-body p { font-size: 14px; line-height: 1.8; }
   .cap-grid { grid-template-columns: 1fr; }
   .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
@@ -924,14 +934,27 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     for (let i = 0; i < rects.length; i++) w = Math.max(w, rects[i].width);
     return w;
   }
+  // The statement's layer reaches under the columns, so its own box is not the
+  // limit — the left edge of the text is. That edge comes from the grid and from a
+  // percentage margin, never from the statement, so reading it back is not circular.
+  function availableWidth() {
+    const parent = el.parentElement;
+    let box = parent.clientWidth;
+    const body = document.querySelector('.approach-body');
+    if (body && window.matchMedia('(min-width: 901px)').matches) {
+      const room = body.getBoundingClientRect().left - parent.getBoundingClientRect().left - 56;
+      if (room > 120) box = Math.min(box, room);
+    }
+    return box;
+  }
   function largestThatFits(html) {
-    const box = el.parentElement.clientWidth;
+    const box = availableWidth();
     const w = widestAt100(html);
     if (!box || !w) return 34;
     const lines = html.split(/<br\s*\/?>/i).length;
     // What the pull-quote, the top row and the section's padding leave behind.
     const byHeight = (window.innerHeight - 206) / (lines * .84);
-    return Math.max(30, Math.min(100 * box / w, byHeight, 168));
+    return Math.max(30, Math.min(100 * box / w, byHeight, 240));
   }
   function resizeAbout() {
     const wordings = variants || [el.innerHTML];
