@@ -155,8 +155,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* Over anything dark the ink turns pale so it stays readable. The two ends of the bar
    are judged separately: the name sits on the left and the language switch on the
    right, so a picture occupying only the right of the page must not pale the name
-   into invisibility against the cream beside it. Any element carrying .nav-dark-bg
-   is watched; today that is the portrait, and adding another is a class, nothing more. */
+   into invisibility against the cream beside it. What counts as dark is measured from
+   the picture itself, not declared here — see ABOVE DARK in the script. */
 .nav-logo, .lang-btn, .lang-sep { transition: color .3s ease, border-color .3s ease; }
 .dot-sq { transition: background-color .3s ease; }
 .nav-logo.over-dark { color: var(--ink-on-olive); }
@@ -918,14 +918,48 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   window.addEventListener('scroll', check, { passive: true });
   check();
 
+  // ── ABOVE DARK ──
   // Pale ink over anything dark. The observer's root is squeezed down to the band the
-  // bar occupies, so it reports exactly the elements crossing under it and the costly
-  // work only runs while one actually is. Each end of the bar is then tested against
-  // those elements on its own, in both axes — a picture on the right of the page must
-  // not pale the name on the left, where there is nothing but cream behind it.
-  const darks = document.querySelectorAll('.nav-dark-bg');
+  // bar occupies, so it reports exactly what is crossing under it and the costly work
+  // only runs while something is. Each end of the bar is then tested on its own, in
+  // both axes: a picture on the right of the page must not pale the name on the left,
+  // where there is nothing behind it but cream.
+  const CANDIDATES = '.nav-dark-bg, .thumb';
+  const DARK_BELOW = .42;
   const ends = [nav.querySelector('.nav-logo'), nav.querySelector('.lang-switcher')].filter(Boolean);
-  if (darks.length && ends.length && 'IntersectionObserver' in window) {
+  const marks = document.querySelectorAll(CANDIDATES);
+  if (marks.length && ends.length && 'IntersectionObserver' in window) {
+    // Whether a thumbnail is dark is not a thing to decide by hand across dozens of
+    // them: each one is sampled once, down to 16x16, and its mean luminance decides.
+    const sampler = document.createElement('canvas');
+    sampler.width = sampler.height = 16;
+    const sctx = sampler.getContext('2d', { willReadFrequently: true });
+    const known = new WeakMap();
+    function isDark(el) {
+      if (el.classList.contains('nav-dark-bg')) return true;
+      if (known.has(el)) return known.get(el);
+      const img = el.querySelector('img');
+      // Not decoded yet: answer false for now and ask again on the next pass rather
+      // than caching an answer taken before there was anything to look at.
+      if (!img || !img.complete || !img.naturalWidth) return false;
+      let dark = false;
+      try {
+        sctx.clearRect(0, 0, 16, 16);
+        sctx.drawImage(img, 0, 0, 16, 16);
+        const d = sctx.getImageData(0, 0, 16, 16).data;
+        let sum = 0, n = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i + 3] < 10) continue;
+          sum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+          n++;
+        }
+        dark = n > 0 && sum / n < DARK_BELOW;
+      } catch (e) {
+        dark = false; // a canvas the browser refuses to read must not break the bar
+      }
+      known.set(el, dark);
+      return dark;
+    }
     const under = new Set();
     let io = null;
     function apply() {
@@ -934,6 +968,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         if (under.size) {
           const r = el.getBoundingClientRect();
           under.forEach(function (d) {
+            if (dark || !isDark(d)) return;
             const b = d.getBoundingClientRect();
             if (b.right > r.left + 2 && b.left < r.right - 2 &&
                 b.bottom > r.top + 2 && b.top < r.bottom - 2) dark = true;
@@ -952,7 +987,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         });
         apply();
       }, { rootMargin: '0px 0px -' + Math.max(0, window.innerHeight - band) + 'px 0px' });
-      darks.forEach(function (el) { io.observe(el); });
+      marks.forEach(function (el) { io.observe(el); });
     }
     watch();
     window.addEventListener('scroll', apply, { passive: true });
