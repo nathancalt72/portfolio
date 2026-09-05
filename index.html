@@ -144,8 +144,21 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 /* ═══════════════════════════════════════
    NAV
 ═══════════════════════════════════════ */
-nav { position: relative; z-index: 100; display: flex; align-items: center;
-  justify-content: space-between; padding: 0 40px; height: 64px; }
+/* Sticky, not fixed: the bar keeps its place in the flow, so the hero's
+   calc(100vh - nav) and every layout below it stay exactly as they were.
+   It carries no background until something is actually scrolling underneath —
+   at the top of the page the vertical rules and the ascii run through it
+   untouched, which is how the page reads now. */
+nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 40px; height: 64px;
+  border-bottom: 1px solid transparent;
+  transition: background-color .3s ease, border-bottom-color .3s ease; }
+nav.is-stuck { background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-bottom-color: var(--border); }
+/* An anchor would otherwise land its section's first line under the bar. */
+#hero, #work, #approach, #contact { scroll-margin-top: calc(var(--nav-h, 64px) + 8px); }
 .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px;
   color: var(--fg); text-decoration: none; letter-spacing: .02em; }
 .nav-short { display: none; }
@@ -877,6 +890,26 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       setTimeout(() => { label.style.opacity = '0'; }, letters.length * 22 + 150);
     }
   }, { passive: true });
+})();
+
+/* ── STICKY NAV ──
+   The bar only takes a background once something is passing under it. Reading
+   scrollY forces no layout and the class is touched only when the state actually
+   flips, so the handler costs one comparison on the overwhelming majority of
+   scroll events — cheaper than deferring the work to a frame that, in a document
+   that never paints, would never arrive. */
+(function () {
+  const nav = document.getElementById('nav');
+  if (!nav) return;
+  let stuck = null;
+  function check() {
+    const now = window.scrollY > 8;
+    if (now === stuck) return;
+    stuck = now;
+    nav.classList.toggle('is-stuck', now);
+  }
+  window.addEventListener('scroll', check, { passive: true });
+  check();
 })();
 
 /* ── HERO AUTO-FIT HEADLINE ── */
