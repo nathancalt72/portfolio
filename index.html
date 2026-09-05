@@ -927,8 +927,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   const CANDIDATES = '.nav-dark-bg, .thumb';
   const DARK_BELOW = .42;
   const ends = [nav.querySelector('.nav-logo'), nav.querySelector('.lang-switcher')].filter(Boolean);
-  const marks = document.querySelectorAll(CANDIDATES);
-  if (marks.length && ends.length && 'IntersectionObserver' in window) {
+  if (ends.length && 'IntersectionObserver' in window) {
     // Whether a thumbnail is dark is not a thing to decide by hand across dozens of
     // them: each one is sampled once, down to 16x16, and its mean luminance decides.
     const sampler = document.createElement('canvas');
@@ -987,9 +986,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         });
         apply();
       }, { rootMargin: '0px 0px -' + Math.max(0, window.innerHeight - band) + 'px 0px' });
-      marks.forEach(function (el) { io.observe(el); });
+      // Re-queried every time: the project tiles are built by script further down this
+      // file, so a list taken when this ran would have held the portrait and nothing
+      // else — which is exactly the bug this replaced.
+      document.querySelectorAll(CANDIDATES).forEach(function (el) { io.observe(el); });
     }
     watch();
+    window.addEventListener('load', watch);
     window.addEventListener('scroll', apply, { passive: true });
     let t = null;
     window.addEventListener('resize', function () {
