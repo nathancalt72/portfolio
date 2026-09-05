@@ -146,23 +146,18 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 ═══════════════════════════════════════ */
 /* Sticky, not fixed: the bar keeps its place in the flow, so the hero's
    calc(100vh - nav) and every layout below it stay exactly as they were.
-   It carries no background until something is actually scrolling underneath —
-   at the top of the page the vertical rules and the ascii run through it
-   untouched, which is how the page reads now. */
+   Nothing is painted here — no background, no rule, no blur. Only the name and the
+   language switch ride down the page; the section links step aside once the page
+   starts moving, so what follows the reader is two lines of type and nothing else. */
 nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center;
-  justify-content: space-between; padding: 0 40px; height: 64px;
-  border-bottom: 1px solid transparent;
-  transition: background-color .3s ease, border-bottom-color .3s ease; }
-nav.is-stuck { background: var(--bg);
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  border-bottom-color: var(--border); }
-/* An anchor would otherwise land its section's first line under the bar. */
+  justify-content: space-between; padding: 0 40px; height: 64px; }
+nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
+/* An anchor would otherwise land its section's first line under the name. */
 #hero, #work, #approach, #contact { scroll-margin-top: calc(var(--nav-h, 64px) + 8px); }
 .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px;
   color: var(--fg); text-decoration: none; letter-spacing: .02em; }
 .nav-short { display: none; }
-.nav-links { display: flex; gap: 30px; }
+.nav-links { display: flex; gap: 30px; transition: opacity .35s ease; }
 .nav-link { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px;
   color: var(--fg-muted); letter-spacing: .04em; text-decoration: none; transition: color .25s; }
 .nav-link:hover { color: var(--fg); }
@@ -1868,8 +1863,8 @@ const translations = {
     pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
     approach_display: '<i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i>',
-    approach_body_a: '<p>I think it clicked in 2019 — the year I switched over to the digital side of making things. Halfway through high school, editing became a real chance to open myself to the world. Discovering, posting and keeping a community alive on social platforms let me build a visual world of my own. All of that was the way in to my studies.</p><p>I began with foreign languages. The taste for them had been there since middle school. I am drawn to other cultures, and language is to me the medium that carries them best. So I went for a degree in applied foreign languages and trade (LEA).</p>',
-    approach_body_b: '<p>More recently, I decided to reconnect the creative side with the digital one in my studies. In 2024 I started a master\'s in marketing &amp; communication, on a work-study contract. Getting a first foothold in the professional world across those two years has been hugely valuable.</p><p>What I am looking for now are video, animation and SaaS projects driven by organisations committed to environmental issues. That side of it matters to me, and it is something I want to put further forward in what comes next.</p><p>I am open, and looking forward to working together! ;)</p>',
+    approach_body_a: '<p>I think the turning point came in 2019: the time when I switched to the digital side of creativity. Right in the middle of my sixth-form years, editing was, to say the least, a real opportunity to open myself up to the world. Discovering, posting and engaging with a community on social media allowed me to forge a strong artistic identity. All of this paved the way for my higher education.</p><p>I started with foreign languages. My passion for languages has always been there, ever since secondary school. I’m drawn to different cultures, and I see languages as a major cultural medium that represents them. So I went on to study for a Bachelor’s degree in Languages and Business at the University of Le Mans (France).</p>',
+    approach_body_b: '<p>More recently, I decided to reconnect with creativity and the digital world in my studies. Therefore, in 2024, began a work-study Master’s degree in Marketing &amp; Communication. The opportunity to get a foothold in the professional world during these two years of my Master’s has been very enriching for me.</p><p>What I’m looking for now are opportunities to work on video projects, animations and SaaS initiatives led by organisations committed to environmental issues. This aspect is important to me and something I’d like to focus on more in the future.</p><p>I’m ready and looking forward to working with you ! ;)</p>',
     approach_status: 'available · france',
     cap_motion_title: 'motion', cap_motion_desc: 'Animation, art direction and putting an idea into movement.',
     cap_edit_title: 'edit', cap_edit_desc: 'Rhythm, narrative and color grading — shaping raw footage into form.',
