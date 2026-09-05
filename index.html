@@ -433,14 +433,14 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
    comes to; this section is no longer held to a single screen. */
 #approach { border-top: 1px solid var(--border); padding: 110px 40px 70px;
   display: grid; grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: auto auto auto; column-gap: 26px; }
+  grid-template-rows: auto auto auto auto; column-gap: 26px; }
 .approach-top { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: baseline;
   justify-content: space-between; gap: 20px; margin-bottom: 28px; }
 /* A layer, not a column: it claims columns 1-9 and passes in front of the portrait,
    the way the spread's headline crosses its photograph. The pointer goes through it
    so the picture underneath still answers the mouse. min-width:0 as well, or the
    nowrap lines would set the track's floor and a phone would lose their right edge. */
-.approach-display { grid-column: 1 / 9; grid-row: 2; align-self: start; min-width: 0;
+.approach-display { grid-column: 1 / 9; grid-row: 2 / 5; align-self: start; min-width: 0;
   z-index: 2; pointer-events: none;
   font-family: var(--display); font-weight: 700; text-transform: uppercase;
   color: var(--green-deep); font-size: clamp(34px, 11vw, 150px);
@@ -457,18 +457,14 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   align-self: start; z-index: 1; width: 100%; aspect-ratio: 1000 / 587; margin: 0; }
 .approach-photo svg { display: block; width: 100%; height: 100%; }
 /* The two columns are staggered rather than paired, as the spread staggers its own.
-   The opening half takes the higher slot, under the picture: it is the one the eye
-   reaches first, so it has to be the one the story starts with. */
-.approach-body-a { grid-column: 9 / 13; grid-row: 2; align-self: end; min-width: 0; }
-.approach-quote { position: relative; grid-column: 1 / 4; grid-row: 3; align-self: start;
-  margin: 54px 0 0; padding: 0 0 0 26px;
-  font-family: var(--mono); font-weight: 500; font-style: normal; font-size: 10px;
-  line-height: 2.1; letter-spacing: .2em; word-spacing: .5em; color: var(--green-deep);
-  max-width: 34ch; text-transform: lowercase; }
-.approach-quote::before { content: '\201C'; position: absolute; left: 0; top: -4px;
-  font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1;
-  letter-spacing: 0; color: var(--green-light); }
-.approach-body-b { grid-column: 4 / 8; grid-row: 3; align-self: start; min-width: 0;
+   The opening half takes the higher slot, in the band directly under the picture: it
+   is the one the eye reaches first, so it has to be where the story starts.
+   It gets a row of its own rather than sharing the picture's — bottom-aligned in the
+   same cell, a longer text simply grew upwards and slid under the photograph, which
+   sits above it, and the opening sentences vanished without a trace. */
+.approach-body-a { grid-column: 9 / 13; grid-row: 3; align-self: start; min-width: 0;
+  margin-top: 30px; }
+.approach-body-b { grid-column: 4 / 8; grid-row: 4; align-self: start; min-width: 0;
   margin-top: 54px; }
 .approach-body-a p, .approach-body-b p { font-size: 12px; line-height: 1.65;
   font-weight: 300; color: var(--fg); text-align: justify; hyphens: auto; }
@@ -531,7 +527,7 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
      indents that hold the block together on a page only unbalance it in one column. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
     padding-top: 76px; padding-bottom: 60px; }
-  .approach-display, .approach-photo, .approach-quote,
+  .approach-display, .approach-photo,
   .approach-body-a, .approach-body-b {
     grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch;
     margin-top: 0; }
@@ -709,7 +705,6 @@ nav { position: relative; z-index: 100; display: flex; align-items: center;
   </figure>
   <div class="approach-body-a reveal reveal-delay-2" data-i18n-html="approach_body_a"></div>
   <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
-  <div class="approach-quote reveal reveal-delay-2" data-i18n="approach_quote">reaching for the right gesture, not the effect.</div>
 </section>
 
 <!-- ═══ CAPABILITIES ═══ -->
@@ -1823,7 +1818,6 @@ const translations = {
     approach_display: '<i>UN</i><i class="in2">PETIT</i><i class="in1">PEU</i><i class="in3">PLUS</i><i class="in4">SUR</i><i>MOI</i>',
     approach_body_a: '<p>Je pense que le déclic s’est fait en 2019 : l’époque à laquelle j’ai switché pour le côté digital de la création. En plein milieu du cycle lycée, le montage a été pour moi une vraie opportunité de m’ouvrir au monde. Découvrir, publier et entretenir une communauté sur les réseaux sociaux m’a permis de me forger un univers artistique fort. Tout cela a été la porte d’entrée vers mon cursus d’études supérieures.</p><p>J\'ai commencé par les langues étrangères. Mon appétence pour les langues a toujours été présente depuis le collège. Je suis attiré par les différentes cultures et les langues sont pour moi un médium culturel majeur qui les représente. Je me suis donc dirigé vers une licence de langues et de commerce (LEA).</p>',
     approach_body_b: '<p>Plus récemment, j’ai décidé de reconnecter la création et le digital dans mon cursus scolaire. Ainsi, j’entame en 2024 un mastère marketing &amp; communication en alternance. L’opportunité d’avoir un premier pied dans le secteur professionnel durant ces deux années de mastère a été pour moi très enrichissante.</p><p>Ce que je cherche maintenant, ce sont des projets vidéos, animations, SaaS portés par des structures engagées sur les enjeux environnementaux. Cet aspect est pour moi important et quelque chose que j’aimerai mettre davantage en avant dans le futur.</p><p>Je suis ouvert et attends avec impatience notre collaboration ! ;)</p>',
-    approach_quote: 'chercher le geste juste plutôt que l\'effet.',
     approach_status: 'disponible · france',
     cap_motion_title: 'motion', cap_motion_desc: 'Animation, direction artistique et mise en mouvement d\'une idée.',
     cap_edit_title: 'montage', cap_edit_desc: 'Rythme, narration et étalonnage — donner une forme au chaos des rushs.',
@@ -1843,7 +1837,6 @@ const translations = {
     approach_display: '<i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i>',
     approach_body_a: '<p>I think it clicked in 2019 — the year I switched over to the digital side of making things. Halfway through high school, editing became a real chance to open myself to the world. Discovering, posting and keeping a community alive on social platforms let me build a visual world of my own. All of that was the way in to my studies.</p><p>I began with foreign languages. The taste for them had been there since middle school. I am drawn to other cultures, and language is to me the medium that carries them best. So I went for a degree in applied foreign languages and trade (LEA).</p>',
     approach_body_b: '<p>More recently, I decided to reconnect the creative side with the digital one in my studies. In 2024 I started a master\'s in marketing &amp; communication, on a work-study contract. Getting a first foothold in the professional world across those two years has been hugely valuable.</p><p>What I am looking for now are video, animation and SaaS projects driven by organisations committed to environmental issues. That side of it matters to me, and it is something I want to put further forward in what comes next.</p><p>I am open, and looking forward to working together! ;)</p>',
-    approach_quote: 'reaching for the right gesture, not the effect.',
     approach_status: 'available · france',
     cap_motion_title: 'motion', cap_motion_desc: 'Animation, art direction and putting an idea into movement.',
     cap_edit_title: 'edit', cap_edit_desc: 'Rhythm, narrative and color grading — shaping raw footage into form.',
