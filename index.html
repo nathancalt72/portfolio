@@ -152,6 +152,18 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center;
   justify-content: space-between; padding: 0 40px; height: 64px; }
 nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
+/* Over anything dark the ink turns pale so it stays readable. The two ends of the bar
+   are judged separately: the name sits on the left and the language switch on the
+   right, so a picture occupying only the right of the page must not pale the name
+   into invisibility against the cream beside it. Any element carrying .nav-dark-bg
+   is watched; today that is the portrait, and adding another is a class, nothing more. */
+.nav-logo, .lang-btn, .lang-sep { transition: color .3s ease, border-color .3s ease; }
+.dot-sq { transition: background-color .3s ease; }
+.nav-logo.over-dark { color: var(--ink-on-olive); }
+.nav-logo.over-dark .dot-sq.static { background: var(--green-light); }
+.lang-switcher.over-dark .lang-btn,
+.lang-switcher.over-dark .lang-sep { color: var(--ink-on-olive); }
+.lang-switcher.over-dark .lang-btn.active { color: #fff; border-bottom-color: #fff; }
 /* An anchor would otherwise land its section's first line under the name. */
 #hero, #work, #approach, #contact { scroll-margin-top: calc(var(--nav-h, 64px) + 8px); }
 .nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px;
@@ -659,7 +671,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
     </div>
   </div>
   <h2 class="approach-display reveal reveal-delay-1" data-i18n-html="approach_display"><i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i></h2>
-  <figure class="approach-photo reveal reveal-delay-1" id="aboutPhoto">
+  <figure class="approach-photo nav-dark-bg reveal reveal-delay-1" id="aboutPhoto">
     <svg viewBox="0 0 1000 587" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Nathan Charlot">
       <defs>
         <!-- The reference scene stacks Circle → FBM → Pixelate → Duotone, and this
@@ -905,6 +917,51 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   }
   window.addEventListener('scroll', check, { passive: true });
   check();
+
+  // Pale ink over anything dark. The observer's root is squeezed down to the band the
+  // bar occupies, so it reports exactly the elements crossing under it and the costly
+  // work only runs while one actually is. Each end of the bar is then tested against
+  // those elements on its own, in both axes — a picture on the right of the page must
+  // not pale the name on the left, where there is nothing but cream behind it.
+  const darks = document.querySelectorAll('.nav-dark-bg');
+  const ends = [nav.querySelector('.nav-logo'), nav.querySelector('.lang-switcher')].filter(Boolean);
+  if (darks.length && ends.length && 'IntersectionObserver' in window) {
+    const under = new Set();
+    let io = null;
+    function apply() {
+      ends.forEach(function (el) {
+        let dark = false;
+        if (under.size) {
+          const r = el.getBoundingClientRect();
+          under.forEach(function (d) {
+            const b = d.getBoundingClientRect();
+            if (b.right > r.left + 2 && b.left < r.right - 2 &&
+                b.bottom > r.top + 2 && b.top < r.bottom - 2) dark = true;
+          });
+        }
+        el.classList.toggle('over-dark', dark);
+      });
+    }
+    function watch() {
+      if (io) io.disconnect();
+      under.clear();
+      const band = nav.offsetHeight || 64;
+      io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) under.add(e.target); else under.delete(e.target);
+        });
+        apply();
+      }, { rootMargin: '0px 0px -' + Math.max(0, window.innerHeight - band) + 'px 0px' });
+      darks.forEach(function (el) { io.observe(el); });
+    }
+    watch();
+    window.addEventListener('scroll', apply, { passive: true });
+    let t = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(t);
+      t = setTimeout(watch, 200);
+    });
+  }
 })();
 
 /* ── HERO AUTO-FIT HEADLINE ── */
