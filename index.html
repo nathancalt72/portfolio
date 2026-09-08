@@ -553,7 +553,9 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .approach-display i:nth-child(2) { left: 52%; top: 2%; }
   .approach-display i:nth-child(3) { left: 14%; top: 32%; }
   .approach-display i:nth-child(4) { left: 0;   top: 58%; }
-  .approach-display i:nth-child(5) { left: 44%; top: 82%; }
+  /* Anchored from the right, not the left: 'about' is twice the width of 'sur', and
+     a left offset that suited one ran the pair into each other in the other. */
+  .approach-display i:nth-child(5) { left: auto; right: 30%; top: 82%; }
   .approach-display i:nth-child(6) { right: 0;  top: 82%; }
   /* Room for the first word, which rides above the picture's top edge. */
   .approach-top { margin-bottom: 48px; }
@@ -770,7 +772,29 @@ const applyLangHooks = [];
    back where they were, which drops them mid-band while the curtain is still
    opening. Skipped when the URL names a section, so the nav links still work. */
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-if (!location.hash) window.scrollTo(0, 0);
+/* One reset is not enough on ios: the browser puts the old offset back after the
+   page has settled, later than the curtain lifts, so the visitor lands mid-page.
+   The top is therefore held for a short while — and released the instant the
+   visitor scrolls, so it never fights a real gesture. */
+(function () {
+  if (location.hash) return;
+  let holding = true;
+  function top() { if (holding) window.scrollTo(0, 0); }
+  function release() { holding = false; }
+  ['touchstart', 'wheel', 'keydown', 'pointerdown'].forEach(function (e) {
+    window.addEventListener(e, release, { passive: true, once: true });
+  });
+  top();
+  window.addEventListener('pageshow', top);
+  window.addEventListener('load', function () {
+    top();
+    let n = 0;
+    const beat = setInterval(function () {
+      top();
+      if (++n > 12 || !holding) clearInterval(beat);
+    }, 100);
+  });
+})();
 
 /* Feed the nav's real height to the hero, so the first screen ends exactly at
    the fold whatever the breakpoint does to the bar. */
