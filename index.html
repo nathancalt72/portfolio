@@ -1328,8 +1328,8 @@ const projectGroups = [
   { key: 'pro', items: [
     {title:{fr:'Alternance Carrosserie Toutain', en:'Toutain - Industrial Bodywork apprenticeship'},
      tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026',
-     desc:{fr:"Alternance à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication — de la charte graphique à la signalétique du site, en passant par le web et les réseaux sociaux. Le périmètre couvrait aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
-           en:"Apprenticeship at Toutain - Industrial Bodywork, where I took on the communication as a whole — from the visual guidelines to the signage on site, by way of web and social media. The remit also covered HLSolutions, a side brand the owner was building in parallel."},
+     desc:{fr:"Alternance réalisée à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication, de la charte graphique à la signalétique physique de l’entreprise, en passant par le web et les réseaux sociaux. Mes missions couvraient aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
+           en:"A work-study placement at Toutain - Industrial Bodywork, where I took on the whole of the company's communication, from the visual guidelines to the physical signage on site, by way of the website and social media. My brief also covered HLSolutions, a side brand the owner was building in parallel."},
      client:{fr:'Carrosserie Toutain · HLSolutions', en:'Toutain - Industrial Bodywork · HLSolutions'}, site:'https://sastoutain.com/', credits:'Nathan Charlot',
      // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
@@ -1435,14 +1435,14 @@ const projectGroups = [
      ]},
   ]},
   { key: 'personal',
-    note:{fr:"Le montage avant le métier : ce que je fais quand personne ne le commande. Des fan edits depuis 2019, des images que je tourne pour le souvenir, et des compositions photo tirées du quotidien.",
-          en:"Editing before it was the job: what I make when nobody has asked for it. Fan edits since 2019, footage shot to keep, and photo compositions drawn from everyday life."},
+    note:{fr:"Depuis 2019, j’apprends de manière autodidacte le montage photo/vidéo et l’animation et c’est devenu pour moi un passe-temps. J’ai aujourd’hui comme objectif d’apprendre l’animation et le modeling 3D (Blender). Continuez de scroller pour voir plusieurs de mes projets.",
+          en:"Since 2019 I have been teaching myself photo and video editing and animation, and it has become a pastime of mine. My aim now is to learn 3D animation and modelling (Blender). Keep scrolling to see several of my projects."},
     views:{fr:'plus de 3,5 M de vues cumulées', en:'over 3.5M views in total'},
     items: [
     {title:{fr:'Fan edits', en:'Fan edits'},
      tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026',
-     desc:{fr:"Le montage a commencé là, en 2019, du côté du spectateur : les fan edits, ces courts montages bâtis autour de personnages de fiction, de célébrités, de voitures — de à peu près tout. J'ai fini par en faire, sur plusieurs comptes Instagram et TikTok. Le format est devenu depuis un langage à part entière, que les marques emploient pour mettre en avant un produit ou un service.",
-           en:"Editing started here, in 2019, on the watching side: fan edits, short cuts built around fictional characters, celebrities, cars — around just about anything. I ended up making them myself, across several Instagram and TikTok accounts. The form has since become a language of its own, one brands now use to put a product or a service across."},
+     desc:{fr:"Le montage a commencé ici, en 2019, du côté du spectateur : les fan edits, ces courts montages pensés autour de personnages de fiction, de célébrités, de voitures… de à peu près tout. Je me suis donc lancé dans le montage d’« édits », sur plusieurs comptes Instagram et TikTok. Le format est depuis devenu un langage à part entière, que les marques emploient pour mettre en avant un produit ou un service.",
+           en:"Editing started here, in 2019, on the watching side: fan edits, those short cuts built around fictional characters, celebrities, cars — around just about anything. So I started making edits of my own, across several Instagram and TikTok accounts. The form has since become a language in its own right, one brands use to put a product or a service across."},
      credits:'Nathan Charlot',
      thumbs:[
        {file:'edit1.mp4', ratio:'square', ar:'1/1', label:'le jeu de la dame', src:'projects/edit-queens-gambit/poster.jpg',
@@ -1555,7 +1555,13 @@ const siteCell = s => /^https?:\/\//.test(s)
   : esc(s);
 let projectIndex = 0;
 const galleries = [];
+// The figure beside a category name is its rank on the page, not the number of
+// projects it holds: read as a count it said 02 for the two professional entries
+// and 01 for the single academic one, which scans as an ordering and got them
+// backwards.
+let catRank = 0;
 projectList.innerHTML = projectGroups.map(group => {
+  catRank++;
   const rows = group.items.map((p, n) => {
     const num = String(n + 1).padStart(2, '0');
     // Only the fields a project actually has: personal work answers to no
@@ -1634,7 +1640,7 @@ projectList.innerHTML = projectGroups.map(group => {
   <div class="cat-group">
     <div class="cat-head">
       <span class="cat-name" data-i18n="cat_${group.key}">${group.key}</span>
-      <span class="cat-count">${String(group.items.length).padStart(2, '0')}</span>
+      <span class="cat-count">${String(catRank).padStart(2, '0')}</span>
     </div>
     ${group.note ? `<div class="cat-note">
       <p class="cat-note-text" data-fr="${esc(group.note.fr)}" data-en="${esc(group.note.en)}">${group.note.en}</p>
