@@ -546,13 +546,15 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .approach-display i { position: absolute; white-space: nowrap; }
   .approach-display .in1, .approach-display .in2,
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
-  /* The three words that land on the picture carry a halo of the page's own cream:
-     olive on a photograph of a face reads badly without it. Three stacked blurs
-     rather than one, which spreads the glow instead of ringing the letters. */
+  /* The three words that land on the picture get just enough of the page's own cream
+     behind them to separate olive from skin. Tight radii and part transparency: at
+     full strength and 34px it read as a glow around the type rather than as the
+     letters simply being legible. */
   .approach-display i:nth-child(2),
   .approach-display i:nth-child(3),
   .approach-display i:nth-child(4) {
-    text-shadow: 0 0 10px var(--bg), 0 0 22px var(--bg), 0 0 34px var(--bg); }
+    text-shadow: 0 0 5px color-mix(in srgb, var(--bg) 78%, transparent),
+                 0 0 12px color-mix(in srgb, var(--bg) 42%, transparent); }
   .approach-display i:nth-child(1) { left: 46%; top: -26%; }
   .approach-display i:nth-child(2) { left: 52%; top: 2%; }
   .approach-display i:nth-child(3) { left: 14%; top: 32%; }
