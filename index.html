@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+  const opening = document.querySelector('.approach-body-a');
+  const closing = document.getElementById('contact');
+  if (!box || !opening || !closing) return;<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1301,31 +1303,42 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 /* ── ASCII FADE-OUT ──
    The backdrop is fixed, so it sits under the about text and makes it hard to read.
    Rather than move it — which read as a lurch — it goes soft and thin as that text
-   comes up, and comes back as it leaves. Both properties are set on the container,
-   never on the <pre>: that one carries the centring offset the backdrop computes for
-   itself, and its own .6 opacity, which this one multiplies rather than replaces. */
+   comes up, holds there while the text is being read, and comes back once it has
+   gone by, well before the contact section. It never disappears: the plateau leaves
+   it present as a texture, which is as far as it should go.
+   Both properties are set on the container, never on the <pre>: that one carries the
+   centring offset the backdrop computes for itself, and its own .6 opacity, which
+   this one multiplies rather than replaces. */
 (function () {
   const box = document.getElementById('asciiBg');
-  const anchor = document.querySelector('.approach-body-a');
-  if (!box || !anchor) return;
-  const MAX_BLUR = 10;
+  const opening = document.querySelector('.approach-body-a');
+  const closing = document.getElementById('contact');
+  if (!box || !opening || !closing) return;
+  const MAX_BLUR = 6;      // px at the plateau
+  const MIN_OPACITY = .4;  // of its own .6, so a quarter of full strength
+
+  function ramp(value, from, to) {
+    const p = (from - value) / (from - to);
+    return p < 0 ? 0 : p > 1 ? 1 : p;
+  }
 
   let last = -1;
   function fade() {
-    const top = anchor.getBoundingClientRect().top;
-    // Untouched while the text is still well below; gone by the time it has risen
-    // into the upper part of the screen, which is where it starts being read.
-    const from = window.innerHeight * 1.8;
-    const to = window.innerHeight * 0.7;
-    let p = (from - top) / (from - to);
-    p = p < 0 ? 0 : p > 1 ? 1 : p;
+    const h = window.innerHeight;
+    // Out as the first column rises into the part of the screen where it gets read.
+    const out = ramp(opening.getBoundingClientRect().top, h * 1.8, h * 0.7);
+    // Back in on the approach to the contact section, and finished well before it
+    // arrives. Anchored on that section rather than on the end of the text: the page
+    // stops scrolling shortly after the text does, and a ramp measured from there
+    // ran out of room to complete — the backdrop stalled at nine tenths.
+    const back = ramp(closing.getBoundingClientRect().top, h * 1.5, h * 0.9);
     // Quantised to whole steps: a blur radius that changes on every pixel of scroll
     // is a full-screen filter recomputed on every frame for no visible gain.
-    const step = Math.round(p * 20);
+    const step = Math.round(out * (1 - back) * 20);
     if (step === last) return;
     last = step;
     const q = step / 20;
-    box.style.opacity = q >= 1 ? '0' : String(1 - q);
+    box.style.opacity = q ? String(1 - q * (1 - MIN_OPACITY)) : '';
     box.style.filter = q ? 'blur(' + (q * MAX_BLUR).toFixed(1) + 'px)' : '';
   }
 
