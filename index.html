@@ -567,7 +567,14 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   nav { height: 56px; padding: 0 18px; }
   .nav-short { display: inline; } .nav-long { display: none; }
   .lang-switcher { margin-left: auto; margin-right: 14px; }
-  #hero { padding: 88px 18px 28px; }
+  /* iOS measures 100vh with the browser's toolbars hidden — a height the reader may
+     never actually see. The hero was therefore taller than the screen, and since its
+     content is bottom-aligned the last line of the headline fell under the address
+     bar. svh is the height with the toolbars shown, the one always on screen; the vh
+     line stays first as the fallback for browsers that do not know it. */
+  #hero { padding: 88px 18px 28px;
+    min-height: calc(100vh - var(--nav-h, 56px));
+    min-height: calc(100svh - var(--nav-h, 56px)); }
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 64px; }
   .thumb { height: 154px; }
@@ -985,7 +992,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   function largestThatFits() {
     const containerWidth = h1.parentElement.offsetWidth;
     const isMobile = window.innerWidth < 768;
-    const targetHeight = window.innerHeight * (isMobile ? .37 : .44);
+    // Same reason as the hero's svh: on a phone innerHeight is the toolbars-hidden
+    // height. visualViewport reports what is on screen at this moment, which is the
+    // height the headline actually has to fit inside.
+    const visible = isMobile && window.visualViewport
+      ? Math.min(window.innerHeight, window.visualViewport.height)
+      : window.innerHeight;
+    const targetHeight = visible * (isMobile ? .37 : .44);
     let size = 20;
     h1.style.fontSize = size + 'px';
     while (h1.scrollHeight < targetHeight && h1.scrollWidth <= containerWidth + 1 && size < 260) {
@@ -1236,8 +1249,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 
   function fit() {
     if (!cols) return;
-    // Monospace advance is ~0.6em; size to fill on whichever axis binds first.
-    const size = Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows);
+    // Monospace advance is ~0.6em. On a wide screen, size to fill on whichever axis
+    // binds first. On a phone the width binds far too early — 164 columns across
+    // 390px left the artwork covering barely a third of the height — so there it is
+    // sized on the height alone and the sides are simply cropped by the container.
+    const size = window.innerWidth >= 768
+      ? Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows)
+      : box.clientHeight / rows;
     pre.style.fontSize = size + 'px';
     pre.style.transform = 'translateX(' + (-shiftX * size * 0.6) + 'px)';
   }
