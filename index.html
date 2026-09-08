@@ -184,8 +184,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .lang-btn.active { color: var(--gold); border-bottom: 1px solid var(--gold); }
 .lang-btn:hover:not(.active) { color: var(--fg); }
 .lang-sep { font-family: var(--mono); font-size: 9px; color: var(--border-strong); }
-.nav-hamburger { display: none; }
-.mobile-menu { display: none; }
 
 /* ═══════════════════════════════════════
    HERO
@@ -548,8 +546,15 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .approach-display i { position: absolute; white-space: nowrap; }
   .approach-display .in1, .approach-display .in2,
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
+  /* The three words that land on the picture carry a halo of the page's own cream:
+     olive on a photograph of a face reads badly without it. Three stacked blurs
+     rather than one, which spreads the glow instead of ringing the letters. */
+  .approach-display i:nth-child(2),
+  .approach-display i:nth-child(3),
+  .approach-display i:nth-child(4) {
+    text-shadow: 0 0 10px var(--bg), 0 0 22px var(--bg), 0 0 34px var(--bg); }
   .approach-display i:nth-child(1) { left: 46%; top: -26%; }
-  .approach-display i:nth-child(2) { left: 40%; top: 2%; }
+  .approach-display i:nth-child(2) { left: 52%; top: 2%; }
   .approach-display i:nth-child(3) { left: 14%; top: 32%; }
   .approach-display i:nth-child(4) { left: 0;   top: 58%; }
   .approach-display i:nth-child(5) { left: 44%; top: 82%; }
@@ -575,19 +580,11 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .nav-links { display: none; }
 }
 @media (max-width: 600px) {
-  .nav-hamburger { display: flex; flex-direction: column; justify-content: center; gap: 5px;
-    width: 26px; height: 26px; background: none; border: none; cursor: pointer; padding: 0; }
-  .nav-hamburger span { display: block; height: 1px; background: var(--fg); transition: transform .3s, opacity .3s; }
-  .nav-hamburger.open span:first-child { transform: translateY(6px) rotate(45deg); }
-  .nav-hamburger.open span:last-child { transform: translateY(-6px) rotate(-45deg); }
-  .mobile-menu { display: none; position: fixed; top: 58px; left: 0; right: 0; bottom: 0;
-    background: color-mix(in srgb, var(--bg) 97%, transparent); z-index: 99;
-    flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a { font-family: var(--display); font-weight: 700; text-transform: lowercase; font-size: 22px; color: var(--fg); text-decoration: none; }
   nav { height: 56px; padding: 0 18px; }
   .nav-short { display: inline; } .nav-long { display: none; }
-  .lang-switcher { margin-left: auto; margin-right: 14px; }
+  /* The 14px used to hold the burger off; without it the switch would sit short of
+     the margin the name is aligned to. */
+  .lang-switcher { margin-left: auto; margin-right: 0; }
   /* iOS measures 100vh with the browser's toolbars hidden — a height the reader may
      never actually see. The hero was therefore taller than the screen, and since its
      content is bottom-aligned the last line of the headline fell under the address
@@ -623,12 +620,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <div id="cursor-ring"></div>
 <div id="scrollLabel"></div>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#work" data-i18n="nav_work">work</a>
-  <a href="#approach" data-i18n="nav_about">about</a>
-  <a href="#contact" data-i18n="nav_contact">contact</a>
-</div>
-
 <nav id="nav">
   <a href="#hero" class="nav-logo">
     <span class="dot-sq static"></span>
@@ -646,7 +637,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
       <span class="lang-sep">/</span>
       <button class="lang-btn active" data-lang="en">EN</button>
     </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menu"><span></span><span></span></button>
   </div>
 </nav>
 
@@ -1975,19 +1965,6 @@ document.addEventListener('click', e => {
     });
   });
 });
-
-/* ── HAMBURGER ── */
-const hamburger = document.getElementById('navHamburger');
-const mobileMenu = document.getElementById('mobileMenu');
-if (hamburger) {
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-  });
-  mobileMenu.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); });
-  });
-}
 
 /* ── I18N ── */
 const translations = {
