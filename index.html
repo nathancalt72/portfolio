@@ -523,22 +523,39 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 80px; }
-  /* Stacked, but the statement still crosses the portrait as it does on a wide
-     screen: the picture is pulled up by half a line of type so the last word sits
-     on it. The offset is expressed in the fitted size the script publishes, so it
-     holds whether the statement lands at 91px or 113px. */
-  #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
-    padding-top: 76px; padding-bottom: 60px; }
-  .approach-display, .approach-photo,
-  .approach-body-a, .approach-body-b {
-    grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch;
-    margin-top: 0; }
-  .approach-display { position: relative; z-index: 2; pointer-events: none;
-    font-size: clamp(38px, 12vw, 84px); }
-  .approach-photo { margin-top: calc(-30px - var(--about-fs, 84px) * .52); }
+  /* Stacked, the statement is scattered across the portrait rather than set above it:
+     the two share one grid cell and every word is placed by hand. Lowercase and the
+     display face, like the hero and the contact heading — the capitals were borrowed
+     from the reference spread, and only the wide layout still follows it. */
+  #approach { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto;
+    gap: 30px; padding-top: 76px; padding-bottom: 60px; }
+  /* No margin here: the statement shares this cell and places its words as
+     percentages of it, so any offset on the picture alone pulls them off the
+     picture. The room the first word needs above is taken from the row before. */
+  .approach-photo { grid-column: 1; grid-row: 2; align-self: start; justify-self: stretch;
+    margin: 0; }
+  .approach-display { grid-column: 1; grid-row: 2; align-self: stretch; justify-self: stretch;
+    position: relative; z-index: 2; pointer-events: none; margin: 0;
+    font-weight: 700; text-transform: lowercase; letter-spacing: -.02em; line-height: .96;
+    font-size: clamp(28px, 14.5vw, 72px); }
+  .approach-body-a { grid-column: 1; grid-row: 3; align-self: start; justify-self: stretch; margin-top: 0; }
+  .approach-body-b { grid-column: 1; grid-row: 4; align-self: start; justify-self: stretch; margin-top: 0; }
+  /* Placed as drawn: two words riding the top edge, two down the left, the last
+     pair along the bottom. Percentages of the picture, so the arrangement holds
+     from a 320px screen to a 430px one. */
+  /* The desktop indents are class-on-class and outrank a bare element selector —
+     zeroed at equal specificity here, or they push the words off the screen. */
+  .approach-display i { position: absolute; white-space: nowrap; }
   .approach-display .in1, .approach-display .in2,
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
-  .approach-top { margin-bottom: 0; }
+  .approach-display i:nth-child(1) { left: 46%; top: -26%; }
+  .approach-display i:nth-child(2) { left: 40%; top: 2%; }
+  .approach-display i:nth-child(3) { left: 14%; top: 32%; }
+  .approach-display i:nth-child(4) { left: 0;   top: 58%; }
+  .approach-display i:nth-child(5) { left: 44%; top: 82%; }
+  .approach-display i:nth-child(6) { right: 0;  top: 82%; }
+  /* Room for the first word, which rides above the picture's top edge. */
+  .approach-top { margin-bottom: 48px; }
   .approach-body-a p, .approach-body-b p { font-size: 14px; line-height: 1.8; }
   /* Four columns are too tight to read here: name and year on one line, the
      rest of the metadata stacked underneath. */
@@ -1072,6 +1089,10 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // it back is not circular.
   const rightCol = document.querySelector('.approach-body-a');
   function resizeAbout() {
+    // Stacked, the words are scattered over the portrait at a size set in css. The
+    // column arithmetic below has nothing to measure there, and an inline size would
+    // override the clamp that keeps the arrangement in proportion.
+    if (!window.matchMedia('(min-width: 901px)').matches) { el.style.fontSize = ''; return; }
     let box = el.clientWidth;
     if (rightCol && window.matchMedia('(min-width: 901px)').matches) {
       const room = rightCol.getBoundingClientRect().left - el.getBoundingClientRect().left - 46;
