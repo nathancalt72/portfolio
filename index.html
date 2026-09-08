@@ -521,40 +521,34 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 80px; }
-  /* Stacked, the statement is scattered across the portrait rather than set above it:
-     the two share one grid cell and every word is placed by hand. Lowercase and the
-     display face, like the hero and the contact heading — the capitals were borrowed
-     from the reference spread, and only the wide layout still follows it. */
-  #approach { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto;
+  /* Stacked, the statement sits above the portrait rather than on it, in the same
+     scattered arrangement — only the last pair dips onto the picture's top edge.
+     Lowercase and the display face, like the hero and the contact heading; the
+     capitals were borrowed from the reference spread, and only the wide layout
+     still follows it. */
+  #approach { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto;
     gap: 30px; padding-top: 76px; padding-bottom: 60px; }
-  /* No margin here: the statement shares this cell and places its words as
-     percentages of it, so any offset on the picture alone pulls them off the
-     picture. The room the first word needs above is taken from the row before. */
-  .approach-photo { grid-column: 1; grid-row: 2; align-self: start; justify-self: stretch;
-    margin: 0; }
-  .approach-display { grid-column: 1; grid-row: 2; align-self: stretch; justify-self: stretch;
+  /* The block is given the picture's own proportions, so the percentages below place
+     the words exactly as they did when the two shared a cell. */
+  .approach-display { grid-column: 1; grid-row: 2; align-self: start; justify-self: stretch;
     position: relative; z-index: 2; pointer-events: none; margin: 0;
+    width: 100%; aspect-ratio: 1000 / 587;
     font-weight: 700; text-transform: lowercase; letter-spacing: -.02em; line-height: .96;
     font-size: clamp(28px, 14.5vw, 72px); }
-  .approach-body-a { grid-column: 1; grid-row: 3; align-self: start; justify-self: stretch; margin-top: 0; }
-  .approach-body-b { grid-column: 1; grid-row: 4; align-self: start; justify-self: stretch; margin-top: 0; }
-  /* Placed as drawn: two words riding the top edge, two down the left, the last
-     pair along the bottom. Percentages of the picture, so the arrangement holds
-     from a 320px screen to a 430px one. */
+  /* Pulled up under the last pair of words: the picture's top edge cuts through them
+     rather than clearing them, which is the crossing the wide layout makes too. */
+  .approach-photo { grid-column: 1; grid-row: 3; align-self: start; justify-self: stretch;
+    margin: -40px 0 0; }
+  .approach-body-a { grid-column: 1; grid-row: 4; align-self: start; justify-self: stretch; margin-top: 0; }
+  .approach-body-b { grid-column: 1; grid-row: 5; align-self: start; justify-self: stretch; margin-top: 0; }
+  /* Placed as drawn: two words riding the top, two down the left, the last pair along
+     the bottom where the picture comes up to meet them. Percentages, so the
+     arrangement holds from a 320px screen to a 430px one. */
   /* The desktop indents are class-on-class and outrank a bare element selector —
      zeroed at equal specificity here, or they push the words off the screen. */
   .approach-display i { position: absolute; white-space: nowrap; }
   .approach-display .in1, .approach-display .in2,
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
-  /* The three words that land on the picture get just enough of the page's own cream
-     behind them to separate olive from skin. Tight radii and part transparency: at
-     full strength and 34px it read as a glow around the type rather than as the
-     letters simply being legible. */
-  .approach-display i:nth-child(2),
-  .approach-display i:nth-child(3),
-  .approach-display i:nth-child(4) {
-    text-shadow: 0 0 5px color-mix(in srgb, var(--bg) 78%, transparent),
-                 0 0 12px color-mix(in srgb, var(--bg) 42%, transparent); }
   .approach-display i:nth-child(1) { left: 46%; top: -26%; }
   .approach-display i:nth-child(2) { left: 52%; top: 2%; }
   .approach-display i:nth-child(3) { left: 14%; top: 32%; }
