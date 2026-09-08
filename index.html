@@ -523,15 +523,19 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
   #work { --pad: 22px; padding: 70px var(--pad) 80px; }
-  /* Stacked: with nothing beside it the statement has nothing to lie across, and the
-     indents that hold the block together on a page only unbalance it in one column. */
+  /* Stacked, but the statement still crosses the portrait as it does on a wide
+     screen: the picture is pulled up by half a line of type so the last word sits
+     on it. The offset is expressed in the fitted size the script publishes, so it
+     holds whether the statement lands at 91px or 113px. */
   #approach { grid-template-columns: 1fr; grid-template-rows: auto; gap: 30px;
     padding-top: 76px; padding-bottom: 60px; }
   .approach-display, .approach-photo,
   .approach-body-a, .approach-body-b {
     grid-column: 1; grid-row: auto; align-self: start; justify-self: stretch;
     margin-top: 0; }
-  .approach-display { z-index: auto; pointer-events: auto; font-size: clamp(38px, 12vw, 84px); }
+  .approach-display { position: relative; z-index: 2; pointer-events: none;
+    font-size: clamp(38px, 12vw, 84px); }
+  .approach-photo { margin-top: calc(-30px - var(--about-fs, 84px) * .52); }
   .approach-display .in1, .approach-display .in2,
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
   .approach-top { margin-bottom: 0; }
@@ -1083,7 +1087,11 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         window.innerHeight * 1.45 / (lineCount(html) * .84));
     });
     if (smallest === Infinity) return;
-    el.style.fontSize = Math.max(30, Math.min(smallest, 260)) + 'px';
+    const size = Math.max(30, Math.min(smallest, 260));
+    el.style.fontSize = size + 'px';
+    // Published so the stacked layout can pull the portrait up by half a line and let
+    // the statement cross it, the way the columns let it cross on a wide screen.
+    document.documentElement.style.setProperty('--about-fs', size + 'px');
   }
   window.addEventListener('load', resizeAbout);
   window.addEventListener('resize', resizeAbout);
@@ -1228,7 +1236,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   if (!pre || !box) return;
   const FPS = 15;
   let frames = [], cols = 0, rows = 0, i = 0, timer = null;
-  let shiftX = 0;
+  let shiftX = 0, shiftLeftX = 0;
 
   // Trailing spaces are stripped to save bytes, so the text box is narrower than
   // the real grid and flexbox centres the wrong thing. Centre on the centroid of
@@ -1236,15 +1244,21 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // the box past where the mass actually reads.
   // Vertically there is nothing to correct — the ink runs to the last row, and
   // the container aligns to flex-end, so the artwork already sits on the bottom.
+  // A second centroid is kept for the left half alone: the artwork holds two
+  // plants, and a phone only has room for one. Centring on the whole picture
+  // framed the right-hand one; this one frames the left.
   function measureInk() {
-    let n = 0, sumC = 0;
+    let n = 0, sumC = 0, nLeft = 0, sumLeft = 0;
+    const midpoint = cols * 0.55;
     frames.forEach(f => f.split('\n').forEach(l => {
       for (let c = 0; c < l.length; c++) {
-        if (l[c] !== ' ') { n++; sumC += c; }
+        if (l[c] === ' ') continue;
+        n++; sumC += c;
+        if (c < midpoint) { nLeft++; sumLeft += c; }
       }
     }));
-    if (!n) return;
-    shiftX = sumC / n - cols / 2;
+    if (n) shiftX = sumC / n - cols / 2;
+    if (nLeft) shiftLeftX = sumLeft / nLeft - cols / 2;
   }
 
   function fit() {
@@ -1253,11 +1267,14 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     // binds first. On a phone the width binds far too early — 164 columns across
     // 390px left the artwork covering barely a third of the height — so there it is
     // sized on the height alone and the sides are simply cropped by the container.
-    const size = window.innerWidth >= 768
+    const wide = window.innerWidth >= 768;
+    const size = wide
       ? Math.min(box.clientWidth / (cols * 0.6), box.clientHeight / rows)
       : box.clientHeight / rows;
+    // A phone sees roughly a third of the columns: frame the left plant, not the pair.
+    const centre = wide ? shiftX : shiftLeftX;
     pre.style.fontSize = size + 'px';
-    pre.style.transform = 'translateX(' + (-shiftX * size * 0.6) + 'px)';
+    pre.style.transform = 'translateX(' + (-centre * size * 0.6) + 'px)';
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   function run() {
