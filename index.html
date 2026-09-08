@@ -73,7 +73,7 @@ a { color: inherit; }
 /* Ascii animation as a fixed backdrop: plain text, so no blend mode or alpha
    video is needed — the glyphs simply sit on the page colour. Held well below
    the content and faint enough to read through. */
-#asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none; will-change: transform;
+#asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none; will-change: opacity, filter;
   display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
 #asciiBg pre { font-family: var(--mono); line-height: 1; white-space: pre; margin: 0;
   color: var(--fg); opacity: .6; }
@@ -1298,53 +1298,40 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   reduced.addEventListener('change', run);
 })();
 
-/* ── ASCII SLIDE-OUT ──
+/* ── ASCII FADE-OUT ──
    The backdrop is fixed, so it sits under the about text and makes it hard to read.
-   It slides off to the left as that text comes up, and slides back as it leaves.
-   The transform goes on the container, never on the <pre>: that one already carries
-   the centring offset the backdrop computes for itself, and overwriting it would
-   throw the artwork off-centre. */
+   Rather than move it — which read as a lurch — it goes soft and thin as that text
+   comes up, and comes back as it leaves. Both properties are set on the container,
+   never on the <pre>: that one carries the centring offset the backdrop computes for
+   itself, and its own .6 opacity, which this one multiplies rather than replaces. */
 (function () {
   const box = document.getElementById('asciiBg');
-  const pre = document.getElementById('asciiPre');
   const anchor = document.querySelector('.approach-body-a');
-  if (!box || !pre || !anchor) return;
-
-  // How far left the artwork has to go to clear the screen entirely. Measured with
-  // the slide removed, or the reading would be of the already-shifted position.
-  let span = 0;
-  function measure() {
-    const held = box.style.transform;
-    box.style.transform = 'none';
-    span = Math.max(0, pre.getBoundingClientRect().right) + 24;
-    box.style.transform = held;
-  }
+  if (!box || !anchor) return;
+  const MAX_BLUR = 10;
 
   let last = -1;
-  function slide() {
-    if (!span) return;
+  function fade() {
     const top = anchor.getBoundingClientRect().top;
     // Untouched while the text is still well below; gone by the time it has risen
     // into the upper part of the screen, which is where it starts being read.
-    const from = window.innerHeight * 1.6;
-    const to = window.innerHeight * 0.8;
+    const from = window.innerHeight * 1.8;
+    const to = window.innerHeight * 0.7;
     let p = (from - top) / (from - to);
     p = p < 0 ? 0 : p > 1 ? 1 : p;
-    const px = Math.round(-p * span);
-    if (px === last) return;
-    last = px;
-    box.style.transform = px ? 'translateX(' + px + 'px)' : '';
+    // Quantised to whole steps: a blur radius that changes on every pixel of scroll
+    // is a full-screen filter recomputed on every frame for no visible gain.
+    const step = Math.round(p * 20);
+    if (step === last) return;
+    last = step;
+    const q = step / 20;
+    box.style.opacity = q >= 1 ? '0' : String(1 - q);
+    box.style.filter = q ? 'blur(' + (q * MAX_BLUR).toFixed(1) + 'px)' : '';
   }
 
-  // The artwork arrives from a fetch, so its width is not known at first. Watching
-  // the <pre> catches that, and every later reflow, without polling for it.
-  if (window.ResizeObserver) {
-    new ResizeObserver(function () { measure(); last = -1; slide(); }).observe(pre);
-  }
-  measure();
-  slide();
-  window.addEventListener('scroll', slide, { passive: true });
-  window.addEventListener('resize', function () { measure(); last = -1; slide(); });
+  fade();
+  window.addEventListener('scroll', fade, { passive: true });
+  window.addEventListener('resize', function () { last = -1; fade(); });
 })();
 
 /* ── REVEAL ── */
