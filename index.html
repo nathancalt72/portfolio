@@ -1,6 +1,4 @@
-  const opening = document.querySelector('.approach-body-a');
-  const closing = document.getElementById('contact');
-  if (!box || !opening || !closing) return;<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -499,30 +497,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
 
 /* ═══════════════════════════════════════
-   CAPABILITIES
-═══════════════════════════════════════ */
-#capabilities { border-top: 1px solid var(--border); }
-.cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
-.cap-card { position: relative; padding: 50px 36px; border-right: 1px solid var(--border);
-  min-height: 280px; display: flex; flex-direction: column; justify-content: space-between;
-  overflow: hidden; cursor: none; }
-.cap-card:last-child { border-right: none; }
-.cap-card::before { content: ''; position: absolute; inset: 0; background: var(--panel);
-  opacity: 0; transition: opacity .4s ease; z-index: 0; }
-.cap-card:hover::before { opacity: 1; }
-.cap-card > * { position: relative; z-index: 1; }
-.cap-num { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); }
-.cap-title { font-family: var(--display); font-weight: 700; text-transform: lowercase; font-size: 27px;
-  margin-top: 18px; letter-spacing: -.01em; transition: color .3s; }
-.cap-card:hover .cap-title { color: var(--gold); }
-.cap-desc { font-size: 13px; color: var(--fg-muted); line-height: 1.75; margin-top: 12px; max-width: 30ch; }
-.cap-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px;
-  opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; }
-.cap-card:hover .cap-tools { opacity: 1; transform: translateY(0); }
-.cap-tool { font-family: var(--mono); font-size: 9px; letter-spacing: .04em; color: var(--fg);
-  padding: 4px 9px; border: 1px solid var(--border); }
-
-/* ═══════════════════════════════════════
    CONTACT
 ═══════════════════════════════════════ */
 #contact { border-top: 1px solid var(--border); padding: 100px 40px 60px; display: flex;
@@ -562,8 +536,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .approach-display .in3, .approach-display .in4 { margin-left: 0; }
   .approach-top { margin-bottom: 0; }
   .approach-body-a p, .approach-body-b p { font-size: 14px; line-height: 1.8; }
-  .cap-grid { grid-template-columns: 1fr; }
-  .cap-card { border-right: none; border-bottom: 1px solid var(--border); }
   /* Four columns are too tight to read here: name and year on one line, the
      rest of the metadata stacked underneath. */
   /* Undo the desktop pinning at matching specificity — a plain .pcol reset loses
@@ -600,7 +572,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   #work { --pad: 18px; padding: 60px var(--pad) 64px; }
   .thumb { height: 154px; }
   #approach { padding: 64px 18px 60px; }
-  .cap-card { padding: 36px 18px; min-height: 220px; }
   #contact { padding: 60px 18px 44px; }
   #footer { padding: 20px 18px; }
 }
@@ -733,10 +704,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   <div class="approach-body-b reveal reveal-delay-2" data-i18n-html="approach_body_b"></div>
 </section>
 
-<!-- ═══ CAPABILITIES ═══ -->
-<section id="capabilities">
-  <div class="cap-grid" id="capGrid"></div>
-</section>
 
 <!-- ═══ CONTACT ═══ -->
 <section id="contact">
@@ -1352,26 +1319,6 @@ const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
-
-/* ── CAPABILITIES ── */
-const capabilities = [
-  { key:'motion', num:'01', tools:['After Effects 92%','Motion Design'] },
-  { key:'edit',   num:'02', tools:['Premiere Pro 85%','Étalonnage'] },
-  { key:'design', num:'03', tools:['Illustrator 72%','Photoshop 70%','InDesign 58%'] },
-];
-const capGrid = document.getElementById('capGrid');
-function renderCaps() {
-  const t = translations[currentLang];
-  capGrid.innerHTML = capabilities.map(c => `
-    <div class="cap-card">
-      <div>
-        <div class="cap-num">${c.num}</div>
-        <div class="cap-title">${t['cap_'+c.key+'_title']}</div>
-        <div class="cap-desc">${t['cap_'+c.key+'_desc']}</div>
-      </div>
-      <div class="cap-tools">${c.tools.map(tool => `<span class="cap-tool">${tool}</span>`).join('')}</div>
-    </div>`).join('');
-}
 
 /* ── PROJECTS (grouped accordions + masonry grid) ──
    Grouped into three categories. Headings carry data-i18n so applyLang, which
@@ -1995,9 +1942,6 @@ const translations = {
     approach_body_a: '<p>Je pense que le déclic s’est fait en 2019 : l’époque à laquelle j’ai switché pour le côté digital de la création. En plein milieu du cycle lycée, le montage a été pour moi une vraie opportunité de m’ouvrir au monde. Découvrir, publier et entretenir une communauté sur les réseaux sociaux m’a permis de me forger un univers artistique fort. Tout cela a été la porte d’entrée vers mon cursus d’études supérieures.</p><p>J\'ai commencé par les langues étrangères. Mon appétence pour les langues a toujours été présente depuis le collège. Je suis attiré par les différentes cultures et les langues sont pour moi un médium culturel majeur qui les représente. Je me suis donc dirigé vers une licence de langues et de commerce (LEA).</p>',
     approach_body_b: '<p>Plus récemment, j’ai décidé de reconnecter la création et le digital dans mon cursus scolaire. Ainsi, j’entame en 2024 un mastère marketing &amp; communication en alternance. L’opportunité d’avoir un premier pied dans le secteur professionnel durant ces deux années de mastère a été pour moi très enrichissante.</p><p>Ce que je cherche maintenant, ce sont des projets vidéos, animations, SaaS portés par des structures engagées sur les enjeux environnementaux. Cet aspect est pour moi important et quelque chose que j’aimerai mettre davantage en avant dans le futur.</p><p>Je suis ouvert et attends avec impatience notre collaboration ! ;)</p>',
     approach_status: 'disponible · france',
-    cap_motion_title: 'motion', cap_motion_desc: 'Animation, direction artistique et mise en mouvement d\'une idée.',
-    cap_edit_title: 'montage', cap_edit_desc: 'Rythme, narration et étalonnage — donner une forme au chaos des rushs.',
-    cap_design_title: 'identité', cap_design_desc: 'Marque, typographie et supports print pensés pour durer.',
     contact_label: 'contact', contact_big: 'travaillons<br><span class="mark">ensemble.</span>',
     footer_credits: 'conçu et développé par nathan charlot',
   },
@@ -2014,9 +1958,6 @@ const translations = {
     approach_body_a: '<p>I think the turning point came in 2019: the time when I switched to the digital side of creativity. Right in the middle of my sixth-form years, editing was, to say the least, a real opportunity to open myself up to the world. Discovering, posting and engaging with a community on social media allowed me to forge a strong artistic identity. All of this paved the way for my higher education.</p><p>I started with foreign languages. My passion for languages has always been there, ever since secondary school. I’m drawn to different cultures, and I see languages as a major cultural medium that represents them. So I went on to study for a Bachelor’s degree in Languages and Business at the University of Le Mans (France).</p>',
     approach_body_b: '<p>More recently, I decided to reconnect with creativity and the digital world in my studies. Therefore, in 2024, began a work-study Master’s degree in Marketing &amp; Communication. The opportunity to get a foothold in the professional world during these two years of my Master’s has been very enriching for me.</p><p>What I’m looking for now are opportunities to work on video projects, animations and SaaS initiatives led by organisations committed to environmental issues. This aspect is important to me and something I’d like to focus on more in the future.</p><p>I’m ready and looking forward to working with you ! ;)</p>',
     approach_status: 'available · france',
-    cap_motion_title: 'motion', cap_motion_desc: 'Animation, art direction and putting an idea into movement.',
-    cap_edit_title: 'edit', cap_edit_desc: 'Rhythm, narrative and color grading — shaping raw footage into form.',
-    cap_design_title: 'identity', cap_design_desc: 'Brand, typography and print, built to last.',
     contact_label: 'contact', contact_big: 'let\'s work<br><span class="mark">together.</span>',
     footer_credits: 'designed and developed by nathan charlot',
   }
@@ -2043,7 +1984,6 @@ function applyLang(lang) {
     }
   });
   document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.lang === lang); });
-  renderCaps();
   applyLangHooks.forEach(fn => fn());
 }
 /* Reading localStorage throws outright where site data is blocked — a private
