@@ -178,11 +178,19 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   color: var(--fg-muted); letter-spacing: .04em; text-decoration: none; transition: color .25s; }
 .nav-link:hover { color: var(--fg); }
 .nav-right { display: flex; align-items: center; gap: 22px; }
-.lang-switcher { display: flex; align-items: center; gap: 6px; }
-.lang-btn { background: none; border: none; cursor: none; font-family: var(--mono); font-size: 9px;
+.lang-switcher { display: flex; align-items: center; gap: 8px; }
+/* The flag sits inside the button, so the whole thing is one target — which also
+   takes the switch from 13px wide to something a thumb can actually hit. */
+.lang-btn { display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: none; cursor: none; font-family: var(--mono); font-size: 9px;
   letter-spacing: .1em; color: var(--fg-muted); padding: 3px 0; transition: color .2s; }
 .lang-btn.active { color: var(--gold); border-bottom: 1px solid var(--gold); }
 .lang-btn:hover:not(.active) { color: var(--fg); }
+.lang-flag { display: block; width: 16px; height: 11px; flex-shrink: 0;
+  outline: 1px solid color-mix(in srgb, var(--fg) 18%, transparent); outline-offset: -1px; }
+/* Dimmed until chosen, so the one in use reads as the one in use. */
+.lang-btn:not(.active) .lang-flag { opacity: .45; transition: opacity .25s ease; }
+.lang-btn:hover .lang-flag { opacity: 1; }
 .lang-sep { font-family: var(--mono); font-size: 9px; color: var(--border-strong); }
 
 /* ═══════════════════════════════════════
@@ -631,9 +639,23 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   </div>
   <div class="nav-right">
     <div class="lang-switcher">
-      <button class="lang-btn" data-lang="fr">FR</button>
+      <!-- The flags are the only colour on the page, and that is the point: a french
+           visitor landing on english copy has to see the way out at a glance. -->
+      <button class="lang-btn" data-lang="fr" lang="fr" aria-label="Français">
+        <svg class="lang-flag" viewBox="0 0 3 2" aria-hidden="true" focusable="false">
+          <rect width="1" height="2" fill="#002395"/>
+          <rect x="1" width="1" height="2" fill="#fff"/>
+          <rect x="2" width="1" height="2" fill="#ED2939"/>
+        </svg>FR</button>
       <span class="lang-sep">/</span>
-      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn active" data-lang="en" lang="en" aria-label="English">
+        <svg class="lang-flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false">
+          <rect width="60" height="30" fill="#012169"/>
+          <path d="M0 0 60 30 M60 0 0 30" stroke="#fff" stroke-width="6"/>
+          <path d="M0 0 60 30 M60 0 0 30" stroke="#C8102E" stroke-width="3"/>
+          <path d="M30 0 V30 M0 15 H60" stroke="#fff" stroke-width="10"/>
+          <path d="M30 0 V30 M0 15 H60" stroke="#C8102E" stroke-width="6"/>
+        </svg>EN</button>
     </div>
   </div>
 </nav>
@@ -2057,7 +2079,18 @@ function rememberLang(lang) {
   try { localStorage.setItem('lang', lang); } catch (e) { /* nothing to do */ }
 }
 document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', () => { applyLang(btn.dataset.lang); rememberLang(btn.dataset.lang); } ); });
-applyLang(rememberedLang() === 'fr' ? 'fr' : 'en');
+/* A french visitor used to land on english copy and have to find the switch before
+   reading a word. Their own choice still wins; failing that, the browser's languages
+   decide, and anything that is not french gets english as before. */
+function preferredLang() {
+  const chosen = rememberedLang();
+  if (chosen === 'fr' || chosen === 'en') return chosen;
+  const tags = (navigator.languages && navigator.languages.length)
+    ? navigator.languages
+    : [navigator.language || ''];
+  return tags.some(function (t) { return /^fr\b/i.test(t); }) ? 'fr' : 'en';
+}
+applyLang(preferredLang());
 
 /* ── CLICK EFFECT ── */
 document.addEventListener('click', function (e) {
