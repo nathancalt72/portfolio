@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nathan Charlot — Motion Designer &amp; Video Editor</title>
+<title>portfolio nathan charlot</title>
 <meta name="description" content="Motion designer and video editor. Animated branding, titling and editing for brands with something to say. Professional, academic and personal work.">
 <meta name="author" content="Nathan Charlot">
 <meta name="theme-color" content="#f2ede0">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Nathan Charlot">
 <meta property="og:url" content="https://nathancharlot.com/">
-<meta property="og:title" content="Nathan Charlot — Motion Designer &amp; Video Editor">
+<meta property="og:title" content="portfolio nathan charlot">
 <meta property="og:description" content="Animated branding, titling and editing for brands with something to say.">
 <meta property="og:image" content="https://nathancharlot.com/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -22,7 +22,7 @@
 <meta property="og:locale" content="en_GB">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Nathan Charlot — Motion Designer &amp; Video Editor">
+<meta name="twitter:title" content="portfolio nathan charlot">
 <meta name="twitter:description" content="Animated branding, titling and editing for brands with something to say.">
 <meta name="twitter:image" content="https://nathancharlot.com/og.jpg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -2104,7 +2104,6 @@ document.addEventListener('click', e => {
 /* ── I18N ── */
 const translations = {
   fr: {
-    meta_title: 'Nathan Charlot — Motion designer & monteur',
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
     hero_title: 'Motion designer et monteur. <span class="mark">Je fais bouger les marques</span> qui ont quelque chose à dire.',
     hero_scroll: 'défiler',
@@ -2121,7 +2120,6 @@ const translations = {
     footer_credits: 'conçu et développé par nathan charlot',
   },
   en: {
-    meta_title: 'Nathan Charlot — Motion Designer & Video Editor',
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
     hero_title: 'Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.',
     hero_scroll: 'scroll',
@@ -2164,7 +2162,6 @@ function applyLang(lang) {
     const v = el.dataset[lang === 'fr' ? 'altFr' : 'altEn'];
     if (v !== undefined) el.alt = v;
   });
-  if (t.meta_title) document.title = t.meta_title;
   // Six words set as six blocks run together into one for a screen reader.
   // The heading keeps its arrangement and is read as a sentence.
   document.querySelectorAll('[data-i18n-html="approach_display"]').forEach(el => {
