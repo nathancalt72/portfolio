@@ -1,3 +1,11 @@
-# ProRes masters — hundreds of MB, kept locally only.
-# The web-ready WebM exports are committed instead.
+# Masters ProRes — plusieurs centaines de Mo, gardés en local.
+# Ce sont les exports WebM prêts pour le web qui sont publiés.
 *.mov
+
+# Rushes, sources et exports de travail posés à la racine.
+# Rien de tout ça n'est servi par le site.
+/*.mp4
+/*.gif
+/*.jpg
+/favicon portfolio.png
+/Composition 1/
