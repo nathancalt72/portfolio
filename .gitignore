@@ -7,5 +7,7 @@
 /*.mp4
 /*.gif
 /*.jpg
+# …except the share card, which the site serves.
+!/og.jpg
 /favicon portfolio.png
 /Composition 1/

@@ -3,7 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>portfolio nathan charlot</title>
+<title>Nathan Charlot — Motion Designer &amp; Video Editor</title>
+<meta name="description" content="Motion designer and video editor. Animated branding, titling and editing for brands with something to say. Professional, academic and personal work.">
+<meta name="author" content="Nathan Charlot">
+<meta name="theme-color" content="#f2ede0">
+<link rel="canonical" href="https://nathancharlot.com/">
+<!-- Shared links carry a card. Crawlers do not run the language switch, so these
+     are written once, in English, the wider of the two audiences. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nathan Charlot">
+<meta property="og:url" content="https://nathancharlot.com/">
+<meta property="og:title" content="Nathan Charlot — Motion Designer &amp; Video Editor">
+<meta property="og:description" content="Animated branding, titling and editing for brands with something to say.">
+<meta property="og:image" content="https://nathancharlot.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Nathan Charlot, close up, headphones on.">
+<meta property="og:locale" content="en_GB">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nathan Charlot — Motion Designer &amp; Video Editor">
+<meta name="twitter:description" content="Animated branding, titling and editing for brands with something to say.">
+<meta name="twitter:image" content="https://nathancharlot.com/og.jpg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="180x180" href="favicon-180.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
@@ -76,7 +97,7 @@ a { color: inherit; }
 #asciiBg { position: fixed; inset: 0; z-index: 0; pointer-events: none; will-change: opacity, filter;
   display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
 #asciiBg pre { font-family: var(--mono); line-height: 1; white-space: pre; margin: 0;
-  color: var(--fg); opacity: .6; }
+  color: var(--fg); opacity: .38; }
 .bg-grid-12 {
   position: fixed; inset: 0; z-index: 9500; pointer-events: none; display: none;
   grid-template-columns: repeat(12, 1fr); gap: 0;
@@ -333,12 +354,16 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    surface instead of a scatter of palettes. The sepia/saturate pair was picked
    by measuring: light tones land on #f6eddc, a shade off the page's own cream,
    while blacks stay black. Real colour returns under the cursor. */
-.thumb img { filter: grayscale(1) sepia(.9) saturate(.35) brightness(1.05);
+.thumb img { filter: saturate(.78) sepia(.1) brightness(1.02);
   /* Both transitions live here: this selector outranks .thumb-poster and
      .thumb-alt, and would otherwise strip the fades they declare. */
   transition: filter .45s ease, opacity .35s ease; }
 .thumb-poster { z-index: 1; }
 .grid-item:hover .thumb img, .grid-item.is-open .thumb img { filter: none; }
+/* No cursor means no hover means the colour never comes back. A phone showed a
+   band of frozen, drained stills — the worst possible case for motion work.
+   Touch screens get the pictures as they are. */
+@media (hover: none) { .thumb img { filter: none; } }
 .grid-item.is-playing .thumb-poster { opacity: 0; }
 /* Two sides of the same sheet: the second is stacked over the first and fades
    in on hover, rather than swapping the src, which would flash the first time
@@ -595,12 +620,32 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
      content is bottom-aligned the last line of the headline fell under the address
      bar. svh is the height with the toolbars shown, the one always on screen; the vh
      line stays first as the fallback for browsers that do not know it. */
+  /* The plants are framed on the left one here and fill the screen, so at the
+     strength the wide layout uses they ran straight through the headline. */
+  #asciiBg pre { opacity: .26; }
   #hero { padding: 88px 18px 28px;
     min-height: calc(100vh - var(--nav-h, 56px));
     min-height: calc(100svh - var(--nav-h, 56px)); }
   .title-h1 { font-size: 32px; }
   #work { --pad: 18px; padding: 60px var(--pad) 64px; }
-  .thumb { height: 154px; }
+  /* One tile to a row, the full width of the screen. Wrapped tiles of a fixed
+     height left a ragged gap down the right-hand side and showed the work at a
+     third of the size a phone can give it. Height comes from the ratio now. */
+  .project-grid { gap: 20px; }
+  .grid-item { flex: 1 1 100%; }
+  .thumb { height: auto; }
+  /* The name and the flags keep their place with no bar, as asked. Under them is a
+     short wash of the page colour fading to nothing: no edge to read as a band,
+     but enough that a paragraph no longer scrolls through the letters. It is
+     withdrawn over a dark picture, where the ink inverts instead and a cream
+     band would read worse than the overlap it fixes. */
+  nav::before { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -20px;
+    z-index: -1; pointer-events: none; transition: opacity .3s ease;
+    background: linear-gradient(to bottom,
+      var(--bg) 0%,
+      color-mix(in srgb, var(--bg) 86%, transparent) 58%,
+      color-mix(in srgb, var(--bg) 0%, transparent) 100%); }
+  nav.over-dark-any::before { opacity: 0; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
   #footer { padding: 20px 18px; }
@@ -683,7 +728,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <!-- ═══ HERO ═══ -->
 <section id="hero">
   <div class="hero-inner">
-    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Creative, motion designer junior &amp; social media editor. based in france — <span class="mark">open to work with you</span>, 2026.</h1>
+    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.</h1>
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
   </div>
 </section>
@@ -860,20 +905,35 @@ window.addEventListener('keydown', e => {
 (function () {
   const pt = document.getElementById('pageTransition');
   document.body.classList.add('no-scroll-transition');
-  window.addEventListener('load', function () {
+  let lifted = false;
+  function lift() {
+    if (lifted) return;
+    lifted = true;
+    pt.classList.add('retract');
     setTimeout(function () {
-      pt.classList.add('retract');
-      setTimeout(function () {
-        pt.classList.add('hidden');
-        document.body.classList.remove('no-scroll-transition');
-        // The scroll was locked until now, so a restored offset could only take
-        // effect here; put it back to the top once more.
-        if (!location.hash) window.scrollTo(0, 0);
-        // Unlocking the scroll can change the available width; re-fit the headline.
-        window.dispatchEvent(new Event('resize'));
-      }, 650);
-    }, 250);
-  });
+      pt.classList.add('hidden');
+      document.body.classList.remove('no-scroll-transition');
+      // The scroll was locked until now, so a restored offset could only take
+      // effect here; put it back to the top once more.
+      if (!location.hash) window.scrollTo(0, 0);
+      // Unlocking the scroll can change the available width; re-fit the headline.
+      window.dispatchEvent(new Event('resize'));
+    }, 650);
+  }
+  // This used to wait on window.load — every image, every font, the lot — which
+  // left the visitor on an empty cream screen for a second or two on a slow line,
+  // long enough to read as a page that had failed. The content is built and laid
+  // out at DOMContentLoaded, so that is when the curtain lifts. load stays as a
+  // backstop for a page that arrives already parsed, and the ceiling catches the
+  // rest. Both headline fitters re-run on document.fonts.ready, so lifting ahead
+  // of the web fonts costs nothing.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(lift, 120); });
+  } else {
+    setTimeout(lift, 120);
+  }
+  window.addEventListener('load', lift);
+  setTimeout(lift, 2200);
 })();
 
 /* ── CURSOR ── */
@@ -1028,6 +1088,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         }
         el.classList.toggle('over-dark', dark);
       });
+      // The phone wash under the name is withdrawn over a dark picture.
+      nav.classList.toggle('over-dark-any', Boolean(nav.querySelector('.over-dark')));
     }
     function watch() {
       if (io) io.disconnect();
@@ -1390,7 +1452,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   const closing = document.getElementById('contact');
   if (!box || !opening || !closing) return;
   const MAX_BLUR = 6;      // px at the plateau
-  const MIN_OPACITY = .4;  // of its own .6, so a quarter of full strength
+  const MIN_OPACITY = .4;  // of its own .38, so a seventh of full strength
 
   function ramp(value, from, to) {
     const p = (from - value) / (from - to);
@@ -1438,26 +1500,9 @@ const projectGroups = [
      tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026',
      desc:{fr:"Alternance réalisée à la Carrosserie Industrielle Toutain, où j'ai pris en charge l'ensemble de la communication, de la charte graphique à la signalétique physique de l’entreprise, en passant par le web et les réseaux sociaux. Mes missions couvraient aussi HLSolutions, marque annexe que le dirigeant développait en parallèle.",
            en:"A work-study placement at Toutain - Industrial Bodywork, where I took on the whole of the company's communication, from the visual guidelines to the physical signage on site, by way of the website and social media. My brief also covered HLSolutions, a side brand the owner was building in parallel."},
-     client:{fr:'Carrosserie Toutain · HLSolutions', en:'Toutain - Industrial Bodywork · HLSolutions'}, site:'https://sastoutain.com/', credits:'Nathan Charlot',
+     client:{fr:'Carrosserie Toutain · HLSolutions', en:'Toutain - Industrial Bodywork · HLSolutions'}, site:'https://sastoutain.com/',
      // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
-       {file:'toutain1.gif', ratio:'portrait', ar:'1080/1400', label:'plaquette commerciale',
-        src:'projects/cit-plaquette/thumb.jpg', poster:'projects/cit-plaquette/thumb.jpg',
-        title:{fr:'Plaquette commerciale', en:'Sales brochure'},
-        desc:{fr:"Plaquette commerciale présentant les deux gammes de la carrosserie — véhicules utilitaires légers et poids-lourds — avec leurs types de caisses : fourgon, plsc, savoyarde, benne, plateau, porteur remorque.",
-              en:"Sales brochure covering the two ranges — light commercial vehicles and heavy goods — with their body types: van, curtain-side, tarpaulin, tipper, flatbed, drawbar."},
-        video:'projects/cit-plaquette/loop.mp4', silent:true},
-
-       {file:'toutain2.pdf', ratio:'landscape', ar:'2400/1697', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
-        title:{fr:'Charte graphique', en:'Brand guidelines'},
-        desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Ce document pose le système complet : logotypes et déclinaisons, règles d'usage, typographie, palette, iconographie et formes récurrentes, puis les applications sur supports réels.",
-              en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
-        images:['01','02','03','04','05','06','07','08','09','10','11','12','13'].map(n => 'projects/cit-charte/' + n + '.jpg')},
-       {file:'toutain3.pdf', ratio:'portrait', ar:'2700/3750', label:'signalétique', src:'projects/cit-plan/thumb.jpg',
-        title:{fr:'Signalétique', en:'Signage'},
-        desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie. Le plan de circulation affiché à l'entrée cartographie les zones — ateliers, châssis à carrosser, stocks, déchargement — les sens de circulation et les accès interdits.",
-              en:"Floor markings, panels and plans for the site itself. The circulation plan posted at the entrance maps out the zones — workshops, chassis bays, stock, unloading — along with traffic directions and restricted access."},
-        images:['projects/cit-plan/01.jpg']},
        {file:'toutain4.mp4', ratio:'landscape', ar:'16/9', label:'site internet', src:'projects/cit-video/thumb.jpg',
         title:{fr:'Site internet', en:'Website'},
         desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l'accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l'iPhone 15 Pro.",
@@ -1470,13 +1515,28 @@ const projectGroups = [
         desc:{fr:"Post LinkedIn pour la Carrosserie Toutain : recrutement d'un technicien BE dessinateur développement, en CDI à La Flèche.",
               en:"LinkedIn post for Toutain - Industrial Bodywork: hiring a design-office draughtsman on a permanent contract in La Flèche."},
         video:'projects/cit-social/loop.mp4', silent:true},
-
        {file:'toutain6.mp4', ratio:'portrait', ar:'900/1080', label:'vœux 2026',
         src:'projects/hl-social/thumb.jpg', poster:'projects/hl-social/thumb.jpg',
         title:{fr:'Vœux 2026', en:'New year 2026'},
         desc:{fr:"Vœux de bonne année pour le compte LinkedIn de HLSolutions.",
               en:"New year greetings for the HLSolutions LinkedIn account."},
         video:'projects/hl-social/loop.mp4', silent:true},
+       {file:'toutain1.gif', ratio:'portrait', ar:'1080/1400', label:'plaquette commerciale',
+        src:'projects/cit-plaquette/thumb.jpg', poster:'projects/cit-plaquette/thumb.jpg',
+        title:{fr:'Plaquette commerciale', en:'Sales brochure'},
+        desc:{fr:"Plaquette commerciale présentant les deux gammes de la carrosserie — véhicules utilitaires légers et poids-lourds — avec leurs types de caisses : fourgon, plsc, savoyarde, benne, plateau, porteur remorque.",
+              en:"Sales brochure covering the two ranges — light commercial vehicles and heavy goods — with their body types: van, curtain-side, tarpaulin, tipper, flatbed, drawbar."},
+        video:'projects/cit-plaquette/loop.mp4', silent:true},
+       {file:'toutain2.pdf', ratio:'landscape', ar:'2400/1697', src:'projects/cit-charte/thumb.jpg', label:'charte graphique',
+        title:{fr:'Charte graphique', en:'Brand guidelines'},
+        desc:{fr:"Le logo et le nom de marque existaient de longue date, sans charte graphique pour les tenir ensemble. Ce document pose le système complet : logotypes et déclinaisons, règles d'usage, typographie, palette, iconographie et formes récurrentes, puis les applications sur supports réels.",
+              en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
+        images:['01','02','03','04','05','06','07','08','09','10','11','12','13'].map(n => 'projects/cit-charte/' + n + '.jpg')},
+       {file:'toutain3.pdf', ratio:'portrait', ar:'2700/3750', label:'signalétique', src:'projects/cit-plan/thumb.jpg',
+        title:{fr:'Signalétique', en:'Signage'},
+        desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie. Le plan de circulation affiché à l'entrée cartographie les zones — ateliers, châssis à carrosser, stocks, déchargement — les sens de circulation et les accès interdits.",
+              en:"Floor markings, panels and plans for the site itself. The circulation plan posted at the entrance maps out the zones — workshops, chassis bays, stock, unloading — along with traffic directions and restricted access."},
+        images:['projects/cit-plan/01.jpg']},
        {file:'toutain7.pdf', ratio:'landscape', ar:'16/9', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
         title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
         desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
@@ -1488,7 +1548,7 @@ const projectGroups = [
      tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'2024',
      desc:{fr:"Motion design pour les réseaux sociaux et miniatures YouTube, réalisé lors d'un stage d'avril à mai 2024 dans cette startup de courtage en assurance de prêts.",
            en:"Social media motion design and YouTube thumbnails, made over a two-month internship in the spring of 2024 at this loan-insurance brokerage startup."},
-     client:'Ma Nouvelle Assurance', site:'—', credits:'Nathan Charlot',
+     client:'Ma Nouvelle Assurance',
      thumbs:[
        {file:'mna1.mp4', ratio:'landscape', ar:'16/9', label:'loi lemoine', src:'projects/mna-lemoine/poster.jpg',
         title:{fr:'Loi Lemoine', en:'The Lemoine law'},
@@ -1514,7 +1574,7 @@ const projectGroups = [
      tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026',
      desc:{fr:"Deux ans de mastère marketing et communication, majeur direction artistique. Le mémoire de fin d'études y côtoie les travaux de cours, du projet de groupe au film d'auteur.",
            en:"Two years of a master's in marketing and communication, art direction major. The final thesis sits alongside the coursework, from group projects to a film of my own."},
-     client:'CESACOM', site:'https://www.cesacom.fr/', credits:'Nathan Charlot',
+     school:'CESACOM', site:'https://www.cesacom.fr/',
      thumbs:[
        {file:'brochure.pdf', ratio:'landscape', ar:'1723/850', src:'projects/ces-abstrait/verso.jpg', hover:'projects/ces-abstrait/recto.jpg', label:'l’abstrait contemporain',
         title:{fr:'L’Abstrait Contemporain', en:'L’Abstrait Contemporain'},
@@ -1539,7 +1599,7 @@ const projectGroups = [
               en:"A podcast invented from nothing, four of us, one week to deliver an episode. The subject was ours to choose: mental health among young people, taken gently — à feu doux — as a pot simmering over its flame, the title rising out of it like steam. I made the opening titles, and had a hand in the branding, the idea and the shoot."},
         video:'projects/ces-podcast/loop.mp4', poster:'projects/ces-podcast/poster.jpg', silent:true,
         link:{href:'https://www.youtube.com/watch?v=FQ6ZWMKPxck',
-              fr:'épisode complet sur youtube (30 min)', en:'full episode on youtube (30 min)'}},
+              fr:'épisode complet sur YouTube (30 min)', en:'full episode on YouTube (30 min)'}},
      ]},
   ]},
   { key: 'personal',
@@ -1551,7 +1611,6 @@ const projectGroups = [
      tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026',
      desc:{fr:"Le montage a commencé ici, en 2019, du côté du spectateur : les fan edits, ces courts montages pensés autour de personnages de fiction, de célébrités, de voitures… de à peu près tout. Je me suis donc lancé dans le montage d’« édits », sur plusieurs comptes Instagram et TikTok. Le format est depuis devenu un langage à part entière, que les marques emploient pour mettre en avant un produit ou un service.",
            en:"Editing started here, in 2019, on the watching side: fan edits, those short cuts built around fictional characters, celebrities, cars — around just about anything. So I started making edits of my own, across several Instagram and TikTok accounts. The form has since become a language in its own right, one brands use to put a product or a service across."},
-     credits:'Nathan Charlot',
      thumbs:[
        {file:'edit1.mp4', ratio:'square', ar:'1/1', label:'le jeu de la dame', src:'projects/edit-queens-gambit/poster.jpg',
         title:{fr:'Le Jeu de la dame', en:'The Queen’s Gambit'},
@@ -1582,7 +1641,6 @@ const projectGroups = [
      tags:{fr:'Tournage, Montage', en:'Shooting, Editing'}, year:'—',
      desc:{fr:"Des images que je tourne moi-même et que je monte pour ce qu'elles sont : des souvenirs, et un terrain où chercher une esthétique sans commande ni cahier des charges.",
            en:"Footage I shoot myself and cut for what it is: memories, and a place to look for an aesthetic with no brief and no client."},
-     credits:'Nathan Charlot',
      thumbs:[
        {file:'perso1.mp4', ratio:'portrait', ar:'9/16', label:'balade', src:'projects/clip-balade/poster.jpg',
         title:{fr:'Balade', en:'Walk'},
@@ -1613,7 +1671,6 @@ const projectGroups = [
      tags:{fr:'Photographie, Composition', en:'Photography, Composition'}, year:'—',
      desc:{fr:"Des compositions souvent abstraites, assemblées à partir de photos prises au fil des jours.",
            en:"Compositions, often abstract, assembled from photographs taken day to day."},
-     credits:'Nathan Charlot',
      thumbs:[
        {file:'picedit1.jpg', ratio:'landscape', ar:'16/9', label:'teen wolf', src:'projects/photo-teenwolf/thumb.jpg',
         title:{fr:'Teen Wolf', en:'Teen Wolf'},
@@ -1677,6 +1734,7 @@ projectList.innerHTML = projectGroups.map(group => {
     // filled with a dash.
     const metaRows = [];
     if (p.client) metaRows.push(['pm_client', clientCell(p.client)]);
+    if (p.school) metaRows.push(['pm_school', esc(p.school)]);
     if (p.site) metaRows.push(['pm_site', siteCell(p.site)]);
     if (p.credits) metaRows.push(['pm_credits', esc(p.credits)]);
     const metaLabels = metaRows.map(r => `<span data-i18n="${r[0]}"></span>`).join('<br>');
@@ -1688,16 +1746,22 @@ projectList.innerHTML = projectGroups.map(group => {
     const grid = p.thumbs.map((t, gi) => {
       const o = typeof t === 'string' ? { ratio: t } : t;
       const gal = o.desc ? galleries.push(o) - 1 : -1;
+      // A screen reader met nothing but a run of unnamed images. The piece's own
+      // title is the name; it rides on data attributes so the language switch can
+      // swap it the way it swaps every other pair of strings.
+      const altAttr = o.title
+        ? ` alt="${esc(o.title.en)}" data-alt-fr="${esc(o.title.fr)}" data-alt-en="${esc(o.title.en)}"`
+        : ' alt=""';
       // A tile rests on its thumbnail and fetches nothing: preload="none" keeps
       // the video off the wire until the cursor asks for it. The still sits over
       // the video rather than in its poster attribute, so it can fade away.
       const inner = o.video
         ? `<video muted loop playsinline preload="none"
              src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
-           ${o.poster ? `<img class="thumb-poster" src="${esc(o.poster)}" alt="" loading="lazy">` : ''}`
+           ${o.poster ? `<img class="thumb-poster" src="${esc(o.poster)}"${altAttr} loading="lazy">` : ''}`
         : o.src
-        ? `<img src="${esc(o.src)}" alt="" loading="lazy">` +
-          (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}" alt="" loading="lazy">` : '')
+        ? `<img src="${esc(o.src)}"${altAttr} loading="lazy">` +
+          (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}"${altAttr} loading="lazy">` : '')
         : `<div class="thumb-label">[ img ]</div>`;
       // A film expands in place, so its write-up has to live in the tile — there
       // is no panel to carry it. The text sits in its own element rather than
@@ -1705,7 +1769,12 @@ projectList.innerHTML = projectGroups.map(group => {
       // and would wipe out any link beside it.
       // The name under a tile is given, not derived: it says what the piece is
       // and in what form, and survives any reordering of the band.
-      const fileTag = o.file ? `<span class="thumb-file">${esc(o.file)}</span>` : '';
+      // The caption was the file name, which is a look rather than information:
+      // 'toutain4.mp4' tells a visitor nothing about what opens. The piece's own
+      // title does, and it already exists in both languages.
+      const fileTag = o.title
+        ? `<span class="thumb-file" data-fr="${esc(o.title.fr)}" data-en="${esc(o.title.en)}">${esc(o.title.en)}</span>`
+        : o.file ? `<span class="thumb-file">${esc(o.file)}</span>` : '';
       const desc = o.video && o.desc
         ? `<div class="grid-item-desc">` +
           `<span data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</span>` +
@@ -1891,7 +1960,7 @@ function lbOpen(g) {
   lbCounter.textContent = imgs.length ? pageCount(imgs.length) : '';
   const sheet = (src, i) => `
     <div class="sheet" data-at="${i}">
-      <img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : ''}>
+      <img src="${esc(src)}" alt="${esc((g.title[currentLang] || g.title.en) + ' — ' + (i + 1) + '/' + imgs.length)}" ${i ? 'loading="lazy"' : ''}>
     </div>`;
   // A film takes the whole width and plays in place; pages keep the cover-plus-
   // grid split. preload="none" so opening the entry does not pull megabytes.
@@ -1933,6 +2002,10 @@ function zoomShow(i) {
   if (!lbGallery || !lbGallery.images) return;
   lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
   lbImg.src = lbGallery.images[lbAt];
+  lbImg.alt = lbGallery.title
+    ? (lbGallery.title[currentLang] || lbGallery.title.en) +
+      (lbGallery.images.length > 1 ? ' — ' + (lbAt + 1) + '/' + lbGallery.images.length : '')
+    : '';
   const solo = lbGallery.images.length === 1;
   lbZoomCounter.textContent = solo ? '' : String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
   lbPrev.disabled = lbAt === 0;
@@ -2031,34 +2104,36 @@ document.addEventListener('click', e => {
 /* ── I18N ── */
 const translations = {
   fr: {
+    meta_title: 'Nathan Charlot — Motion designer & monteur',
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
-    hero_title: 'Créatif, motion designer junior et monteur. Basé en France et <span class="mark">prêt à collaborer avec vous</span>, 2026.',
+    hero_title: 'Motion designer et monteur. <span class="mark">Je fais bouger les marques</span> qui ont quelque chose à dire.',
     hero_scroll: 'défiler',
     work_label: 'projets',
     lb_close: 'fermer',
-    cat_pro: 'projets pro', cat_school: 'projets écoles', cat_personal: 'projets personnels',
-    pm_client: 'client :', pm_site: 'site :', pm_credits: 'crédits :',
+    cat_pro: 'projets pro', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
+    pm_client: 'client :', pm_school: 'formation :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
     approach_display: '<i>UN</i><i class="in2">PETIT</i><i class="in1">PEU</i><i class="in3">PLUS</i><i class="in4">SUR</i><i>MOI</i>',
-    approach_body_a: '<p>Je pense que le déclic s’est fait en 2019 : l’époque à laquelle j’ai switché pour le côté digital de la création. En plein milieu du cycle lycée, le montage a été pour moi une vraie opportunité de m’ouvrir au monde. Découvrir, publier et entretenir une communauté sur les réseaux sociaux m’a permis de me forger un univers artistique fort. Tout cela a été la porte d’entrée vers mon cursus d’études supérieures.</p><p>J\'ai commencé par les langues étrangères. Mon appétence pour les langues a toujours été présente depuis le collège. Je suis attiré par les différentes cultures et les langues sont pour moi un médium culturel majeur qui les représente. Je me suis donc dirigé vers une licence de langues et de commerce (LEA).</p>',
-    approach_body_b: '<p>Plus récemment, j’ai décidé de reconnecter la création et le digital dans mon cursus scolaire. Ainsi, j’entame en 2024 un mastère marketing &amp; communication en alternance. L’opportunité d’avoir un premier pied dans le secteur professionnel durant ces deux années de mastère a été pour moi très enrichissante.</p><p>Ce que je cherche maintenant, ce sont des projets vidéos, animations, SaaS portés par des structures engagées sur les enjeux environnementaux. Cet aspect est pour moi important et quelque chose que j’aimerai mettre davantage en avant dans le futur.</p><p>Je suis ouvert et attends avec impatience notre collaboration ! ;)</p>',
-    approach_status: 'disponible · france',
+    approach_body_a: '<p>Je pense que le déclic s’est fait en 2019 : l’époque à laquelle j’ai basculé vers le côté digital de la création. En plein milieu du cycle lycée, le montage a été pour moi une vraie opportunité de m’ouvrir au monde. Découvrir, publier et entretenir une communauté sur les réseaux sociaux m’a permis de me forger un univers artistique fort. Tout cela a été la porte d’entrée vers mon cursus d’études supérieures.</p><p>J\'ai commencé par les langues étrangères. Mon appétence pour les langues a toujours été présente depuis le collège. Je suis attiré par les différentes cultures et les langues sont pour moi un médium culturel majeur qui les représente. Je me suis donc dirigé vers une licence de langues et de commerce (LEA).</p>',
+    approach_body_b: '<p>Plus récemment, j’ai décidé de reconnecter la création et le digital dans mon cursus scolaire. Ainsi, j’entame en 2024 un mastère marketing &amp; communication en alternance. L’opportunité d’avoir un premier pied dans le secteur professionnel durant ces deux années de mastère a été pour moi très enrichissante.</p><p>Ce que je cherche maintenant, ce sont des projets vidéo et des animations portés par des structures engagées sur les enjeux environnementaux. C’est un terrain que j’aimerais occuper davantage.</p><p>Si c’est le vôtre, écrivez-moi.</p>',
+    approach_status: 'dublin · france · disponible à distance',
     contact_label: 'contact', contact_big: 'travaillons<br><span class="mark">ensemble.</span>',
     footer_credits: 'conçu et développé par nathan charlot',
   },
   en: {
+    meta_title: 'Nathan Charlot — Motion Designer & Video Editor',
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
-    hero_title: 'Creative, motion designer junior &amp; social media editor. based in france — <span class="mark">open to work with you</span>, 2026.',
+    hero_title: 'Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.',
     hero_scroll: 'scroll',
     work_label: 'projects',
     lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
-    pm_client: 'client:', pm_site: 'site:', pm_credits: 'credits:',
+    pm_client: 'client:', pm_school: 'course:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
     approach_display: '<i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i>',
     approach_body_a: '<p>I think the turning point came in 2019: the time when I switched to the digital side of creativity. Right in the middle of my sixth-form years, editing was, to say the least, a real opportunity to open myself up to the world. Discovering, posting and engaging with a community on social media allowed me to forge a strong artistic identity. All of this paved the way for my higher education.</p><p>I started with foreign languages. My passion for languages has always been there, ever since secondary school. I’m drawn to different cultures, and I see languages as a major cultural medium that represents them. So I went on to study for a Bachelor’s degree in Languages and Business at the University of Le Mans (France).</p>',
-    approach_body_b: '<p>More recently, I decided to reconnect with creativity and the digital world in my studies. Therefore, in 2024, began a work-study Master’s degree in Marketing &amp; Communication. The opportunity to get a foothold in the professional world during these two years of my Master’s has been very enriching for me.</p><p>What I’m looking for now are opportunities to work on video projects, animations and SaaS initiatives led by organisations committed to environmental issues. This aspect is important to me and something I’d like to focus on more in the future.</p><p>I’m ready and looking forward to working with you ! ;)</p>',
-    approach_status: 'available · france',
+    approach_body_b: '<p>More recently, I decided to reconnect with creativity and the digital world in my studies. Therefore, in 2024, began a work-study Master’s degree in Marketing &amp; Communication. The opportunity to get a foothold in the professional world during these two years of my Master’s has been very enriching for me.</p><p>What I’m looking for now is video and animation work for organisations committed to environmental issues. It is ground I would like to cover more of.</p><p>If it is your ground too, write to me.</p>',
+    approach_status: 'dublin · france · available remotely',
     contact_label: 'contact', contact_big: 'let\'s work<br><span class="mark">together.</span>',
     footer_credits: 'designed and developed by nathan charlot',
   }
@@ -2083,6 +2158,17 @@ function applyLang(lang) {
     } else {
       el.textContent = v;
     }
+  });
+  // Alt text is an attribute, not a text node, so it needs its own pass.
+  document.querySelectorAll('[data-alt-fr][data-alt-en]').forEach(el => {
+    const v = el.dataset[lang === 'fr' ? 'altFr' : 'altEn'];
+    if (v !== undefined) el.alt = v;
+  });
+  if (t.meta_title) document.title = t.meta_title;
+  // Six words set as six blocks run together into one for a screen reader.
+  // The heading keeps its arrangement and is read as a sentence.
+  document.querySelectorAll('[data-i18n-html="approach_display"]').forEach(el => {
+    el.setAttribute('aria-label', (t.approach_display || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim());
   });
   document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.lang === lang); });
   applyLangHooks.forEach(fn => fn());
