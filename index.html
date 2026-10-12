@@ -191,12 +191,15 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .lang-switcher.over-dark .lang-btn.active { color: #fff; border-bottom-color: #fff; }
 /* An anchor would otherwise land its section's first line under the name. */
 #hero, #work, #approach, #contact { scroll-margin-top: calc(var(--nav-h, 64px) + 8px); }
-.nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px;
+.nav-logo { display: flex; align-items: center; padding: 5px 0; margin: -5px 0; gap: 10px; font-family: var(--mono); font-size: 12px;
   color: var(--fg); text-decoration: none; letter-spacing: .02em; }
 .nav-short { display: none; }
 .nav-links { display: flex; gap: 30px; transition: opacity .35s ease; }
+/* 15px tall is a coin toss for a thumb. The padding grows the target without
+   moving anything on screen; the negative margin keeps the row its own height. */
 .nav-link { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px;
-  color: var(--fg-muted); letter-spacing: .04em; text-decoration: none; transition: color .25s; }
+  color: var(--fg-muted); letter-spacing: .04em; text-decoration: none; transition: color .25s;
+  padding: 7px 0; margin: -7px 0; }
 .nav-link:hover { color: var(--fg); }
 .nav-right { display: flex; align-items: center; gap: 22px; }
 .lang-switcher { display: flex; align-items: center; gap: 8px; }
@@ -204,7 +207,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    takes the switch from 13px wide to something a thumb can actually hit. */
 .lang-btn { display: inline-flex; align-items: center; gap: 5px;
   background: none; border: none; cursor: none; font-family: var(--mono); font-size: 9px;
-  letter-spacing: .1em; color: var(--fg-muted); padding: 3px 0; transition: color .2s; }
+  letter-spacing: .1em; color: var(--fg-muted); padding: 5px 0; transition: color .2s; }
 .lang-btn.active { color: var(--gold); border-bottom: 1px solid var(--gold); }
 .lang-btn:hover:not(.active) { color: var(--fg); }
 .lang-flag { display: block; width: 21px; height: 15px; flex-shrink: 0; overflow: visible; }
@@ -245,8 +248,11 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .cat-group + .cat-group { margin-top: 130px; }
 .project + .project { margin-top: 30px; }
 .cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
-.cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em;
-  text-transform: lowercase; color: var(--green-deep); }
+/* The deep green reads 3.96:1 on cream — right for the display sizes it was
+   chosen for, short of the 4.5:1 a 10px label needs. --gold is the same family
+   at 6.36:1. The weight is restated because these are headings now. */
+.cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; font-weight: 400;
+  text-transform: lowercase; color: var(--gold); }
 .cat-count { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
 /* A category can carry a line about itself, and a figure worth stating plainly.
    Kept to one measure so it reads as a note, not a preamble. */
@@ -256,7 +262,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   font-weight: 300; color: var(--fg); }
 .cat-stat { margin: 0; flex-shrink: 0; align-self: flex-end;
   font-family: var(--mono); font-size: 11px; letter-spacing: .05em;
-  color: var(--green-deep); white-space: nowrap; }
+  color: var(--gold); white-space: nowrap; }
 @media (max-width: 700px) {
   .cat-note { flex-direction: column; gap: 14px; }
 }
@@ -284,7 +290,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .project-header .pcol:nth-child(4), .project-content .pcol:nth-child(4) { grid-column: 4; }
 .project-num { font-family: var(--mono); font-size: 11px; color: var(--fg-muted);
   letter-spacing: .06em; margin-right: 12px; }
-.project-name { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .02em;
+.project-name { font-family: var(--mono); font-size: 12px; font-weight: 500; display: inline; letter-spacing: .02em;
   text-transform: lowercase; transition: color .3s; }
 .project-header:hover .project-name { color: var(--green-deep); }
 .project-tags { font-family: var(--mono); font-size: 12px; color: var(--fg); letter-spacing: .02em;
@@ -315,7 +321,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .project-desc { font-size: 13px; line-height: 1.62; font-weight: 300; min-height: 1.62em; max-width: 62ch; }
 .project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 12px; line-height: 1.72;
   color: var(--fg); letter-spacing: .01em; overflow-wrap: break-word; }
-.project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent; }
+.project-meta-value a { color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent;
+  display: inline-block; padding: 4px 0; margin: -4px 0; }
 .project-meta-value a:hover { border-color: var(--gold); }
 
 /* Visuals sit at a common height and keep their own ratio; anything that will
@@ -521,7 +528,9 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .approach-body-b { grid-column: 4 / 8; grid-row: 4; align-self: start; min-width: 0;
   margin-top: 54px; }
 .approach-body-a p, .approach-body-b p { font-size: 12px; line-height: 1.65;
-  font-weight: 300; color: var(--fg); text-align: justify; hyphens: auto; }
+  /* Justified in a 292px measure, every line had to stretch its spaces to fit,
+     and the holes running down the column were the cost. Ragged right instead. */
+  font-weight: 300; color: var(--fg); hyphens: auto; }
 .approach-body-a p + p, .approach-body-b p + p { margin-top: 12px; }
 .approach-status { display: flex; align-items: center; gap: 10px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
@@ -536,12 +545,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .contact-big .mark { color: var(--green-deep); }
 .contact-email { font-family: var(--mono); font-size: 13px; color: var(--gold); letter-spacing: .04em;
   text-decoration: none; margin-top: 32px; display: inline-block; border-bottom: 1px solid var(--gold);
-  padding-bottom: 4px; width: fit-content; transition: opacity .2s; }
+  padding: 4px 0; width: fit-content; transition: opacity .2s; }
 .contact-email:hover { opacity: .7; }
 .contact-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 60px; }
 .contact-links { display: flex; gap: 24px; flex-wrap: wrap; }
 .contact-links a { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .04em;
-  text-decoration: none; transition: color .2s; text-transform: lowercase; }
+  text-decoration: none; transition: color .2s; text-transform: lowercase;
+  padding: 7px 0; margin: -7px 0; }
 .contact-links a:hover { color: var(--gold); }
 
 /* ── FOOTER ── */
@@ -600,7 +610,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .project-header .pcol:first-child, .project-content .pcol:first-child,
   .project-header .pcol:nth-child(3), .project-content .pcol:nth-child(3),
   .project-header .pcol:nth-child(4), .project-content .pcol:nth-child(4) { grid-column: auto; }
-  .project-header { grid-template-columns: 1fr auto; }
+  /* A full-width row, but 21px tall is still under the thumb threshold. */
+  .project-header { grid-template-columns: 1fr auto; padding: 6px 0; }
   .project-header .pcol:nth-child(2), .project-header .pcol:nth-child(3) { display: none; }
   .project-content { grid-template-columns: 1fr 1fr; }
   .project-content .pcol:nth-child(2) { display: none; }
@@ -649,6 +660,44 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
   #footer { padding: 20px 18px; }
+}
+
+/* ── FOCUS, MOTION, SAFE AREAS ── */
+/* The page hides the system cursor and draws its own, and nothing was ever said
+   about the keyboard: a visitor tabbing through got the browser's orange ring,
+   which works but belongs to no part of this palette. Same ring, page ink. */
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.grid-item:focus-visible { outline-offset: 4px; }
+/* An open row turns to dark ink, where the gold ring all but disappears. */
+.project.is-open .project-header:focus-visible { outline-color: var(--green-light); }
+.nav-logo.over-dark:focus-visible,
+.lang-switcher.over-dark .lang-btn:focus-visible { outline-color: var(--green-light); }
+
+/* Two scripts asked about reduced motion — the cursor and the ascii loop — and
+   the stylesheet never did. Everything declared here kept running: the entrance
+   fades, the tiles rising, the curtain wipe, the smooth scroll. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html { scroll-behavior: auto; }
+  /* These two start hidden and are uncovered by an animation; with the animation
+     gone they have to start visible instead. */
+  .reveal { opacity: 1; transform: none; }
+  .page-transition { display: none; }
+  body.no-scroll-transition { overflow: visible; height: auto; }
+}
+
+/* A notched phone held sideways puts the rounded corner over the text column.
+   Only the flow content is inset — the ascii backdrop is fixed and still bleeds
+   edge to edge behind it. */
+@supports (padding: env(safe-area-inset-left)) {
+  @media (orientation: landscape) {
+    body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  }
 }
 </style>
 </head>
@@ -1252,6 +1301,9 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   const layers = ['apDuo0', 'apDuo1', 'apDuo2'].map(function (id) { return document.getElementById(id); });
   const group = document.getElementById('apBlobG');
   if (!fig || !colour || !group || layers.some(function (l) { return !l; })) return;
+  // The reveal is a rAF loop; a media query cannot reach it. Someone who has asked
+  // their system to stop animations keeps the photograph and loses the blob.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   // The photograph is 145 kB and the section sits far below the fold, so it is fetched
   // once the section approaches. <image> has no lazy attribute, hence the observer.
@@ -1783,7 +1835,7 @@ projectList.innerHTML = projectGroups.map(group => {
           `</div>`
         : '';
       return `
-      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''}>
+      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${fileTag}
         ${desc}
@@ -1791,16 +1843,16 @@ projectList.innerHTML = projectGroups.map(group => {
     }).join('');
     return `
     <div class="project is-open" data-index="${idx}">
-      <div class="project-header">
-        <span class="pcol">
+      <div class="project-header" role="button" tabindex="0" aria-expanded="true" aria-controls="panel-${idx}">
+        <div class="pcol">
           <span class="project-num">${num}</span>
-          <span class="project-name" data-fr="${esc(p.title.fr)}" data-en="${esc(p.title.en)}">${p.title.en}</span>
-        </span>
-        <span class="pcol"></span>
-        <span class="pcol"><span class="project-tags" data-fr="${esc(p.tags.fr)}" data-en="${esc(p.tags.en)}">${p.tags.en}</span></span>
-        <span class="pcol pcol-4"><span class="project-year">${p.year}</span><span class="project-plus"></span></span>
+          <h3 class="project-name" data-fr="${esc(p.title.fr)}" data-en="${esc(p.title.en)}">${p.title.en}</h3>
+        </div>
+        <div class="pcol"></div>
+        <div class="pcol"><span class="project-tags" data-fr="${esc(p.tags.fr)}" data-en="${esc(p.tags.en)}">${p.tags.en}</span></div>
+        <div class="pcol pcol-4"><span class="project-year">${p.year}</span><span class="project-plus"></span></div>
       </div>
-      <div class="project-content_wrapper">
+      <div class="project-content_wrapper" id="panel-${idx}">
         <div class="project-content_inner">
           <div class="project-content">
             <div class="pcol"><p class="project-desc" data-fr="${esc(p.desc.fr)}" data-en="${esc(p.desc.en)}" data-scramble-src="${esc(p.desc.en)}" data-done="1">${p.desc.en}</p></div>
@@ -1816,7 +1868,7 @@ projectList.innerHTML = projectGroups.map(group => {
   return `
   <div class="cat-group">
     <div class="cat-head">
-      <span class="cat-name" data-i18n="cat_${group.key}">${group.key}</span>
+      <h2 class="cat-name" data-i18n="cat_${group.key}">${group.key}</h2>
       <span class="cat-count">${String(catRank).padStart(2, '0')}</span>
     </div>
     ${group.note ? `<div class="cat-note">
@@ -1925,7 +1977,21 @@ document.querySelectorAll('.project-header').forEach(header => {
     if (project.classList.contains('is-open')) delete desc.dataset.done;
     else scrambleIn(desc);
     project.classList.toggle('is-open');
+    header.setAttribute('aria-expanded', String(project.classList.contains('is-open')));
   });
+});
+/* Every tile and every project row was a div carrying a click handler: the whole
+   body of work, 34 targets against 15, could be reached with a cursor and with
+   nothing else. They take focus now and answer to Enter and Space, which is what
+   a button does and what a screen reader announces them as. */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+  if (!e.target || !e.target.closest) return;
+  const target = e.target.closest('.grid-item, .project-header');
+  // A link or a real button inside one keeps its own behaviour.
+  if (!target || e.target.closest('a, button')) return;
+  e.preventDefault();
+  target.click();
 });
 
 /* ── DOCUMENT VIEWER ──
