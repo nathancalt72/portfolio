@@ -1851,6 +1851,14 @@ projectList.innerHTML = projectGroups.map(group => {
         ? `<video muted loop playsinline preload="none"
              src="${esc(o.video)}"${o.film ? ` data-preview="${esc(o.video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
            ${o.poster ? `<img class="thumb-poster" src="${esc(o.poster)}"${altAttr} loading="lazy">` : ''}`
+        : o.src && o.images && !o.hover
+        // On a phone a tile is the full width of the screen, around 1200 device
+        // pixels, which the 476-620px thumbnail cannot fill. The first page of the
+        // gallery is the same picture at full size, already on the site for the
+        // viewer, so a phone is handed that instead. Wider screens keep the light
+        // thumbnail, which is plenty for a tile a quarter of the page wide.
+        ? `<picture><source media="(max-width: 600px)" srcset="${esc(o.images[0])}">` +
+          `<img src="${esc(o.src)}"${altAttr} loading="lazy"></picture>`
         : o.src
         ? `<img src="${esc(o.src)}"${altAttr} loading="lazy">` +
           (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}"${altAttr} loading="lazy">` : '')
