@@ -652,6 +652,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
      third of the size a phone can give it. Height comes from the ratio now. */
   .project-grid { gap: 20px; }
   .grid-item { flex: 1 1 100%; }
+  .grid-item.is-tall { display: none; }
   .thumb { height: auto; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
@@ -1870,8 +1871,12 @@ projectList.innerHTML = projectGroups.map(group => {
              data-fr="${esc(o.link.fr)}" data-en="${esc(o.link.en)}">${o.link.en}</a>` : '') +
           `</div>`
         : '';
+      // Phone-format pieces (9:16 and the like) are left out on a phone, where
+      // one would fill the whole screen. Judged from the ratio, not a list.
+      const [arW, arH] = (o.ar || '').split('/').map(Number);
+      const tall = arW && arH && arH / arW >= 1.6;
       return `
-      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
+      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}${tall ? ' is-tall' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${fileTag}
         ${desc}
