@@ -133,6 +133,16 @@ main, nav, footer { position: relative; z-index: 1; }
 body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 4px; height: 4px; background: var(--green-deep); }
 body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52px; height: 52px; border-color: rgba(129,118,26,.45); }
 @media (max-width: 600px) { #cursor, #cursor-ring { display: none; } body { cursor: auto; } a, button { cursor: pointer; } }
+/* The portrait's blob, lent to the pointer across the whole page. It is drawn in
+   cream-plus-ink and set to difference: on the page colour that leaves almost
+   exactly the ink of the text, and over anything else it inverts what it
+   crosses — pictures, olive headings, the text itself. The svg is a small fixed
+   tile carried by the lead disc, so the filter only ever works on 600px square. */
+#blobCursor { position: fixed; left: 0; top: 0; width: 600px; height: 600px; overflow: visible;
+  pointer-events: none; z-index: 9997; mix-blend-mode: difference; will-change: transform; display: none; }
+.blob-on #blobCursor { display: block; }
+.blob-on #cursor, .blob-on #cursor-ring { display: none; }
+@media (max-width: 600px) { .blob-on #blobCursor { display: none; } }
 
 
 /* ── ALL LOWERCASE ──
@@ -714,6 +724,27 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
+<svg id="blobCursor" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- The portrait's apGoo at pointer scale: weld, roughen, square off. -->
+    <filter id="bcGoo" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"
+      color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="bcBlur"/>
+      <feColorMatrix in="bcBlur" type="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="bcGooed"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="2"
+        seed="7" result="bcNoise"/>
+      <feDisplacementMap in="bcGooed" in2="bcNoise" scale="30"
+        xChannelSelector="R" yChannelSelector="G" result="bcWobble"/>
+      <feMorphology in="bcWobble" operator="erode" radius="2" result="bcTight"/>
+      <feMorphology in="bcTight" operator="dilate" radius="4"/>
+    </filter>
+  </defs>
+  <g id="bcGroup" filter="url(#bcGoo)" fill="#ffffe9">
+    <circle r="0"></circle><circle r="0"></circle><circle r="0"></circle>
+    <circle r="0"></circle><circle r="0"></circle>
+  </g>
+</svg>
 <div id="scrollLabel"></div>
 
 <nav id="nav">
@@ -993,6 +1024,73 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
   ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
   requestAnimationFrame(animCursor);
+})();
+
+/* ── BLOB CURSOR ──
+   The about portrait's blob, following the pointer everywhere. Same five discs,
+   same easing and drift, same stretch with speed, in pixels rather than in the
+   portrait's viewBox. The tile is moved by the lead disc and the others are drawn
+   relative to it, clamped so a fast sweep never runs off the 600px tile. Reduced
+   motion and touch keep the plain dot. Over the portrait it steps aside, since
+   the photograph already answers the pointer with its own. */
+(function () {
+  const svg = document.getElementById('blobCursor');
+  const group = document.getElementById('bcGroup');
+  if (!svg || !group) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(hover: none)').matches) return;
+  document.documentElement.classList.add('blob-on');
+
+  const discs = [].slice.call(group.children);
+  const radii = [13, 11, 9, 7, 5];
+  const ease  = [.30, .20, .145, .105, .075];
+  const C = 300, REACH = 230;
+  const pos = discs.map(function () { return { x: -999, y: -999 }; });
+  let target = { x: -999, y: -999 }, open = 0, want = 0, size = 1, wantSize = 1;
+  let lead = { x: 0, y: 0 }, speed = 0, started = false;
+
+  function frame(now) {
+    const time = now / 1000;
+    open += (want - open) * .14;
+    size += (wantSize - size) * .14;
+    for (let i = 0; i < discs.length; i++) {
+      pos[i].x += (target.x - pos[i].x) * ease[i];
+      pos[i].y += (target.y - pos[i].y) * ease[i];
+    }
+    const step = Math.hypot(pos[0].x - lead.x, pos[0].y - lead.y);
+    lead.x = pos[0].x; lead.y = pos[0].y;
+    speed += (step - speed) * .22;
+    const grow = open * size * (1 + Math.min(speed / 12, 3.4));
+    svg.style.transform = 'translate(' + (pos[0].x - C).toFixed(1) + 'px,' + (pos[0].y - C).toFixed(1) + 'px)';
+    for (let i = 0; i < discs.length; i++) {
+      const dx = Math.sin(time * (6.75 + i * 1.23) + i * 2.1) * (2 + i * .8);
+      const dy = Math.cos(time * (5.22 + i * 1.68) + i * 1.3) * (1.6 + i * .7);
+      const breath = 1 + Math.sin(time * (6.09 + i * .81) + i * .9) * .11;
+      const ox = Math.max(-REACH, Math.min(REACH, pos[i].x - pos[0].x));
+      const oy = Math.max(-REACH, Math.min(REACH, pos[i].y - pos[0].y));
+      discs[i].setAttribute('cx', (C + ox + dx).toFixed(1));
+      discs[i].setAttribute('cy', (C + oy + dy).toFixed(1));
+      discs[i].setAttribute('r', (radii[i] * grow * breath).toFixed(1));
+    }
+    requestAnimationFrame(frame);
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    target.x = e.clientX; target.y = e.clientY;
+    if (!started) {
+      // Grow where the pointer first appears rather than flying in from a corner.
+      pos.forEach(function (p) { p.x = target.x; p.y = target.y; });
+      lead.x = target.x; lead.y = target.y;
+      started = true; requestAnimationFrame(frame);
+    }
+    const t = e.target;
+    const overPortrait = t.closest && t.closest('#aboutPhoto');
+    want = overPortrait ? 0 : 1;
+    // Anything clickable swells the blob, as the old ring did.
+    wantSize = t.closest && t.closest('a, button, [role="button"], .project-header') ? 1.9 : 1;
+  });
+  document.documentElement.addEventListener('mouseleave', function () { want = 0; });
+  document.documentElement.addEventListener('mouseenter', function () { want = 1; });
 })();
 
 /* ── SCROLL-FOLLOW LABEL (mirrors scroll-down-tag) ── */
