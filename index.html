@@ -638,6 +638,10 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   /* The plants are framed on the left one here and fill the screen, so at the
      strength the wide layout uses they ran straight through the headline. */
   #asciiBg pre { opacity: .26; }
+  /* A phone packs the same hairlines into a narrow, dense screen, where they run
+     through every line of text and read far heavier than on a wide one. Lighter
+     ink and half strength bring them back to the faint guides they are there. */
+  .bg-columns span { background: var(--border); opacity: .55; }
   #hero { padding: 88px 18px 28px;
     min-height: calc(100vh - var(--nav-h, 56px));
     min-height: calc(100svh - var(--nav-h, 56px)); }
