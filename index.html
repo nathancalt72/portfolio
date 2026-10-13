@@ -555,9 +555,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .contact-links a:hover { color: var(--gold); }
 
 /* ── FOOTER ── */
-#footer { border-top: 1px solid var(--border); padding: 22px 40px; }
-.footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .04em; text-transform: lowercase; }
+/* After maximiliankaspar.com: the rule rides high above the credits, and the
+   credits themselves sit right down on the last pixel of the page. */
+#footer { border-top: 1px solid var(--border); padding: 120px 40px 10px; }
+.footer-inner { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; }
+.footer-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .04em; text-transform: lowercase; line-height: 1; }
+.footer-text a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; transition: color .2s; }
+.footer-text a:hover { color: var(--gold); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
@@ -659,7 +663,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   nav.over-dark-any::before { opacity: 0; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
-  #footer { padding: 20px 18px; }
+  #footer { padding: 88px 18px 8px; }
 }
 
 /* ── FOCUS, MOTION, SAFE AREAS ── */
@@ -897,6 +901,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <footer id="footer">
   <div class="footer-inner">
     <span class="footer-text" data-i18n="footer_credits">designed and developed by nathan charlot</span>
+    <span class="footer-text"><span data-i18n="footer_inspired">inspired by</span> <a href="https://www.maximiliankaspar.com/" target="_blank" rel="noopener noreferrer">maximilian kaspar</a></span>
     <span class="footer-text">©2026</span>
   </div>
 </footer>
@@ -1470,6 +1475,43 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     timer = setInterval(() => { pre.textContent = frames[i = (i + 1) % frames.length]; }, 1000 / FPS);
   }
 
+  // Entrance: the artwork compiles itself in, like code. Each inked cell waits for
+  // its turn — the bottom rows first, so the plants grow upward — flickers through
+  // a few random glyphs, then locks onto its real character. Blank cells stay
+  // blank throughout, so the noise only ever traces the shape of the picture.
+  // The loop keeps playing underneath, so the reveal lands on a moving image.
+  const INTRO_MS = 2200, SCRAMBLE = .12;
+  const GLYPHS = '01<>/{}[]=+*#$%&;:_-';
+  function intro() {
+    if (reduced.matches) return run();
+    const wait = new Float32Array(rows * cols);
+    for (let r = 0; r < rows; r++) {
+      const fromBottom = 1 - r / Math.max(rows - 1, 1);
+      for (let c = 0; c < cols; c++) wait[r * cols + c] = fromBottom * .7 + Math.random() * .3;
+    }
+    const start = performance.now();
+    const end = 1 + SCRAMBLE;
+    timer = setInterval(() => {
+      const p = (performance.now() - start) / INTRO_MS * end;
+      i = (i + 1) % frames.length;
+      if (p >= end) { pre.textContent = frames[i]; return run(); }
+      const lines = frames[i].split('\n');
+      let out = '';
+      for (let r = 0; r < lines.length; r++) {
+        const l = lines[r];
+        let row = '';
+        for (let c = 0; c < l.length; c++) {
+          const ch = l[c];
+          if (ch === ' ') { row += ' '; continue; }
+          const w = wait[r * cols + c];
+          row += p < w ? ' ' : p < w + SCRAMBLE ? GLYPHS[(Math.random() * GLYPHS.length) | 0] : ch;
+        }
+        out += r ? '\n' + row : row;
+      }
+      pre.textContent = out;
+    }, 1000 / 30);
+  }
+
   fetch('ascii-frames.json')
     .then(r => r.json())
     .then(data => {
@@ -1479,9 +1521,9 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       // Trailing spaces are stripped to save bytes, so lines vary — take the widest.
       cols = lines.reduce((m, l) => Math.max(m, l.length), 0);
       measureInk();
-      pre.textContent = frames[0];
+      pre.textContent = '';
       fit();
-      run();
+      intro();
     })
     .catch(function () {});
 
@@ -2184,6 +2226,7 @@ const translations = {
     approach_status: 'disponible · france',
     contact_label: 'contact', contact_big: 'travaillons<br><span class="mark">ensemble.</span>',
     footer_credits: 'conçu et développé par nathan charlot',
+    footer_inspired: 'inspiré par',
   },
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
@@ -2200,6 +2243,7 @@ const translations = {
     approach_status: 'available · france',
     contact_label: 'contact', contact_big: 'let\'s work<br><span class="mark">together.</span>',
     footer_credits: 'designed and developed by nathan charlot',
+    footer_inspired: 'inspired by',
   }
 };
 let currentLang = 'fr';
