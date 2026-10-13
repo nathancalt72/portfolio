@@ -133,15 +133,16 @@ main, nav, footer { position: relative; z-index: 1; }
 body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 4px; height: 4px; background: var(--green-deep); }
 body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52px; height: 52px; border-color: rgba(129,118,26,.45); }
 @media (max-width: 600px) { #cursor, #cursor-ring { display: none; } body { cursor: auto; } a, button { cursor: pointer; } }
-/* The portrait's blob, lent to the pointer across the whole page. It is drawn in
-   cream-plus-ink and set to difference: on the page colour that leaves almost
-   exactly the ink of the text, and over anything else it inverts what it
-   crosses — pictures, olive headings, the text itself. The svg is a small fixed
-   tile carried by the lead disc, so the filter only ever works on 600px square. */
+/* A faint echo of the portrait's blob trailing behind the cursor. Drawn in
+   cream-plus-ink under difference, so on the page colour it tints toward the ink
+   of the text and over anything else it inverts what it crosses — but at a fifth
+   of strength, a shadow behind the pointer rather than the pointer itself. The
+   svg is a small fixed tile carried by the lead disc, so the filter only ever
+   works on 600px square. */
 #blobCursor { position: fixed; left: 0; top: 0; width: 600px; height: 600px; overflow: visible;
-  pointer-events: none; z-index: 9997; mix-blend-mode: difference; will-change: transform; display: none; }
+  pointer-events: none; z-index: 9997; mix-blend-mode: difference; opacity: .2;
+  will-change: transform; display: none; }
 .blob-on #blobCursor { display: block; }
-.blob-on #cursor, .blob-on #cursor-ring { display: none; }
 @media (max-width: 600px) { .blob-on #blobCursor { display: none; } }
 
 
@@ -726,18 +727,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <div id="cursor-ring"></div>
 <svg id="blobCursor" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
   <defs>
-    <!-- The portrait's apGoo at pointer scale: weld, roughen, square off. -->
+    <!-- The portrait's goo without its roughening: the discs weld into one soft
+         shape, and a gentle alpha curve leaves the edge feathered, not cut. -->
     <filter id="bcGoo" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"
       color-interpolation-filters="sRGB">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="bcBlur"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="bcBlur"/>
       <feColorMatrix in="bcBlur" type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="bcGooed"/>
-      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="2"
-        seed="7" result="bcNoise"/>
-      <feDisplacementMap in="bcGooed" in2="bcNoise" scale="30"
-        xChannelSelector="R" yChannelSelector="G" result="bcWobble"/>
-      <feMorphology in="bcWobble" operator="erode" radius="2" result="bcTight"/>
-      <feMorphology in="bcTight" operator="dilate" radius="4"/>
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 9 -3.5"/>
     </filter>
   </defs>
   <g id="bcGroup" filter="url(#bcGoo)" fill="#ffffe9">
@@ -1026,13 +1022,13 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   requestAnimationFrame(animCursor);
 })();
 
-/* ── BLOB CURSOR ──
-   The about portrait's blob, following the pointer everywhere. Same five discs,
-   same easing and drift, same stretch with speed, in pixels rather than in the
-   portrait's viewBox. The tile is moved by the lead disc and the others are drawn
-   relative to it, clamped so a fast sweep never runs off the 600px tile. Reduced
-   motion and touch keep the plain dot. Over the portrait it steps aside, since
-   the photograph already answers the pointer with its own. */
+/* ── BLOB TRAIL ──
+   A soft version of the about portrait's blob, trailing behind the cursor. Same
+   five discs and stretch with speed, but on slower easing and a slow, shallow
+   drift, so it glides after the pointer instead of snapping to it. The tile is
+   moved by the lead disc and the others are drawn relative to it, clamped so a
+   fast sweep never runs off the 600px tile. Reduced motion and touch go without.
+   Over the portrait it steps aside, since the photograph has its own. */
 (function () {
   const svg = document.getElementById('blobCursor');
   const group = document.getElementById('bcGroup');
@@ -1042,30 +1038,36 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   document.documentElement.classList.add('blob-on');
 
   const discs = [].slice.call(group.children);
-  const radii = [13, 11, 9, 7, 5];
-  const ease  = [.30, .20, .145, .105, .075];
+  const radii = [26, 22, 18, 14, 11];
+  const ease  = [.11, .085, .065, .05, .038];
   const C = 300, REACH = 230;
   const pos = discs.map(function () { return { x: -999, y: -999 }; });
   let target = { x: -999, y: -999 }, open = 0, want = 0, size = 1, wantSize = 1;
-  let lead = { x: 0, y: 0 }, speed = 0, started = false;
+  let lead = { x: 0, y: 0 }, speed = 0, started = false, last = 0;
+  // The rates are per 60th of a second and scaled to the real frame time, so the
+  // glide feels the same on a 60Hz screen as on a 120Hz one.
+  function k(rate, f) { return 1 - Math.pow(1 - rate, f); }
 
   function frame(now) {
     const time = now / 1000;
-    open += (want - open) * .14;
-    size += (wantSize - size) * .14;
+    const f = last ? Math.min((now - last) / (1000 / 60), 4) : 1;
+    last = now;
+    open += (want - open) * k(.08, f);
+    size += (wantSize - size) * k(.08, f);
     for (let i = 0; i < discs.length; i++) {
-      pos[i].x += (target.x - pos[i].x) * ease[i];
-      pos[i].y += (target.y - pos[i].y) * ease[i];
+      const e = k(ease[i], f);
+      pos[i].x += (target.x - pos[i].x) * e;
+      pos[i].y += (target.y - pos[i].y) * e;
     }
-    const step = Math.hypot(pos[0].x - lead.x, pos[0].y - lead.y);
+    const step = Math.hypot(pos[0].x - lead.x, pos[0].y - lead.y) / f;
     lead.x = pos[0].x; lead.y = pos[0].y;
-    speed += (step - speed) * .22;
-    const grow = open * size * (1 + Math.min(speed / 12, 3.4));
+    speed += (step - speed) * k(.08, f);
+    const grow = open * size * (1 + Math.min(speed / 20, 1.6));
     svg.style.transform = 'translate(' + (pos[0].x - C).toFixed(1) + 'px,' + (pos[0].y - C).toFixed(1) + 'px)';
     for (let i = 0; i < discs.length; i++) {
-      const dx = Math.sin(time * (6.75 + i * 1.23) + i * 2.1) * (2 + i * .8);
-      const dy = Math.cos(time * (5.22 + i * 1.68) + i * 1.3) * (1.6 + i * .7);
-      const breath = 1 + Math.sin(time * (6.09 + i * .81) + i * .9) * .11;
+      const dx = Math.sin(time * (1.35 + i * .25) + i * 2.1) * (3 + i * 1.2);
+      const dy = Math.cos(time * (1.05 + i * .33) + i * 1.3) * (2.5 + i * 1.0);
+      const breath = 1 + Math.sin(time * (1.2 + i * .16) + i * .9) * .06;
       const ox = Math.max(-REACH, Math.min(REACH, pos[i].x - pos[0].x));
       const oy = Math.max(-REACH, Math.min(REACH, pos[i].y - pos[0].y));
       discs[i].setAttribute('cx', (C + ox + dx).toFixed(1));
@@ -1086,8 +1088,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     const t = e.target;
     const overPortrait = t.closest && t.closest('#aboutPhoto');
     want = overPortrait ? 0 : 1;
-    // Anything clickable swells the blob, as the old ring did.
-    wantSize = t.closest && t.closest('a, button, [role="button"], .project-header') ? 1.9 : 1;
+    // Anything clickable swells it a little.
+    wantSize = t.closest && t.closest('a, button, [role="button"], .project-header') ? 1.4 : 1;
   });
   document.documentElement.addEventListener('mouseleave', function () { want = 0; });
   document.documentElement.addEventListener('mouseenter', function () { want = 1; });
