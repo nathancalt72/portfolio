@@ -1480,9 +1480,12 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // a few random glyphs, then locks onto its real character. Blank cells stay
   // blank throughout, so the noise only ever traces the shape of the picture.
   // The loop keeps playing underneath, so the reveal lands on a moving image.
-  const INTRO_MS = 2200, SCRAMBLE = .12;
+  // It waits until the page has been open three seconds, so the headline is read
+  // first and the backdrop arrives after it, then takes its time.
+  const INTRO_DELAY = 3000, INTRO_MS = 5000, SCRAMBLE = .18;
   const GLYPHS = '01<>/{}[]=+*#$%&;:_-';
   function intro() {
+    clearInterval(timer);
     if (reduced.matches) return run();
     const wait = new Float32Array(rows * cols);
     for (let r = 0; r < rows; r++) {
@@ -1523,7 +1526,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       measureInk();
       pre.textContent = '';
       fit();
-      intro();
+      if (reduced.matches) run();
+      else setTimeout(intro, Math.max(0, INTRO_DELAY - performance.now()));
     })
     .catch(function () {});
 
