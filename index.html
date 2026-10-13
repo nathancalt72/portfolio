@@ -653,18 +653,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .project-grid { gap: 20px; }
   .grid-item { flex: 1 1 100%; }
   .thumb { height: auto; }
-  /* The name and the flags keep their place with no bar, as asked. Under them is a
-     short wash of the page colour fading to nothing: no edge to read as a band,
-     but enough that a paragraph no longer scrolls through the letters. It is
-     withdrawn over a dark picture, where the ink inverts instead and a cream
-     band would read worse than the overlap it fixes. */
-  nav::before { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -20px;
-    z-index: -1; pointer-events: none; transition: opacity .3s ease;
-    background: linear-gradient(to bottom,
-      var(--bg) 0%,
-      color-mix(in srgb, var(--bg) 86%, transparent) 58%,
-      color-mix(in srgb, var(--bg) 0%, transparent) 100%); }
-  nav.over-dark-any::before { opacity: 0; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
   #footer { padding: 88px 18px 8px; }
@@ -1146,8 +1134,6 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         }
         el.classList.toggle('over-dark', dark);
       });
-      // The phone wash under the name is withdrawn over a dark picture.
-      nav.classList.toggle('over-dark-any', Boolean(nav.querySelector('.over-dark')));
     }
     function watch() {
       if (io) io.disconnect();
