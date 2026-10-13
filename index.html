@@ -1529,8 +1529,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 /* ── ASCII FADE-OUT ──
    The backdrop is fixed, so it sits under the about text and makes it hard to read.
    Rather than move it — which read as a lurch — it goes soft and thin as that text
-   comes up, holds there while the text is being read, and comes back once it has
-   gone by, well before the contact section. It never disappears: the plateau leaves
+   comes up, holds there while the text is being read, and comes back only once the
+   last line has been read and is leaving the screen. It never disappears: the plateau leaves
    it present as a texture, which is as far as it should go.
    Both properties are set on the container, never on the <pre>: that one carries the
    centring offset the backdrop computes for itself, and its own .6 opacity, which
@@ -1538,10 +1538,10 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 (function () {
   const box = document.getElementById('asciiBg');
   const opening = document.querySelector('.approach-body-a');
-  const closing = document.getElementById('contact');
-  if (!box || !opening || !closing) return;
+  const texts = document.querySelectorAll('.approach-body-a, .approach-body-b');
+  if (!box || !opening || !texts.length) return;
   const MAX_BLUR = 6;      // px at the plateau
-  const MIN_OPACITY = .4;  // of its own .38, so a seventh of full strength
+  const MIN_OPACITY = .25; // of its own .38, so under a tenth of full strength
 
   function ramp(value, from, to) {
     const p = (from - value) / (from - to);
@@ -1553,11 +1553,14 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     const h = window.innerHeight;
     // Out as the first column rises into the part of the screen where it gets read.
     const out = ramp(opening.getBoundingClientRect().top, h * 1.8, h * 0.7);
-    // Back in on the approach to the contact section, and finished well before it
-    // arrives. Anchored on that section rather than on the end of the text: the page
-    // stops scrolling shortly after the text does, and a ramp measured from there
-    // ran out of room to complete — the backdrop stalled at nine tenths.
-    const back = ramp(closing.getBoundingClientRect().top, h * 1.5, h * 0.9);
+    // Back in only once the last line of the text is up in the top quarter of the
+    // screen, read and on its way out. Anchored on the contact section it came back
+    // while the last paragraphs were still being read. At the foot of the page the
+    // text ends between a twentieth and a fifth of the way down, depending on the
+    // screen, so a ramp finishing at a quarter always completes.
+    let end = -Infinity;
+    texts.forEach(t => { end = Math.max(end, t.getBoundingClientRect().bottom); });
+    const back = ramp(end, h * 0.45, h * 0.25);
     // Quantised to whole steps: a blur radius that changes on every pixel of scroll
     // is a full-screen filter recomputed on every frame for no visible gain.
     const step = Math.round(out * (1 - back) * 20);
