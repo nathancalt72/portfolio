@@ -474,19 +474,19 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    It rises into place the way the reference does: the picture starts a little
    large and a little high, and settles to its frame as the section reaches
    the top (see the scroll code). The section clips, so the overscan never
-   shows. On a screen taller than it is wide a 16:9 film cropped to the full
-   height would keep a sliver of the middle, so there it takes its own
-   ratio across the width instead. */
+   shows. The reel is cut at 2:1, the shape a browser window on a desktop
+   screen has once its bars are counted. The section is the full height of the
+   window, but never taller than a 2:1 frame across its width: a window wider
+   than that loses a few percent top and bottom, which the reel's framing
+   keeps clear, and one narrower (a laptop, a phone) gets the whole film edge
+   to edge, a little short of the full height. Never bands down the sides,
+   never the side captions cropped. */
 #reel { position: relative; z-index: 1; overflow: hidden; background: var(--bg); cursor: none;
-  height: 100vh; height: 100svh; }
-@media (orientation: portrait) { #reel { height: 56.25vw; } }
+  height: min(100vh, 50vw); height: min(100svh, 50vw); }
 .reel-frame { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
 .reel-frame img, .reel-frame video { position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; transition: opacity .35s ease; }
 .reel-frame .thumb-poster { z-index: 1; }
-/* Watched, the film is shown whole: letterboxed, in the page colour its own
-   cream grid already sits on, rather than cropped. */
-#reel.is-open video { object-fit: contain; }
 #reel .vmark { width: 86px; height: 86px; margin: -43px 0 0 -43px; }
 #reel .vmark svg { width: 24px; height: 24px; margin-left: 3px; }
 #reel .vmark .i-pause { margin-left: 0; }
@@ -500,6 +500,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   #reel.is-open .vmark { opacity: 0; }
 }
 .vbox:fullscreen { background: #000; }
+/* Full screen, the reel is shown whole: a monitor is rarely 2:1. */
+#reel .vbox:fullscreen video { object-fit: contain; }
 .vbox:-webkit-full-screen { background: #000; }
 
 /* ── DOCUMENT VIEWER ──
