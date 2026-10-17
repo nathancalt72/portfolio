@@ -1952,18 +1952,18 @@ projectList.innerHTML = projectGroups.map(group => {
       const still = phone && !o.hover && o.images && o.images[0] || o.src;
       const inner = video
         ? `<video muted loop playsinline preload="none"
-             src="${esc(video)}"${o.film ? ` data-preview="${esc(video)}" data-film="${esc(o.film)}"` : ''}${o.silent ? ' data-silent="1"' : ''}></video>
+             src="${esc(video)}"${o.film ? ` data-preview="${esc(video)}" data-film="${esc(o.film)}"` : ''}></video>
            ${poster ? `<img class="thumb-poster" src="${esc(poster)}"${altAttr} loading="lazy">` : ''}
-           <span class="vmark" aria-hidden="true">${ICON.play}${ICON.pause}</span>
+           ${o.silent ? '' : `<span class="vmark" aria-hidden="true">${ICON.play}${ICON.pause}</span>
            <div class="vbar">
              <button class="vb-play" type="button">${ICON.play}${ICON.pause}</button>
              <input class="vb-seek" type="range" min="0" max="1000" step="1" value="0">
              <span class="vb-time">0:00</span>
-             ${o.silent ? '' : `<button class="vb-mute" type="button">${ICON.sound}${ICON.muted}</button>
-             <input class="vb-vol" type="range" min="0" max="1" step="0.05" value="1">`}
+             <button class="vb-mute" type="button">${ICON.sound}${ICON.muted}</button>
+             <input class="vb-vol" type="range" min="0" max="1" step="0.05" value="1">
              <button class="vb-full" type="button">${ICON.full}</button>
              <button class="vb-close" type="button">${ICON.close}</button>
-           </div>`
+           </div>`}`
         : still
         ? `<img src="${esc(still)}"${altAttr} loading="lazy">` +
           (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}"${altAttr} loading="lazy">` : '')
@@ -1992,7 +1992,7 @@ projectList.innerHTML = projectGroups.map(group => {
       const [arW, arH] = (o.ar || '').split('/').map(Number);
       const tall = arW && arH && arH / arW >= 1.6;
       return `
-      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}${tall ? ' is-tall' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
+      <div class="grid-item${o.video ? (o.silent ? ' is-gif' : ' is-film') : gal > -1 ? ' has-gallery' : ''}${tall ? ' is-tall' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${fileTag}
         ${desc}
@@ -2139,15 +2139,13 @@ function syncTime(item) {
 function openTile(item) {
   document.querySelectorAll('.grid-item.is-film.is-open').forEach(o => { if (o !== item) closeTile(o); });
   const v = item.querySelector('video');
-  const silent = v.dataset.silent === '1';
   item.classList.add('is-open');
   // Compare the attribute, not currentSrc: the latter only catches up once the
   // browser has re-run resource selection, so the swap back never fired.
   if (v.dataset.film && v.getAttribute('src') !== v.dataset.film) { v.src = v.dataset.film; v.load(); }
   else v.currentTime = 0;
-  // A silent post has no sound to turn on, so it just keeps looping.
-  v.loop = silent;
-  v.muted = silent || vPrefs.muted;
+  v.loop = false;
+  v.muted = vPrefs.muted;
   v.volume = vPrefs.volume;
   playSafe(v);
   syncBar(item);
@@ -2192,6 +2190,22 @@ const filmAway = new IntersectionObserver(entries => entries.forEach(en => {
   if (!en.isIntersecting && en.target.classList.contains('is-open')) en.target.querySelector('video').pause();
 }));
 document.querySelectorAll('.grid-item.is-film').forEach(i => filmAway.observe(i));
+
+/* A silent post is a gif in all but format: no sound, nothing to control, so
+   it loops by itself, with neither mark nor bar. Only while on screen, so a
+   page of them costs nothing out of sight, and not at all for a visitor who
+   has asked for less motion. */
+const gifMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const gifSeen = new IntersectionObserver(entries => entries.forEach(en => {
+  const v = en.target.querySelector('video');
+  if (en.isIntersecting) playLoop(v); else v.pause();
+}));
+document.querySelectorAll('.grid-item.is-gif').forEach(item => {
+  const v = item.querySelector('video');
+  v.addEventListener('playing', () => item.classList.add('is-playing'));
+  ['pause', 'ended', 'error'].forEach(e => v.addEventListener(e, () => item.classList.remove('is-playing')));
+  if (gifMotion) gifSeen.observe(item);
+});
 
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('.vbar button');
@@ -2425,6 +2439,8 @@ document.addEventListener('click', e => {
     }
     return;
   }
+  // A gif plays regardless; a click only opens its write-up.
+  if (item.classList.contains('is-gif')) { item.classList.toggle('is-open'); return; }
 
   // Items backed by a gallery open the viewer instead of expanding in place.
   if (item.dataset.gallery !== undefined) { lbOpen(galleries[+item.dataset.gallery]); return; }
