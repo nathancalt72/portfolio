@@ -352,6 +352,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* contain, never cover: a visual is shown whole. Tiles carry the media's own
    ratio so there is nothing to letterbox. */
 .thumb img, .thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* A video's last row or column of pixels can come out dark: the encoder pads
+   the frame to a multiple of 16 and the browser's scaling bleeds that padding
+   into the edge, and a ratio a pixel off the tile's leaves a hairline of its
+   own. Scaling the picture by a hair, inside a tile that clips, keeps any such
+   line out of sight; 0.6% per side is below what the eye can tell is cropped. */
+.thumb { overflow: hidden; }
+.thumb video { transform: scale(1.012); }
 /* The still covers the video at rest and lifts once there are frames to see.
    Keyed on playback rather than on hover: if the clip cannot start, the tile
    keeps its picture instead of baring an empty frame. It also survives a paused
