@@ -487,9 +487,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* Watched, the film is shown whole: letterboxed, in the page colour its own
    cream grid already sits on, rather than cropped. */
 #reel.is-open video { object-fit: contain; }
-/* The title sits at the centre of the picture, so the mark waits below it,
-   between the title and the waveform. */
-#reel .vmark { top: 77%; width: 86px; height: 86px; margin: -43px 0 0 -43px; }
+#reel .vmark { width: 86px; height: 86px; margin: -43px 0 0 -43px; }
 #reel .vmark svg { width: 24px; height: 24px; margin-left: 3px; }
 #reel .vmark .i-pause { margin-left: 0; }
 #reel .vbar { padding: 40px 22px 14px; }
@@ -2266,6 +2264,44 @@ document.querySelectorAll('.grid-item.is-gif').forEach(item => {
   ['pause', 'ended', 'error'].forEach(e => v.addEventListener(e, () => item.classList.remove('is-playing')));
   if (gifMotion) gifSeen.observe(item);
 });
+
+/* Smooth wheel scrolling, as on the reference (which runs Lenis): a turn of
+   the wheel sets where the page is going, and the page glides there, a tenth
+   of the remaining way each frame, instead of jumping a notch at a time.
+   Touch screens keep their own scrolling, which already has momentum, and so
+   does anything with a scroll of its own (the viewer), a zoom (ctrl+wheel), a
+   sideways swipe, a locked page and a visitor who asked for less motion.
+   Scrollbar, keys and anchors still move the page directly; the glide picks
+   up from wherever they leave it. */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      window.matchMedia('(hover: none)').matches) return;
+  let target = 0, cur = 0, raf = 0;
+  const maxY = () => document.documentElement.scrollHeight - innerHeight;
+  const ownScroll = el => {
+    for (; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+      if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) return true;
+    }
+    return false;
+  };
+  function step() {
+    cur += (target - cur) * 0.1;
+    if (Math.abs(target - cur) < 0.5) cur = target;
+    // 'instant': the page's own scroll-behavior: smooth would otherwise turn
+    // every frame of the glide into a glide of its own.
+    window.scrollTo({ top: cur, behavior: 'instant' });
+    raf = cur === target ? 0 : requestAnimationFrame(step);
+  }
+  addEventListener('wheel', e => {
+    if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if (getComputedStyle(document.body).overflow === 'hidden' || ownScroll(e.target)) return;
+    e.preventDefault();
+    if (!raf) target = cur = scrollY;
+    const d = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY;
+    target = Math.max(0, Math.min(maxY(), target + d));
+    if (!raf) raf = requestAnimationFrame(step);
+  }, { passive: false });
+})();
 
 /* The showreel rises into place. Progress runs from 0, the section's top at
    the bottom of the screen, to 1, its bottom there too, fully revealed. On
