@@ -378,7 +378,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    band of frozen, drained stills — the worst possible case for motion work.
    Touch screens get the pictures as they are. */
 @media (hover: none) { .thumb img { filter: none; } }
-.grid-item.is-playing .thumb-poster { opacity: 0; }
+.grid-item.is-playing .thumb-poster, #reel.is-playing .thumb-poster { opacity: 0; }
 /* Two sides of the same sheet: the second is stacked over the first and fades
    in on hover, rather than swapping the src, which would flash the first time
    while the other side is still being fetched. */
@@ -409,18 +409,18 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   transition: opacity .3s ease, transform .3s ease; }
 .vmark svg { width: 16px; height: 16px; margin-left: 2px; }
 .vmark .i-pause { margin-left: 0; }
-.grid-item:hover .vmark { transform: scale(1.08); }
+.is-film:hover .vmark { transform: scale(1.08); }
 /* Playing, the mark gets out of the picture. Under a cursor it comes back
    faintly as a pause, which is what the next click will do. */
-.grid-item.is-open:not(.is-paused) .vmark { opacity: 0; transform: scale(1.3); }
+.is-film.is-open:not(.is-paused) .vmark { opacity: 0; transform: scale(1.3); }
 @media (hover: hover) {
-  .grid-item.is-open:not(.is-paused) .thumb:hover .vmark { opacity: .5; transform: none; }
+  .is-film.is-open:not(.is-paused) .vbox:hover .vmark { opacity: .5; transform: none; }
 }
 .i-pause, .i-muted { display: none; }
-.grid-item.is-open:not(.is-paused) .i-play { display: none; }
-.grid-item.is-open:not(.is-paused) .i-pause { display: block; }
-.grid-item.is-muted .i-sound { display: none; }
-.grid-item.is-muted .i-muted { display: block; }
+.is-film.is-open:not(.is-paused) .i-play { display: none; }
+.is-film.is-open:not(.is-paused) .i-pause { display: block; }
+.is-film.is-muted .i-sound { display: none; }
+.is-film.is-muted .i-muted { display: block; }
 
 /* The bar only exists once a film is open. The gradient under it lets taps
    through to the picture; only its controls take them. container-type lets
@@ -432,10 +432,10 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   background: linear-gradient(to top, rgba(0,0,0,.66), rgba(0,0,0,0));
   transition: opacity .3s ease; }
 .vbar > * { pointer-events: auto; }
-.grid-item.is-open .vbar { display: flex; }
+.is-film.is-open .vbar { display: flex; }
 /* On a desktop it steps aside while the film plays and the cursor is elsewhere. */
 @media (hover: hover) {
-  .grid-item.is-open:not(.is-paused) .thumb:not(:hover):not(:focus-within) .vbar { opacity: 0; }
+  .is-film.is-open:not(.is-paused) .vbox:not(:hover):not(:focus-within) .vbar { opacity: 0; }
 }
 .vbar button { flex: 0 0 auto; width: 30px; height: 30px; padding: 0; border: 0;
   background: none; color: inherit; cursor: none;
@@ -469,8 +469,40 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .vbar button { width: 40px; height: 40px; }
   .vb-vol { display: none; }
 }
-.thumb:fullscreen { background: #000; }
-.thumb:-webkit-full-screen { background: #000; }
+/* ── SHOWREEL ──
+   The full width and the full height of the screen, right under the hero.
+   It rises into place the way the reference does: the picture starts a little
+   large and a little high, and settles to its frame as the section reaches
+   the top (see the scroll code). The section clips, so the overscan never
+   shows. On a screen taller than it is wide a 16:9 film cropped to the full
+   height would keep a sliver of the middle, so there it takes its own
+   ratio across the width instead. */
+#reel { position: relative; z-index: 1; overflow: hidden; background: var(--bg); cursor: none;
+  height: 100vh; height: 100svh; }
+@media (orientation: portrait) { #reel { height: 56.25vw; } }
+.reel-frame { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+.reel-frame img, .reel-frame video { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; transition: opacity .35s ease; }
+.reel-frame .thumb-poster { z-index: 1; }
+/* Watched, the film is shown whole: letterboxed, in the page colour its own
+   cream grid already sits on, rather than cropped. */
+#reel.is-open video { object-fit: contain; }
+/* The title sits at the centre of the picture, so the mark waits below it,
+   between the title and the waveform. */
+#reel .vmark { top: 77%; width: 86px; height: 86px; margin: -43px 0 0 -43px; }
+#reel .vmark svg { width: 24px; height: 24px; margin-left: 3px; }
+#reel .vmark .i-pause { margin-left: 0; }
+#reel .vbar { padding: 40px 22px 14px; }
+#reel:focus-visible { outline: 2px solid var(--green-light); outline-offset: -4px; }
+@media (max-width: 600px) {
+  #reel .vmark { width: 64px; height: 64px; margin: -32px 0 0 -32px; }
+  #reel .vmark svg { width: 20px; height: 20px; }
+  #reel .vbar { padding: 26px 8px 4px; }
+  /* The band is too short for the mark and the bar together; open, the bar has it. */
+  #reel.is-open .vmark { opacity: 0; }
+}
+.vbox:fullscreen { background: #000; }
+.vbox:-webkit-full-screen { background: #000; }
 
 /* ── DOCUMENT VIEWER ──
    The whole document at a glance, and it has to hold in the window: the panel
@@ -866,6 +898,19 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   <div class="hero-inner">
     <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.</h1>
     <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
+  </div>
+</section>
+
+<!-- ═══ SHOWREEL ═══ -->
+<section id="reel" class="is-film" role="button" tabindex="0" aria-label="showreel">
+  <div class="reel-frame vbox">
+    <video playsinline preload="none"
+      data-film-fr="projects/showreel/showreel-fr.mp4"
+      data-film-en="projects/showreel/showreel-en.mp4"></video>
+    <picture>
+      <source media="(max-width: 600px)" srcset="projects/showreel/poster-m.jpg">
+      <img class="thumb-poster" src="projects/showreel/poster.jpg" alt="">
+    </picture>
   </div>
 </section>
 
@@ -1914,6 +1959,17 @@ const ICON = {
   full:  svg('i-full', '<path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.4"/>'),
   close: svg('i-close', '<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.4"/>'),
 };
+// The play mark and the player bar, the same for a tile and for the showreel.
+const playerChrome = () => `<span class="vmark" aria-hidden="true">${ICON.play}${ICON.pause}</span>
+  <div class="vbar">
+    <button class="vb-play" type="button">${ICON.play}${ICON.pause}</button>
+    <input class="vb-seek" type="range" min="0" max="1000" step="1" value="0">
+    <span class="vb-time">0:00</span>
+    <button class="vb-mute" type="button">${ICON.sound}${ICON.muted}</button>
+    <input class="vb-vol" type="range" min="0" max="1" step="0.05" value="1">
+    <button class="vb-full" type="button">${ICON.full}</button>
+    <button class="vb-close" type="button">${ICON.close}</button>
+  </div>`;
 // The figure beside a category name is its rank on the page, not the number of
 // projects it holds: read as a count it said 02 for the two professional entries
 // and 01 for the single academic one, which scans as an ordering and got them
@@ -1961,16 +2017,7 @@ projectList.innerHTML = projectGroups.map(group => {
         ? `<video muted loop playsinline preload="none"
              src="${esc(video)}"${o.film ? ` data-preview="${esc(video)}" data-film="${esc(o.film)}"` : ''}></video>
            ${poster ? `<img class="thumb-poster" src="${esc(poster)}"${altAttr} loading="lazy">` : ''}
-           ${o.silent ? '' : `<span class="vmark" aria-hidden="true">${ICON.play}${ICON.pause}</span>
-           <div class="vbar">
-             <button class="vb-play" type="button">${ICON.play}${ICON.pause}</button>
-             <input class="vb-seek" type="range" min="0" max="1000" step="1" value="0">
-             <span class="vb-time">0:00</span>
-             <button class="vb-mute" type="button">${ICON.sound}${ICON.muted}</button>
-             <input class="vb-vol" type="range" min="0" max="1" step="0.05" value="1">
-             <button class="vb-full" type="button">${ICON.full}</button>
-             <button class="vb-close" type="button">${ICON.close}</button>
-           </div>`}`
+           ${o.silent ? '' : playerChrome()}`
         : still
         ? `<img src="${esc(still)}"${altAttr} loading="lazy">` +
           (o.hover ? `<img class="thumb-alt" src="${esc(o.hover)}"${altAttr} loading="lazy">` : '')
@@ -2000,7 +2047,7 @@ projectList.innerHTML = projectGroups.map(group => {
       const tall = arW && arH && arH / arW >= 1.6;
       return `
       <div class="grid-item${o.video ? (o.silent ? ' is-gif' : ' is-film') : gal > -1 ? ' has-gallery' : ''}${tall ? ' is-tall' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
-        <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
+        <div class="thumb ${o.ratio}${video && !o.silent ? ' vbox' : ''}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${fileTag}
         ${desc}
       </div>`;
@@ -2097,6 +2144,11 @@ function watchLoop(v) {
 }
 document.querySelectorAll('.grid-item video').forEach(watchLoop);
 
+// The showreel takes the same mark and bar as the tiles, before they are wired.
+document.querySelector('#reel .reel-frame').insertAdjacentHTML('beforeend', playerChrome());
+// A phone shows the reel at the width of its screen: it takes the 720p cut.
+if (phone) { const rv = document.querySelector('#reel video'); rv.dataset.filmFr = rv.dataset.filmFr.replace('.mp4', '-m.mp4'); rv.dataset.filmEn = rv.dataset.filmEn.replace('.mp4', '-m.mp4'); }
+
 /* ── VIDEO PLAYER ──
    A film tile rests on its still under a play mark, so motion can be told from
    stills at a glance. Nothing moves until it is asked to: passing the cursor
@@ -2145,12 +2197,14 @@ function syncTime(item) {
 
 // Only one film speaks at a time: opening one puts any other back to rest.
 function openTile(item) {
-  document.querySelectorAll('.grid-item.is-film.is-open').forEach(o => { if (o !== item) closeTile(o); });
+  document.querySelectorAll('.is-film.is-open').forEach(o => { if (o !== item) closeTile(o); });
   const v = item.querySelector('video');
   item.classList.add('is-open');
   // Compare the attribute, not currentSrc: the latter only catches up once the
   // browser has re-run resource selection, so the swap back never fired.
-  if (v.dataset.film && v.getAttribute('src') !== v.dataset.film) { v.src = v.dataset.film; v.load(); }
+  // The showreel exists in each language; it opens in the one the page is in.
+  const film = v.dataset[currentLang === 'fr' ? 'filmFr' : 'filmEn'] || v.dataset.film;
+  if (film && v.getAttribute('src') !== film) { v.src = film; v.load(); }
   else v.currentTime = 0;
   v.loop = false;
   v.muted = vPrefs.muted;
@@ -2171,14 +2225,14 @@ function closeTile(item) {
 // The tile itself goes full screen where the browser allows it, so the bar
 // comes along. An iPhone only lets the video go, into its own player.
 function goFull(item) {
-  const thumb = item.querySelector('.thumb'), v = item.querySelector('video');
+  const v = item.querySelector('video'), thumb = v.parentElement;
   if (document.fullscreenElement) { document.exitFullscreen(); return; }
   if (thumb.requestFullscreen) thumb.requestFullscreen().catch(function () {});
   else if (thumb.webkitRequestFullscreen) thumb.webkitRequestFullscreen();
   else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
 }
 
-document.querySelectorAll('.grid-item.is-film').forEach(item => {
+document.querySelectorAll('.is-film').forEach(item => {
   const v = item.querySelector('video');
   if (!v) return;
   // The still answers to the video, not to the cursor.
@@ -2189,13 +2243,13 @@ document.querySelectorAll('.grid-item.is-film').forEach(item => {
     v.addEventListener(e, () => { if (item.classList.contains('is-open')) syncTime(item); }));
 });
 // Also the bars' first labelling: applyLang runs once the page is built.
-applyLangHooks.push(() => document.querySelectorAll('.grid-item.is-film').forEach(syncBar));
+applyLangHooks.push(() => document.querySelectorAll('.is-film').forEach(syncBar));
 
 // A film scrolled out of sight stops talking.
 const filmAway = new IntersectionObserver(entries => entries.forEach(en => {
   if (!en.isIntersecting && en.target.classList.contains('is-open')) en.target.querySelector('video').pause();
 }));
-document.querySelectorAll('.grid-item.is-film').forEach(i => filmAway.observe(i));
+document.querySelectorAll('.is-film').forEach(i => filmAway.observe(i));
 
 /* A silent post is a gif in all but format: no sound, nothing to control, so
    it loops by itself, with neither mark nor bar. Only while on screen, so a
@@ -2213,10 +2267,50 @@ document.querySelectorAll('.grid-item.is-gif').forEach(item => {
   if (gifMotion) gifSeen.observe(item);
 });
 
+/* The showreel rises into place. Progress runs from 0, the section's top at
+   the bottom of the screen, to 1, its bottom there too, fully revealed. On
+   the way the picture is drawn 6% larger and 13% higher, the figures the
+   reference uses, and eases to its frame. The value chases the scroll rather
+   than jumping to it, which is what gives the move its weight. */
+(function () {
+  const reel = document.getElementById('reel');
+  const frame = reel.querySelector('.reel-frame');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let cur = -1, raf = 0;
+  const target = () => {
+    const r = reel.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (innerHeight - r.top) / r.height));
+  };
+  function tick() {
+    const t = target();
+    cur = cur < 0 ? t : cur + (t - cur) * 0.12;
+    if (Math.abs(t - cur) < 0.0005) cur = t;
+    const k = 1 - cur;
+    frame.style.transform = `translate3d(0, ${(-13 * k).toFixed(3)}%, 0) scale(${(1 + 0.06 * k).toFixed(4)})`;
+    raf = cur === t ? 0 : requestAnimationFrame(tick);
+  }
+  const wake = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', wake, { passive: true });
+  addEventListener('resize', wake);
+  wake();
+})();
+
+// Switching language mid-film carries on in the other cut, at the same moment.
+applyLangHooks.push(() => {
+  const reel = document.getElementById('reel'), v = reel.querySelector('video');
+  if (!reel.classList.contains('is-open')) return;
+  const want = v.dataset[currentLang === 'fr' ? 'filmFr' : 'filmEn'];
+  if (!want || v.getAttribute('src') === want) return;
+  const at = v.currentTime, playing = !v.paused;
+  v.src = want;
+  v.load();
+  v.addEventListener('loadedmetadata', () => { v.currentTime = at; if (playing) playSafe(v); }, { once: true });
+});
+
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('.vbar button');
   if (!b) return;
-  const item = b.closest('.grid-item'), v = item.querySelector('video');
+  const item = b.closest('.is-film'), v = item.querySelector('video');
   if (b.classList.contains('vb-play')) { if (v.paused) playSafe(v); else v.pause(); }
   else if (b.classList.contains('vb-mute')) {
     v.muted = !v.muted;
@@ -2229,7 +2323,7 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   const r = e.target.closest && e.target.closest('.vbar input');
   if (!r) return;
-  const item = r.closest('.grid-item'), v = item.querySelector('video');
+  const item = r.closest('.is-film'), v = item.querySelector('video');
   if (r.classList.contains('vb-seek')) {
     if (v.duration) v.currentTime = r.value / 1000 * v.duration;
     syncTime(item);
@@ -2242,13 +2336,13 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('pointerdown', e => {
   const s = e.target.closest && e.target.closest('.vb-seek');
-  if (s) s.closest('.grid-item').dataset.seeking = '1';
+  if (s) s.closest('.is-film').dataset.seeking = '1';
 });
 ['pointerup', 'pointercancel', 'change'].forEach(t => document.addEventListener(t, () =>
-  document.querySelectorAll('.grid-item[data-seeking]').forEach(i => delete i.dataset.seeking)));
+  document.querySelectorAll('[data-seeking]').forEach(i => delete i.dataset.seeking)));
 // The keys every video player answers to, once a film is open and in focus.
 document.addEventListener('keydown', e => {
-  const item = e.target.closest && e.target.closest('.grid-item.is-film.is-open');
+  const item = e.target.closest && e.target.closest('.is-film.is-open');
   if (!item) return;
   const v = item.querySelector('video');
   if (e.key === 'Escape') { closeTile(item); item.focus(); return; }
@@ -2302,7 +2396,7 @@ document.querySelectorAll('.project-header').forEach(header => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
   if (!e.target || !e.target.closest) return;
-  const target = e.target.closest('.grid-item, .project-header');
+  const target = e.target.closest('.grid-item, .project-header, #reel');
   // A link, a real button or a slider inside one keeps its own behaviour.
   if (!target || e.target.closest('a, button, input')) return;
   e.preventDefault();
@@ -2428,7 +2522,7 @@ document.addEventListener('keydown', e => {
 
 /* grid item click-to-enlarge (lightweight FLIP) */
 document.addEventListener('click', e => {
-  const item = e.target.closest('.grid-item');
+  const item = e.target.closest('.grid-item, #reel');
   if (!item) return;
   // A link inside a tile is its own destination, and the player bar answers
   // for itself; neither should also toggle the tile.
@@ -2439,7 +2533,7 @@ document.addEventListener('click', e => {
   // player. The write-up under it does nothing.
   if (item.classList.contains('is-film')) {
     if (!item.classList.contains('is-open')) openTile(item);
-    else if (e.target === item || e.target.closest('.thumb')) {
+    else if (e.target === item || e.target.closest('.vbox')) {
       const v = item.querySelector('video');
       if (v.paused) playSafe(v); else v.pause();
     }
