@@ -2099,8 +2099,9 @@ document.querySelectorAll('.grid-item video').forEach(watchLoop);
 
 /* ── VIDEO PLAYER ──
    A film tile rests on its still under a play mark, so motion can be told from
-   stills at a glance. On a desktop the cursor plays a silent preview. A click
-   opens it: the full cut from the start, with sound, and a bar of its own.
+   stills at a glance. Nothing moves until it is asked to: passing the cursor
+   over it does nothing, a click opens it: the full cut from the start, with
+   sound, and a bar of its own.
    The browser's controls are gone: they differed from one browser to the next,
    could not be styled, and a click on them also reached the tile and closed
    it. */
@@ -2180,8 +2181,6 @@ function goFull(item) {
 document.querySelectorAll('.grid-item.is-film').forEach(item => {
   const v = item.querySelector('video');
   if (!v) return;
-  item.addEventListener('mouseenter', () => { if (!item.classList.contains('is-open')) playLoop(v); });
-  item.addEventListener('mouseleave', () => { if (!item.classList.contains('is-open')) v.pause(); });
   // The still answers to the video, not to the cursor.
   v.addEventListener('playing', () => item.classList.add('is-playing'));
   ['pause', 'ended', 'error'].forEach(e => v.addEventListener(e, () => item.classList.remove('is-playing')));
