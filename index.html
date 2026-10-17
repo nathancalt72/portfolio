@@ -631,9 +631,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .contact-links a:hover { color: var(--gold); }
 
 /* ── FOOTER ── */
-#footer { border-top: 1px solid var(--border); padding: 22px 40px; }
-.footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .04em; text-transform: lowercase; }
+/* After maximiliankaspar.com: the rule rides high above the credits, and the
+   credits themselves sit right down on the last pixel of the page. */
+#footer { border-top: 1px solid var(--border); padding: 120px 40px 10px; }
+.footer-inner { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; }
+.footer-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .04em; text-transform: lowercase; line-height: 1; }
+.footer-text a { color: inherit; text-decoration: none; border-bottom: 1px solid currentColor; transition: color .2s; }
+.footer-text a:hover { color: var(--gold); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
@@ -710,6 +714,10 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   /* The plants are framed on the left one here and fill the screen, so at the
      strength the wide layout uses they ran straight through the headline. */
   #asciiBg pre { opacity: .26; }
+  /* A phone packs the same hairlines into a narrow, dense screen, where they run
+     through every line of text and read far heavier than on a wide one. Lighter
+     ink and half strength bring them back to the faint guides they are there. */
+  .bg-columns span { background: var(--border); opacity: .55; }
   #hero { padding: 88px 18px 28px;
     min-height: calc(100vh - var(--nav-h, 56px));
     min-height: calc(100svh - var(--nav-h, 56px)); }
@@ -720,6 +728,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
      third of the size a phone can give it. Height comes from the ratio now. */
   .project-grid { gap: 20px; }
   .grid-item { flex: 1 1 100%; }
+  .grid-item.is-tall { display: none; }
   .thumb { height: auto; }
   /* The small controls stay the size they are drawn; only the area that takes
      a thumb grows, to the 44px a finger needs. Narrower on the flags, which sit
@@ -728,21 +737,9 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .lang-btn::after, .lb-close::after, .lb-nav::after, .lb-zoom-close::after,
   .contact-links a::after { content: ''; position: absolute; inset: -10px; }
   .lang-btn::after { inset: -10px -4px; }
-  /* The name and the flags keep their place with no bar, as asked. Under them is a
-     short wash of the page colour fading to nothing: no edge to read as a band,
-     but enough that a paragraph no longer scrolls through the letters. It is
-     withdrawn over a dark picture, where the ink inverts instead and a cream
-     band would read worse than the overlap it fixes. */
-  nav::before { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -20px;
-    z-index: -1; pointer-events: none; transition: opacity .3s ease;
-    background: linear-gradient(to bottom,
-      var(--bg) 0%,
-      color-mix(in srgb, var(--bg) 86%, transparent) 58%,
-      color-mix(in srgb, var(--bg) 0%, transparent) 100%); }
-  nav.over-dark-any::before { opacity: 0; }
   #approach { padding: 64px 18px 60px; }
   #contact { padding: 60px 18px 44px; }
-  #footer { padding: 20px 18px; }
+  #footer { padding: 88px 18px 8px; }
 }
 
 /* ── FOCUS, MOTION, SAFE AREAS ── */
@@ -980,6 +977,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <footer id="footer">
   <div class="footer-inner">
     <span class="footer-text" data-i18n="footer_credits">designed and developed by nathan charlot</span>
+    <span class="footer-text"><span data-i18n="footer_inspired">inspired by</span> <a href="https://www.maximiliankaspar.com/" target="_blank" rel="noopener noreferrer">maximilian kaspar</a></span>
     <span class="footer-text">©2026</span>
   </div>
 </footer>
@@ -1220,8 +1218,6 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
         }
         el.classList.toggle('over-dark', dark);
       });
-      // The phone wash under the name is withdrawn over a dark picture.
-      nav.classList.toggle('over-dark-any', Boolean(nav.querySelector('.over-dark')));
     }
     function watch() {
       if (io) io.disconnect();
@@ -1553,6 +1549,46 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     timer = setInterval(() => { pre.textContent = frames[i = (i + 1) % frames.length]; }, 1000 / FPS);
   }
 
+  // Entrance: the artwork compiles itself in, like code. Each inked cell waits for
+  // its turn — the bottom rows first, so the plants grow upward — flickers through
+  // a few random glyphs, then locks onto its real character. Blank cells stay
+  // blank throughout, so the noise only ever traces the shape of the picture.
+  // The loop keeps playing underneath, so the reveal lands on a moving image.
+  // It waits until the page has been open three seconds, so the headline is read
+  // first and the backdrop arrives after it, then takes its time.
+  const INTRO_DELAY = 3000, INTRO_MS = 5000, SCRAMBLE = .18;
+  const GLYPHS = '01<>/{}[]=+*#$%&;:_-';
+  function intro() {
+    clearInterval(timer);
+    if (reduced.matches) return run();
+    const wait = new Float32Array(rows * cols);
+    for (let r = 0; r < rows; r++) {
+      const fromBottom = 1 - r / Math.max(rows - 1, 1);
+      for (let c = 0; c < cols; c++) wait[r * cols + c] = fromBottom * .7 + Math.random() * .3;
+    }
+    const start = performance.now();
+    const end = 1 + SCRAMBLE;
+    timer = setInterval(() => {
+      const p = (performance.now() - start) / INTRO_MS * end;
+      i = (i + 1) % frames.length;
+      if (p >= end) { pre.textContent = frames[i]; return run(); }
+      const lines = frames[i].split('\n');
+      let out = '';
+      for (let r = 0; r < lines.length; r++) {
+        const l = lines[r];
+        let row = '';
+        for (let c = 0; c < l.length; c++) {
+          const ch = l[c];
+          if (ch === ' ') { row += ' '; continue; }
+          const w = wait[r * cols + c];
+          row += p < w ? ' ' : p < w + SCRAMBLE ? GLYPHS[(Math.random() * GLYPHS.length) | 0] : ch;
+        }
+        out += r ? '\n' + row : row;
+      }
+      pre.textContent = out;
+    }, 1000 / 30);
+  }
+
   fetch('ascii-frames.json')
     .then(r => r.json())
     .then(data => {
@@ -1562,9 +1598,10 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
       // Trailing spaces are stripped to save bytes, so lines vary — take the widest.
       cols = lines.reduce((m, l) => Math.max(m, l.length), 0);
       measureInk();
-      pre.textContent = frames[0];
+      pre.textContent = '';
       fit();
-      run();
+      if (reduced.matches) run();
+      else setTimeout(intro, Math.max(0, INTRO_DELAY - performance.now()));
     })
     .catch(function () {});
 
@@ -1575,8 +1612,8 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 /* ── ASCII FADE-OUT ──
    The backdrop is fixed, so it sits under the about text and makes it hard to read.
    Rather than move it — which read as a lurch — it goes soft and thin as that text
-   comes up, holds there while the text is being read, and comes back once it has
-   gone by, well before the contact section. It never disappears: the plateau leaves
+   comes up, holds there while the text is being read, and comes back only once the
+   last line has been read and is leaving the screen. It never disappears: the plateau leaves
    it present as a texture, which is as far as it should go.
    Both properties are set on the container, never on the <pre>: that one carries the
    centring offset the backdrop computes for itself, and its own .6 opacity, which
@@ -1584,10 +1621,10 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
 (function () {
   const box = document.getElementById('asciiBg');
   const opening = document.querySelector('.approach-body-a');
-  const closing = document.getElementById('contact');
-  if (!box || !opening || !closing) return;
+  const texts = document.querySelectorAll('.approach-body-a, .approach-body-b');
+  if (!box || !opening || !texts.length) return;
   const MAX_BLUR = 6;      // px at the plateau
-  const MIN_OPACITY = .4;  // of its own .38, so a seventh of full strength
+  const MIN_OPACITY = .25; // of its own .38, so under a tenth of full strength
 
   function ramp(value, from, to) {
     const p = (from - value) / (from - to);
@@ -1599,11 +1636,14 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     const h = window.innerHeight;
     // Out as the first column rises into the part of the screen where it gets read.
     const out = ramp(opening.getBoundingClientRect().top, h * 1.8, h * 0.7);
-    // Back in on the approach to the contact section, and finished well before it
-    // arrives. Anchored on that section rather than on the end of the text: the page
-    // stops scrolling shortly after the text does, and a ramp measured from there
-    // ran out of room to complete — the backdrop stalled at nine tenths.
-    const back = ramp(closing.getBoundingClientRect().top, h * 1.5, h * 0.9);
+    // Back in only once the last line of the text is up in the top quarter of the
+    // screen, read and on its way out. Anchored on the contact section it came back
+    // while the last paragraphs were still being read. At the foot of the page the
+    // text ends between a twentieth and a fifth of the way down, depending on the
+    // screen, so a ramp finishing at a quarter always completes.
+    let end = -Infinity;
+    texts.forEach(t => { end = Math.max(end, t.getBoundingClientRect().bottom); });
+    const back = ramp(end, h * 0.45, h * 0.25);
     // Quantised to whole steps: a blur radius that changes on every pixel of scroll
     // is a full-screen filter recomputed on every frame for no visible gain.
     const step = Math.round(out * (1 - back) * 20);
@@ -1947,8 +1987,12 @@ projectList.innerHTML = projectGroups.map(group => {
              data-fr="${esc(o.link.fr)}" data-en="${esc(o.link.en)}">${o.link.en}</a>` : '') +
           `</div>`
         : '';
+      // Phone-format pieces (9:16 and the like) are left out on a phone, where
+      // one would fill the whole screen. Judged from the ratio, not a list.
+      const [arW, arH] = (o.ar || '').split('/').map(Number);
+      const tall = arW && arH && arH / arW >= 1.6;
       return `
-      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
+      <div class="grid-item${o.video ? ' is-film' : gal > -1 ? ' has-gallery' : ''}${tall ? ' is-tall' : ''}" style="--d:${260 + gi * 70}ms" data-project="${idx}" data-item="${gi}"${!o.video && gal > -1 ? ` data-gallery="${gal}"` : ''} role="button" tabindex="0"${o.title ? ` aria-label="${esc(o.title.en)}"` : ''}>
         <div class="thumb ${o.ratio}"${o.ar ? ` style="aspect-ratio:${o.ar}"` : ''}>${inner}</div>
         ${fileTag}
         ${desc}
@@ -2423,6 +2467,7 @@ const translations = {
     approach_status: 'disponible · france',
     contact_label: 'contact', contact_big: 'travaillons<br><span class="mark">ensemble.</span>',
     footer_credits: 'conçu et développé par nathan charlot',
+    footer_inspired: 'inspiré par',
   },
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
@@ -2439,6 +2484,7 @@ const translations = {
     approach_status: 'available · france',
     contact_label: 'contact', contact_big: 'let\'s work<br><span class="mark">together.</span>',
     footer_credits: 'designed and developed by nathan charlot',
+    footer_inspired: 'inspired by',
   }
 };
 let currentLang = 'fr';
