@@ -2266,8 +2266,9 @@ document.querySelectorAll('.grid-item.is-gif').forEach(item => {
 });
 
 /* Smooth wheel scrolling, as on the reference (which runs Lenis): a turn of
-   the wheel sets where the page is going, and the page glides there, a tenth
-   of the remaining way each frame, instead of jumping a notch at a time.
+   the wheel sets where the page is going, 80% of the notch the browser would
+   jump, and the page glides there, 7% of the remaining way each frame,
+   instead of jumping a notch at a time.
    Touch screens keep their own scrolling, which already has momentum, and so
    does anything with a scroll of its own (the viewer), a zoom (ctrl+wheel), a
    sideways swipe, a locked page and a visitor who asked for less motion.
@@ -2285,7 +2286,7 @@ document.querySelectorAll('.grid-item.is-gif').forEach(item => {
     return false;
   };
   function step() {
-    cur += (target - cur) * 0.1;
+    cur += (target - cur) * 0.07;
     if (Math.abs(target - cur) < 0.5) cur = target;
     // 'instant': the page's own scroll-behavior: smooth would otherwise turn
     // every frame of the glide into a glide of its own.
@@ -2297,7 +2298,7 @@ document.querySelectorAll('.grid-item.is-gif').forEach(item => {
     if (getComputedStyle(document.body).overflow === 'hidden' || ownScroll(e.target)) return;
     e.preventDefault();
     if (!raf) target = cur = scrollY;
-    const d = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY;
+    const d = 0.8 * (e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY);
     target = Math.max(0, Math.min(maxY(), target + d));
     if (!raf) raf = requestAnimationFrame(step);
   }, { passive: false });
