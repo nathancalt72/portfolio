@@ -269,7 +269,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* The bottom padding is deliberately large: it is the pause between the work and
    the page that talks about the person who made it. */
 #work { --pad: 40px; padding: 160px var(--pad) 150px; }
-/* A wide breath between the three kinds of work, a narrower one between the
+/* A wide breath between the two kinds of work, a narrower one between the
    projects inside a kind. */
 .cat-group + .cat-group { margin-top: clamp(200px, 22vw, 320px); }
 .project + .project, .project + .project-tools { margin-top: 30px; }
@@ -1752,7 +1752,7 @@ const revealObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 /* ── PROJECTS (grouped accordions + masonry grid) ──
-   Grouped into three categories. Headings carry data-i18n so applyLang, which
+   Grouped into two categories. Headings carry data-i18n so applyLang, which
    runs after this render, translates them in place — no re-render, so open
    accordions survive a language switch. */
 // Software marks, drawn in the site's own type rather than with the brands' logos.
@@ -1833,8 +1833,6 @@ const projectGroups = [
               en:"The brand's logo brought to life: the smiling house lands, then the letters of “ma nouvelle assurance” fall into place around it."},
         video:'projects/mna-logo/loop.mp4', poster:'projects/mna-logo/poster.jpg', silent:true},
      ]},
-  ]},
-  { key: 'school', items: [
     {title:{fr:'Mastère marketing & communication (majeure direction artistique)', en:'Master’s in marketing & communication (art direction major)'},
      tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026', tools:['ai','id','ps','ae','me'],
      desc:{fr:"Deux ans de mastère marketing et communication, majeure direction artistique. On y trouve mon mémoire de fin d’études et des travaux de cours, en groupe comme en solo.",
@@ -2698,7 +2696,7 @@ const translations = {
   fr: {
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
     hero_title: 'Créatif, motion designer<br> et monteur. Basé en France,<br> disponible 2026.',
-    cat_pro: 'projets professionnels', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
+    cat_pro: 'projets pro', cat_personal: 'projets perso',
     pm_client: 'client :', pm_school: 'formation :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
     approach_display: '<i>UN</i><i class="in2">PETIT</i><i class="in1">PEU</i><i class="in3">PLUS</i><i class="in4">SUR</i><i>MOI</i>',
@@ -2712,7 +2710,7 @@ const translations = {
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
     hero_title: 'Creative, motion designer<br> and editor. Based in France,<br> available 2026.',
-    cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
+    cat_pro: 'professional work', cat_personal: 'personal work',
     pm_client: 'client:', pm_school: 'course:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
     approach_display: '<i>A</i><i class="in2">LITTLE</i><i class="in1">BIT</i><i class="in3">MORE</i><i class="in4">ABOUT</i><i>ME</i>',
