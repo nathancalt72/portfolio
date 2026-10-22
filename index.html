@@ -300,10 +300,19 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    year column does. */
 .project-tools { display: flex; justify-content: flex-end; gap: 5px;
   margin: 0 calc(-1 * var(--pad)) 6px; padding: 0 18px 0 12px; }
-.project-tools abbr { display: inline-grid; place-items: center; width: 20px; height: 20px;
-  border: 1px solid var(--fg); border-radius: 3px; text-decoration: none;
+.project-tools .tool { position: relative; display: inline-grid; place-items: center; width: 20px; height: 20px;
+  border: 1px solid var(--fg); border-radius: 3px;
   font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: .02em;
-  color: var(--fg); cursor: default; }
+  color: var(--fg); cursor: default; outline: none; transition: background-color .2s, color .2s; }
+.project-tools .tool:hover, .project-tools .tool:focus { background: var(--fg); color: var(--bg); }
+/* The name, above the mark and flush with its right edge so the last one in the
+   row never runs off the page. */
+.project-tools .tool::after { content: attr(data-name); position: absolute; right: -1px; bottom: calc(100% + 6px);
+  padding: 3px 6px; white-space: nowrap; pointer-events: none;
+  font-size: 10px; font-weight: 400; letter-spacing: .04em; text-transform: lowercase;
+  background: var(--fg); color: var(--bg); opacity: 0; transform: translateY(3px);
+  transition: opacity .2s, transform .2s; }
+.project-tools .tool:hover::after, .project-tools .tool:focus::after { opacity: 1; transform: none; }
 .cat-group .project:last-child { border-bottom: 1px solid var(--border); }
 .project-header, .project-content {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
@@ -2045,7 +2054,8 @@ projectList.innerHTML = projectGroups.map(group => {
         ${desc}
       </div>`;
     }).join('');
-    const tools = (p.tools || []).map(t => `<abbr title="${TOOLS[t][1]}">${TOOLS[t][0]}</abbr>`).join('');
+    // Focusable so a click or a tap shows the name too, not only a hover.
+    const tools = (p.tools || []).map(t => `<span class="tool" tabindex="0" role="img" aria-label="${TOOLS[t][1]}" data-name="${TOOLS[t][1]}">${TOOLS[t][0]}</span>`).join('');
     return `${tools ? `
     <div class="project-tools">${tools}</div>` : ''}
     <div class="project is-open" data-index="${idx}">
