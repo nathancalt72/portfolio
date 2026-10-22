@@ -453,6 +453,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .grid-item-desc, .grid-item-desc-in { transition: none; }
 }
+/* The part of a write-up still decoding, set like the ascii backdrop */
+.decoding { font-family: var(--mono); font-size: .92em; font-weight: 400; color: var(--fg-muted); }
 /* Once open, the clip lets go, or a software mark's name would be cut off above it */
 .grid-item.is-open .grid-item-desc-in { animation: desc-unclip 0s .6s forwards; }
 @keyframes desc-unclip { to { overflow: visible; } }
@@ -2140,23 +2142,38 @@ projectList.innerHTML = projectGroups.map(group => {
 function scrambleIn(el) {
   if (el.dataset.done) return;
   el.dataset.done = '1';
-  const target = el.dataset.scrambleSrc;
-  const chars = 'abcdefghijklmnopqrstuvwxyz';
+  decodeText(el, el.dataset.scrambleSrc);
+}
+/* Text decoded out of the backdrop's own glyphs: what is not read yet shows as
+   mono ASCII and resolves left to right. A new call on the same element takes
+   over from one still running. */
+const DECODE_GLYPHS = '.:-=+*x#%8@X';
+const decodeStill = window.matchMedia('(prefers-reduced-motion: reduce)');
+function decodeText(el, target) {
+  const run = (el._decode = (el._decode || 0) + 1);
+  if (decodeStill.matches || !target) { el.textContent = target || ''; return; }
+  const totalFrames = 26;
+  const code = document.createElement('span');
+  code.className = 'decoding';
   let frame = 0;
-  const totalFrames = 18;
-  function tick() {
+  (function tick() {
+    if (el._decode !== run) return;
     frame++;
-    let out = '';
     const reveal = Math.floor((frame / totalFrames) * target.length);
-    for (let i = 0; i < target.length; i++) {
-      if (i < reveal || target[i] === ' ') out += target[i];
-      else out += chars[Math.floor(Math.random() * chars.length)];
+    let rest = '';
+    for (let i = reveal; i < target.length; i++) {
+      rest += /\s/.test(target[i]) ? target[i] : DECODE_GLYPHS[Math.floor(Math.random() * DECODE_GLYPHS.length)];
     }
-    el.textContent = out;
-    if (frame < totalFrames) setTimeout(tick, 22);
+    code.textContent = rest;
+    el.replaceChildren(document.createTextNode(target.slice(0, reveal)), code);
+    if (frame < totalFrames) setTimeout(tick, 24);
     else el.textContent = target;
-  }
-  tick();
+  })();
+}
+// The write-up under a tile decodes each time it opens, in the language on screen.
+function decodeTileDesc(item) {
+  const s = item.querySelector('.grid-item-desc span[data-fr]');
+  if (s) decodeText(s, s.dataset[currentLang] || s.dataset.en);
 }
 
 /* Nudge a tile video into its silent loop. Retries on loadeddata, because a
@@ -2246,6 +2263,7 @@ function openTile(item) {
   document.querySelectorAll('.is-film.is-open').forEach(o => { if (o !== item) closeTile(o); });
   const v = item.querySelector('video');
   item.classList.add('is-open');
+  decodeTileDesc(item);
   // Compare the attribute, not currentSrc: the latter only catches up once the
   // browser has re-run resource selection, so the swap back never fired.
   // The showreel exists in each language; it opens in the one the page is in.
@@ -2511,7 +2529,7 @@ function lbOpen(g) {
   const p = g.parent;
   lbNum.textContent = pad2(g.n || 1);
   lbTitle.textContent = title;
-  lbDesc.textContent = g.desc[currentLang] || g.desc.en;
+  decodeText(lbDesc, g.desc[currentLang] || g.desc.en);
   lbMeta.innerHTML = p ? `
     <dt>${fr ? 'projet' : 'project'}</dt><dd>${esc(p.title[currentLang] || p.title.en)}</dd>
     <dt>${fr ? 'année' : 'year'}</dt><dd>${esc(p.year)}</dd>
@@ -2653,7 +2671,7 @@ document.addEventListener('click', e => {
     return;
   }
   // A gif plays regardless; a click only opens its write-up.
-  if (item.classList.contains('is-gif')) { item.classList.toggle('is-open'); return; }
+  if (item.classList.contains('is-gif')) { if (item.classList.toggle('is-open')) decodeTileDesc(item); return; }
 
   // Items backed by a gallery open the viewer instead of expanding in place.
   if (item.dataset.gallery !== undefined) { lbOpen(galleries[+item.dataset.gallery]); return; }
