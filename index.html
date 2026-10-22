@@ -268,11 +268,11 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* --pad is what the project rows cancel out to reach the viewport edges */
 /* The bottom padding is deliberately large: it is the pause between the work and
    the page that talks about the person who made it. */
-#work { --pad: 40px; padding: 90px var(--pad) 150px; }
+#work { --pad: 40px; padding: 160px var(--pad) 150px; }
 .work-tag_wrapper { margin-bottom: 30px; }
 /* A wide breath between the three kinds of work, a narrower one between the
    projects inside a kind. */
-.cat-group + .cat-group { margin-top: 130px; }
+.cat-group + .cat-group { margin-top: clamp(150px, 16vw, 220px); }
 .project + .project, .project + .project-tools { margin-top: 30px; }
 .cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
 /* The deep green reads 3.96:1 on cream — right for the display sizes it was
@@ -769,7 +769,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   nav, #hero, #approach, #contact, #footer { padding-left: 22px; padding-right: 22px; }
-  #work { --pad: 22px; padding: 70px var(--pad) 80px; }
+  #work { --pad: 22px; padding: 120px var(--pad) 80px; }
   /* Stacked, the statement sits above the portrait rather than on it, in the same
      scattered arrangement — only the last pair dips onto the picture's top edge.
      Lowercase and the display face, like the hero and the contact heading; the
@@ -849,7 +849,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
     min-height: calc(100vh - var(--nav-h, 56px));
     min-height: calc(100svh - var(--nav-h, 56px)); }
   .title-h1 { font-size: 32px; }
-  #work { --pad: 18px; padding: 60px var(--pad) 64px; }
+  #work { --pad: 18px; padding: 96px var(--pad) 64px; }
   /* One tile to a row, the full width of the screen. Wrapped tiles of a fixed
      height left a ragged gap down the right-hand side and showed the work at a
      third of the size a phone can give it. Height comes from the ratio now. */
