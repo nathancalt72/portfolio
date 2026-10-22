@@ -587,12 +587,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   padding: 22px 18px 26px 12px; display: flex; flex-direction: column; gap: 30px; }
 .lb-desc { margin: 0; font-size: 13px; line-height: 1.7; font-weight: 300; color: var(--fg); }
 /* Set like a project's client and site rows: one size, one ink, rows of one height */
-.lb-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; grid-auto-rows: 24px;
-  column-gap: 14px; align-items: center;
+.lb-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; grid-auto-rows: minmax(24px, auto);
+  column-gap: 14px; row-gap: 2px; align-items: baseline; line-height: 1.5;
   font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: .01em;
   color: var(--fg); text-transform: lowercase; }
 .lb-meta dt::after { content: ' :'; }
-.lb-meta dd { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A long project name wraps onto a second line rather than being cut */
+.lb-meta dd { margin: 0; min-width: 0; overflow-wrap: break-word; }
 /* The software marks again, read from the left here, so their names open rightwards */
 .lb-meta .project-tools { margin: 0; padding: 0; justify-content: flex-start; text-transform: none; overflow: visible; }
 .lb-meta .project-tools .tool::after { right: auto; left: -1px; }
