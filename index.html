@@ -672,7 +672,10 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 /* Narrow: one column that scrolls, the page first under the write-up */
 @media (max-width: 900px) {
-  .lb { overflow-y: auto; background: var(--bg); }
+  /* Sized to the large viewport: a phone draws the page under its translucent
+     toolbar, and an inset of 0 stopped above it, baring the work beneath. */
+  .lb { bottom: auto; height: 100vh; height: 100lvh; overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg); }
   .lb-top { position: sticky; top: 0; z-index: 2; grid-template-columns: 1fr auto; }
   .lb-counter { display: none; }
   .lb-name { grid-column: 1; }
@@ -684,7 +687,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   .lb-page { height: auto; }
   .lb-page img { max-height: 70vh; }
   .lb-nav { width: 30px; height: 30px; }
-  .lb-strip { padding: 14px 16px 28px; border-top: 0; }
+  /* Room to scroll the strip clear of the toolbar now drawn over the bottom */
+  .lb-strip { padding: 14px 16px calc(96px + env(safe-area-inset-bottom)); border-top: 0; }
 }
 
 /* ═══════════════════════════════════════
