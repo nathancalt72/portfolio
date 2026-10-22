@@ -269,18 +269,17 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* The bottom padding is deliberately large: it is the pause between the work and
    the page that talks about the person who made it. */
 #work { --pad: 40px; padding: 160px var(--pad) 150px; }
-.work-tag_wrapper { margin-bottom: 30px; }
 /* A wide breath between the three kinds of work, a narrower one between the
    projects inside a kind. */
-.cat-group + .cat-group { margin-top: clamp(150px, 16vw, 220px); }
+.cat-group + .cat-group { margin-top: clamp(200px, 22vw, 320px); }
 .project + .project, .project + .project-tools { margin-top: 30px; }
-.cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
-/* The deep green reads 3.96:1 on cream — right for the display sizes it was
-   chosen for, short of the 4.5:1 a 10px label needs. --gold is the same family
-   at 6.36:1. The weight is restated because these are headings now. */
-.cat-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; font-weight: 400;
-  text-transform: lowercase; color: var(--gold); }
-.cat-count { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
+/* Chapter titles, centred: the site's mono set large enough for the deep green,
+   which reads 3.96:1 on cream, right at display sizes. The rank sits above. */
+.cat-head { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 34px; }
+.cat-name { order: 1; margin: 0; font-family: var(--mono); font-size: clamp(20px, 2.2vw, 30px);
+  letter-spacing: .2em; font-weight: 400; text-transform: lowercase; color: var(--green-deep); text-align: center;
+  margin-right: -.2em; /* the tracking after the last letter would pull it off centre */ }
+.cat-count { font-family: var(--mono); font-size: 11px; color: var(--fg-muted); letter-spacing: .1em; }
 /* A category can carry a line about itself, and a figure worth stating plainly.
    Kept to one measure so it reads as a note, not a preamble. */
 .cat-note { display: flex; align-items: flex-start; justify-content: space-between;
@@ -1004,9 +1003,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 <!-- ═══ WORK ═══ -->
 <section id="work">
-  <div class="work-tag_wrapper">
-    <span class="sec-label accent" data-i18n="work_label">projects</span>
-  </div>
   <div id="projectList"></div>
 </section>
 
@@ -2702,8 +2698,7 @@ const translations = {
   fr: {
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
     hero_title: 'Créatif, motion designer<br> et monteur. Basé en France,<br> disponible 2026.',
-    work_label: 'projets',
-    cat_pro: 'projets pro', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
+    cat_pro: 'projets professionnels', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
     pm_client: 'client :', pm_school: 'formation :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
     approach_display: '<i>UN</i><i class="in2">PETIT</i><i class="in1">PEU</i><i class="in3">PLUS</i><i class="in4">SUR</i><i>MOI</i>',
@@ -2717,7 +2712,6 @@ const translations = {
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
     hero_title: 'Creative, motion designer<br> and editor. Based in France,<br> available 2026.',
-    work_label: 'projects',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client: 'client:', pm_school: 'course:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
