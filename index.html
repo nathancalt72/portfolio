@@ -453,6 +453,13 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .grid-item-desc, .grid-item-desc-in { transition: none; }
 }
+/* Once open, the clip lets go, or a software mark's name would be cut off above it */
+.grid-item.is-open .grid-item-desc-in { animation: desc-unclip 0s .6s forwards; }
+@keyframes desc-unclip { to { overflow: visible; } }
+.grid-item-tools { display: flex; align-items: center; gap: 10px; margin-top: 12px;
+  font-family: var(--mono); font-size: 12px; }
+.grid-item-tools .project-tools { margin: 0; padding: 0; justify-content: flex-start; text-transform: none; }
+.grid-item-tools .project-tools .tool::after { right: auto; left: -1px; }
 .grid-item-link { display: inline-block; margin-top: 10px; font-family: var(--mono);
   font-size: 11px; letter-spacing: .06em; text-transform: lowercase; color: var(--gold);
   text-decoration: none; border-bottom: 1px solid transparent; }
@@ -1752,7 +1759,8 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
    accordions survive a language switch. */
 // Software marks, drawn in the site's own type rather than with the brands' logos.
 const TOOLS = { ai: ['Ai', 'Adobe Illustrator'], id: ['Id', 'Adobe InDesign'], ps: ['Ps', 'Adobe Photoshop'],
-  ae: ['Ae', 'Adobe After Effects'], me: ['Me', 'Adobe Media Encoder'], pa: ['Pa', 'Picsart'], cc: ['Cc', 'CapCut'] };
+  ae: ['Ae', 'Adobe After Effects'], me: ['Me', 'Adobe Media Encoder'], pa: ['Pa', 'Picsart'], cc: ['Cc', 'CapCut'],
+  wp: ['Wp', 'WordPress'], el: ['El', 'Elementor'], cl: ['Cl', 'Claude'], ca: ['Ca', 'Canva'], td: ['Td', 'TouchDesigner'] };
 const projectGroups = [
   { key: 'pro', items: [
     {title:{fr:'Alternance Carrosserie Toutain', en:'Toutain - Industrial Bodywork apprenticeship'},
@@ -1763,26 +1771,26 @@ const projectGroups = [
      // One visual per deliverable — its write-up opens from the thumbnail itself.
      thumbs:[
        {file:'toutain4.mp4', ratio:'landscape', ar:'16/9', label:'site internet', src:'projects/cit-video/thumb.jpg',
-        title:{fr:'Site internet', en:'Website'},
+        title:{fr:'Site internet', en:'Website'}, tools:['wp','el','cl'],
         desc:{fr:"Site internet de la carrosserie, et la vidéo tutorielle qui l’accompagne : « ouvrir et fermer en 3 minutes chrono ». Intro et habillage en motion design sous After Effects, plans tournés sur place à l’iPhone 15 Pro.",
               en:"The company website, and the how-to video that goes with it: opening and closing a truck body in three minutes flat. Motion design intro and titling in After Effects, footage shot on site on an iPhone 15 Pro."},
         video:'projects/cit-video/loop.mp4', videoM:'projects/cit-video/loop-m.mp4', film:'projects/cit-video/film.mp4',
         poster:'projects/cit-video/poster.jpg'},
        {file:'toutain5.mp4', ratio:'square', ar:'1300/1150', label:'post recrutement',
         src:'projects/cit-social/thumb.jpg', poster:'projects/cit-social/thumb.jpg', posterM:'projects/cit-social/poster-m.jpg',
-        title:{fr:'Post recrutement', en:'Recruitment post'},
+        title:{fr:'Post recrutement', en:'Recruitment post'}, tools:['ae','me'],
         desc:{fr:"Post LinkedIn pour la Carrosserie Toutain : recrutement d’un technicien BE dessinateur développement, en CDI à La Flèche.",
               en:"LinkedIn post for Toutain - Industrial Bodywork: hiring a design-office draughtsman on a permanent contract in La Flèche."},
         video:'projects/cit-social/loop.mp4', videoM:'projects/cit-social/loop-m.mp4', silent:true},
        {file:'toutain6.mp4', ratio:'portrait', ar:'900/1080', label:'vœux 2026',
         src:'projects/hl-social/thumb.jpg', poster:'projects/hl-social/thumb.jpg', posterM:'projects/hl-social/poster-m.jpg',
-        title:{fr:'Vœux 2026', en:'New year 2026'},
+        title:{fr:'Vœux 2026', en:'New year 2026'}, tools:['ae','me'],
         desc:{fr:"Vœux de bonne année pour le compte LinkedIn de HLSolutions.",
               en:"New year greetings for the HLSolutions LinkedIn account."},
         video:'projects/hl-social/loop.mp4', videoM:'projects/hl-social/loop-m.mp4', silent:true},
        {file:'toutain1.gif', ratio:'portrait', ar:'1080/1400', label:'plaquette commerciale',
         src:'projects/cit-plaquette/thumb.jpg', poster:'projects/cit-plaquette/thumb.jpg', posterM:'projects/cit-plaquette/poster-m.jpg',
-        title:{fr:'Plaquette commerciale', en:'Sales brochure'},
+        title:{fr:'Plaquette commerciale', en:'Sales brochure'}, tools:['ai','id','ps'],
         desc:{fr:"Plaquette commerciale présentant les deux gammes de la carrosserie (véhicules utilitaires légers et poids-lourds) avec leurs types de caisses : fourgon, plsc, savoyarde, benne, plateau, porteur remorque.",
               en:"Sales brochure covering the two ranges (light commercial vehicles and heavy goods) with their body types: van, curtain-side, tarpaulin, tipper, flatbed, drawbar."},
         video:'projects/cit-plaquette/loop.mp4', videoM:'projects/cit-plaquette/loop-m.mp4', silent:true},
@@ -1792,12 +1800,12 @@ const projectGroups = [
               en:"The logo and brand name had been settled for years, with no guidelines holding them together. This document lays down the whole system: logotypes and variants, usage rules, typography, palette, iconography and recurring shapes, then applications on real material."},
         images:['01','02','03','04','05','06','07','08','09','10','11','12','13'].map(n => 'projects/cit-charte/' + n + '.jpg')},
        {file:'toutain3.pdf', ratio:'portrait', ar:'2700/3750', label:'signalétique', src:'projects/cit-plan/thumb.jpg',
-        title:{fr:'Signalétique', en:'Signage'},
+        title:{fr:'Signalétique', en:'Signage'}, tools:['ai'],
         desc:{fr:"Marquage au sol, panneaux et plans pour le site physique de la carrosserie. Le plan de circulation affiché à l’entrée cartographie les zones (ateliers, châssis à carrosser, stocks, déchargement), les sens de circulation et les accès interdits.",
               en:"Floor markings, panels and plans for the site itself. The circulation plan posted at the entrance maps out the zones (workshops, chassis bays, stock, unloading) along with traffic directions and restricted access."},
         images:['projects/cit-plan/01.jpg']},
        {file:'toutain7.pdf', ratio:'landscape', ar:'16/9', label:'flyers hlsolutions', src:'projects/hl-flyer/thumb.jpg',
-        title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'},
+        title:{fr:'Flyers HLSolutions', en:'HLSolutions flyers'}, tools:['ai','ps','ca'],
         desc:{fr:"Série de flyers pour HLSolutions, la marque annexe développée en parallèle de la carrosserie. Celui-ci présente le casque de Contrôle Digital des Véhicules en réalité augmentée, réalisé pour leur présence au salon professionnel SoluTrans 2025.",
               en:"A set of flyers for HLSolutions, the side brand run alongside the coachbuilding business. This one introduces their augmented-reality vehicle inspection headset, made for their stand at the SoluTrans 2025 trade show."},
         images:['projects/hl-flyer/01.jpg']},
@@ -1836,24 +1844,24 @@ const projectGroups = [
      school:'CESACOM', site:'https://www.cesacom.fr/',
      thumbs:[
        {file:'brochure.pdf', ratio:'landscape', ar:'1723/850', src:'projects/ces-abstrait/verso.jpg', hover:'projects/ces-abstrait/recto.jpg', label:'l’abstrait contemporain',
-        title:{fr:'L’Abstrait Contemporain', en:'L’Abstrait Contemporain'},
+        title:{fr:'L’Abstrait Contemporain', en:'L’Abstrait Contemporain'}, tools:['ai','id'],
         desc:{fr:"Exercice de PAO : bâtir l’identité graphique d’une marque, puis la décliner en affiche et en dépliant. L’Abstrait Contemporain est une exposition inventée pour l’occasion, posée à l’Ancienne Halle des Subsistances à Lyon. La statuaire classique y passe au tamis du noir, du blanc et d’un seul rouge, avec Wornas au titrage et IBM Plex Mono pour le texte. La charte, l’affiche et les deux faces du dépliant sont réunies ici.",
               en:"A desktop-publishing brief: build a brand’s visual identity, then carry it onto a poster and a leaflet. L’Abstrait Contemporain is an exhibition invented for the exercise, set at the Ancienne Halle des Subsistances in Lyon. Classical statuary is put through black, white and a single red, with Wornas for titling and IBM Plex Mono for text. The guidelines, the poster and both sides of the leaflet are gathered here."},
         images:['01','02','03','04'].map(n => 'projects/ces-abstrait/' + n + '.jpg')},
        {file:'thesis.mp4', ratio:'landscape', ar:'16/9', label:'vidéo de mémoire', src:'projects/ces-memoire/poster.jpg',
-        title:{fr:'Vidéo de mémoire', en:'Thesis film'},
+        title:{fr:'Vidéo de mémoire', en:'Thesis film'}, tools:['ae','me'],
         desc:{fr:"Vidéo de mémoire de fin d’études, dont j’ai signé l’écriture, la direction artistique et le motion design. Elle part de la promesse de l’IA générative, une campagne responsable prête en deux secondes, pour poser la question que le métier esquive : ce que cela coûte à la planète, et pourquoi presque personne ne le mesure. Elle nomme cet angle mort, puis se referme sur deux leviers : une charte IA et la formation.",
               en:"My final thesis film, written, art directed and animated by me. It starts from the promise of generative AI, a responsible campaign ready in two seconds, to ask the question the industry sidesteps: what it costs the planet, and why almost nobody measures it. It names that blind spot, then closes on two levers: an AI charter, and training."},
         video:'projects/ces-memoire/loop.mp4', film:'projects/ces-memoire/film.mp4',
         poster:'projects/ces-memoire/poster.jpg'},
        {file:'rollout.mp4', ratio:'landscape', ar:'16/9', label:'7 merveilles du monde', src:'projects/ces-merveilles/poster.jpg',
-        title:{fr:'Bienvenue aux 7 Merveilles du Monde', en:'Welcome to the 7 Wonders of the World'},
+        title:{fr:'Bienvenue aux 7 Merveilles du Monde', en:'Welcome to the 7 Wonders of the World'}, tools:['ai','ae','me'],
         desc:{fr:"Projet de groupe du cours photo et vidéo : une marque de voyage fictive, ROLL OUT, envoie sa mascotte globe faire le tour des sept merveilles. Chacune a son décor en illustration à plat et sa notice (Chichén Itzá, la Grande Muraille, le Taj Mahal, le Colisée, le Christ Rédempteur, Petra, le Machu Picchu), et le film se referme sur un au revoir en plusieurs langues. J’ai réalisé l’intégralité du motion design.",
               en:"A group project from the photography and video course: ROLL OUT, an invented travel brand, sends its globe mascot around the seven wonders. Each gets its own flat-illustrated set and a short note (Chichén Itzá, the Great Wall, the Taj Mahal, the Colosseum, Christ the Redeemer, Petra, Machu Picchu), and the film signs off with a goodbye in several languages. The motion design is entirely mine."},
         video:'projects/ces-merveilles/loop.mp4', film:'projects/ces-merveilles/film.mp4',
         poster:'projects/ces-merveilles/poster.jpg'},
        {file:'podcast.mp4', ratio:'landscape', ar:'16/9', label:'à feu doux', src:'projects/ces-podcast/poster.jpg',
-        title:{fr:'À Feu Doux : générique', en:'À Feu Doux: opening titles'},
+        title:{fr:'À Feu Doux : générique', en:'À Feu Doux: opening titles'}, tools:['ae','me'],
         desc:{fr:"Podcast inventé de A à Z en groupe de quatre, avec une semaine pour livrer un épisode. Sujet libre : ce sera la santé mentale chez les jeunes, prise « à feu doux » : une cocotte qui mijote sur sa flamme, dont le titre s’échappe en vapeur. J’ai réalisé le générique, et pris part au branding, à l’idée et au tournage.",
               en:"A podcast invented from nothing, four of us, one week to deliver an episode. The subject was ours to choose: mental health among young people, taken gently (à feu doux), as a pot simmering over its flame, the title rising out of it like steam. I made the opening titles, and had a hand in the branding, the idea and the shoot."},
         video:'projects/ces-podcast/loop.mp4', videoM:'projects/ces-podcast/loop-m.mp4', poster:'projects/ces-podcast/poster.jpg', posterM:'projects/ces-podcast/poster-m.jpg', silent:true,
@@ -1932,32 +1940,32 @@ const projectGroups = [
            en:"Compositions, often abstract, made from photos taken in everyday life."},
      thumbs:[
        {file:'picedit1.jpg', ratio:'landscape', ar:'16/9', label:'teen wolf', src:'projects/photo-teenwolf/thumb.jpg',
-        title:{fr:'Teen Wolf', en:'Teen Wolf'},
+        title:{fr:'Teen Wolf', en:'Teen Wolf'}, tools:['ae'],
         desc:{fr:"Bannière Teen Wolf, néon rouge sur trame de points.",
               en:"A Teen Wolf banner, red neon over a halftone screen."},
         images:['projects/photo-teenwolf/01.jpg']},
        {file:'picedit2.jpg', ratio:'square', ar:'1/1', label:'fenêtre', src:'projects/photo-fenetre/thumb.jpg',
-        title:{fr:'Fenêtre', en:'Window'},
+        title:{fr:'Fenêtre', en:'Window'}, tools:['ae'],
         desc:{fr:"Intérieur au crépuscule, superposé à l’interface d’un appareil photo.",
               en:"An interior at dusk, layered with a camera interface."},
         images:['projects/photo-fenetre/01.jpg']},
        {file:'picedit3.jpg', ratio:'square', ar:'1/1', label:'fin d’hiver', src:'projects/photo-hiver/thumb.jpg',
-        title:{fr:'Fin d’hiver', en:'End of winter'},
+        title:{fr:'Fin d’hiver', en:'End of winter'}, tools:['ae'],
         desc:{fr:"Chemin, ciel d’orage et bande miroir.",
               en:"A path, a storm sky, and a mirrored strip."},
         images:['projects/photo-hiver/01.jpg']},
        {file:'picedit4.jpg', ratio:'square', ar:'1/1', label:'arcade', src:'projects/photo-arcade/thumb.jpg',
-        title:{fr:'Arcade', en:'Arcade'},
+        title:{fr:'Arcade', en:'Arcade'}, tools:['ae'],
         desc:{fr:"Salle d’arcade, pinces et peluches, en surimpressions.",
               en:"An arcade hall, claws and plush toys, in overlays."},
         images:['projects/photo-arcade/01.jpg']},
        {file:'picedit5.jpg', ratio:'square', ar:'1/1', label:'sous-bois', src:'projects/photo-foret/thumb.jpg',
-        title:{fr:'Sous-bois', en:'Undergrowth'},
+        title:{fr:'Sous-bois', en:'Undergrowth'}, tools:['td'],
         desc:{fr:"Sous-bois et repères de tracking, en aberration chromatique.",
               en:"Undergrowth and tracking marks, in chromatic aberration."},
         images:['projects/photo-foret/01.jpg']},
        {file:'picedit6.jpg', ratio:'square', ar:'1/1', label:'hymne', src:'projects/photo-hymne/thumb.jpg',
-        title:{fr:'Hymne', en:'Hymn'},
+        title:{fr:'Hymne', en:'Hymn'}, tools:['ae'],
         desc:{fr:"Vers antiques et glitch cuivré, autour d’un regard.",
               en:"Ancient verse and copper glitch, around a single eye."},
         images:['projects/photo-hymne/01.jpg']},
@@ -2073,6 +2081,8 @@ projectList.innerHTML = projectGroups.map(group => {
           `<span data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</span>` +
           (o.link ? `<a class="grid-item-link" href="${esc(o.link.href)}" target="_blank" rel="noopener noreferrer"
              data-fr="${esc(o.link.fr)}" data-en="${esc(o.link.en)}">${o.link.en}</a>` : '') +
+          (o.tools ? `<div class="grid-item-tools"><span data-fr="logiciels :" data-en="software:">software:</span>` +
+            `<span class="project-tools">${toolMarks(o.tools)}</span></div>` : '') +
           `</div></div>`
         : '';
       // Phone-format pieces (9:16 and the like) are left out on a phone, where
