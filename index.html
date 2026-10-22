@@ -146,7 +146,7 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 
 /* ── SCROLL-FOLLOW LABEL ── */
 #scrollLabel { position: fixed; top: 0; left: 0; z-index: 9997; pointer-events: none;
-  font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
   color: var(--fg); opacity: 0; }
 #scrollLabel span { display: inline-block; opacity: 0; }
 
@@ -1149,6 +1149,11 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
     return label.querySelectorAll('span');
   }
   let letters = buildLetters();
+  // Built before the language is applied, the label kept the English "scroll" on the French page.
+  applyLangHooks.push(() => {
+    letters = buildLetters();
+    if (hasInit && !hasScrolled) letters.forEach(l => { l.style.opacity = '1'; });
+  });
 
   function isOverNav(x, y) {
     const r = navEl.getBoundingClientRect();
