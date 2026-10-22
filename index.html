@@ -273,7 +273,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* A wide breath between the three kinds of work, a narrower one between the
    projects inside a kind. */
 .cat-group + .cat-group { margin-top: 130px; }
-.project + .project { margin-top: 30px; }
+.project + .project, .project + .project-tools { margin-top: 30px; }
 .cat-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; }
 /* The deep green reads 3.96:1 on cream — right for the display sizes it was
    chosen for, short of the 4.5:1 a 10px label needs. --gold is the same family
@@ -296,6 +296,14 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* Rows break out of the section padding so their four columns line up with the
    background rules at the viewport quarters, as on the reference layout. */
 .project { border-top: 1px solid var(--border); margin: 0 calc(-1 * var(--pad)); }
+/* The software behind a project, set right above its bar and ending where the bar's
+   year column does. */
+.project-tools { display: flex; justify-content: flex-end; gap: 5px;
+  margin: 0 calc(-1 * var(--pad)) 6px; padding: 0 18px 0 12px; }
+.project-tools abbr { display: inline-grid; place-items: center; width: 20px; height: 20px;
+  border: 1px solid var(--fg); border-radius: 3px; text-decoration: none;
+  font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: .02em;
+  color: var(--fg); cursor: default; }
 .cat-group .project:last-child { border-bottom: 1px solid var(--border); }
 .project-header, .project-content {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
@@ -1703,10 +1711,13 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
    Grouped into three categories. Headings carry data-i18n so applyLang, which
    runs after this render, translates them in place — no re-render, so open
    accordions survive a language switch. */
+// Software marks, drawn in the site's own type rather than with the brands' logos.
+const TOOLS = { ai: ['Ai', 'Adobe Illustrator'], id: ['Id', 'Adobe InDesign'], ps: ['Ps', 'Adobe Photoshop'],
+  ae: ['Ae', 'Adobe After Effects'], me: ['Me', 'Adobe Media Encoder'], pa: ['Pa', 'Picsart'], cc: ['Cc', 'CapCut'] };
 const projectGroups = [
   { key: 'pro', items: [
     {title:{fr:'Alternance Carrosserie Toutain', en:'Toutain - Industrial Bodywork apprenticeship'},
-     tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026',
+     tags:{fr:'Identité, Signalétique, Web, Social, Print', en:'Identity, Signage, Web, Social, Print'}, year:'2024–2026', tools:['ai','id','ps','ae','me'],
      desc:{fr:"Deux ans d’alternance à la Carrosserie Industrielle Toutain, où je m’occupais de toute la communication : la charte graphique, le site internet, les réseaux sociaux, et jusqu’à la signalétique dans les locaux. Je gérais aussi HLSolutions, la marque que le dirigeant lançait en parallèle.",
            en:"Two years of work-study at Toutain - Industrial Bodywork, where I looked after all of the communication: the visual guidelines, the website, social media, and even the signage around the premises. I also ran HLSolutions, the brand the owner was launching alongside."},
      client:{fr:'Carrosserie Toutain · HLSolutions', en:'Toutain - Industrial Bodywork · HLSolutions'}, site:'https://sastoutain.com/',
@@ -1754,7 +1765,7 @@ const projectGroups = [
      ]},
 
     {title:{fr:'Ma Nouvelle Assurance', en:'Ma Nouvelle Assurance'},
-     tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'2024',
+     tags:{fr:'Motion design, Social media', en:'Motion design, Social media'}, year:'2024', tools:['ae'],
      desc:{fr:"Un stage d’avril à mai 2024 dans une startup de courtage en assurance de prêt. J’y faisais du motion design pour les réseaux sociaux et les miniatures YouTube.",
            en:"A two-month internship in spring 2024 at a loan-insurance brokerage startup. I made motion design for their social media and YouTube thumbnails."},
      client:'Ma Nouvelle Assurance',
@@ -1780,7 +1791,7 @@ const projectGroups = [
   ]},
   { key: 'school', items: [
     {title:{fr:'Mastère marketing & communication (majeure direction artistique)', en:'Master’s in marketing & communication (art direction major)'},
-     tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026',
+     tags:{fr:'Direction artistique, Motion design', en:'Art direction, Motion design'}, year:'2024–2026', tools:['ai','id','ps','ae','me'],
      desc:{fr:"Deux ans de mastère marketing et communication, majeure direction artistique. On y trouve mon mémoire de fin d’études et des travaux de cours, en groupe comme en solo.",
            en:"Two years of a master's in marketing and communication, art direction major. Here you'll find my final thesis and coursework, some made in groups, some on my own."},
      school:'CESACOM', site:'https://www.cesacom.fr/',
@@ -1817,7 +1828,7 @@ const projectGroups = [
     views:{fr:'plus de 3,5 millions de vues cumulées', en:'over 3.5M views in total'},
     items: [
     {title:{fr:'Fan edits', en:'Fan edits'},
-     tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026',
+     tags:{fr:'Montage, Réseaux sociaux', en:'Editing, Social media'}, year:'2019–2026', tools:['ae'],
      desc:{fr:"C’est par là que le montage a commencé pour moi, en 2019 : les fan edits, ces courts montages autour d’un personnage, d’une célébrité, d’une voiture… d’à peu près n’importe quoi. Je les publiais sur plusieurs comptes Instagram et TikTok. Depuis, le format est devenu un vrai langage, que les marques utilisent pour mettre en avant leurs produits.",
            en:"This is where editing started for me, in 2019: fan edits, those short cuts built around a character, a celebrity, a car… just about anything. I posted them on several Instagram and TikTok accounts. The format has since become a language of its own, one brands use to show off their products."},
      thumbs:[
@@ -1847,7 +1858,7 @@ const projectGroups = [
         poster:'projects/edit-leo-woodall/cover.jpg', posterM:'projects/edit-leo-woodall/poster-m.jpg'},
      ]},
     {title:{fr:'Clips personnels', en:'Personal clips'},
-     tags:{fr:'Tournage, Montage', en:'Shooting, Editing'}, year:'2025–2026',
+     tags:{fr:'Tournage, Montage', en:'Shooting, Editing'}, year:'2025–2026', tools:['ae'],
      desc:{fr:"Des images que je filme et monte moi-même, pour garder des souvenirs et chercher mon esthétique, sans brief ni contrainte.",
            en:"Footage I shoot and edit myself, to keep memories and to find my own aesthetic, with no brief and no constraints."},
      thumbs:[
@@ -1877,7 +1888,7 @@ const projectGroups = [
         poster:'projects/clip-cocliclots/poster.jpg', posterM:'projects/clip-cocliclots/poster-m.jpg'},
      ]},
     {title:{fr:'Montages photo', en:'Photo montages'},
-     tags:{fr:'Photographie, Composition', en:'Photography, Composition'}, year:'2025–2026',
+     tags:{fr:'Photographie, Composition', en:'Photography, Composition'}, year:'2025–2026', tools:['ae','pa','cc'],
      desc:{fr:"Des compositions souvent abstraites, faites à partir de photos prises au quotidien.",
            en:"Compositions, often abstract, made from photos taken in everyday life."},
      thumbs:[
@@ -2034,7 +2045,9 @@ projectList.innerHTML = projectGroups.map(group => {
         ${desc}
       </div>`;
     }).join('');
-    return `
+    const tools = (p.tools || []).map(t => `<abbr title="${TOOLS[t][1]}">${TOOLS[t][0]}</abbr>`).join('');
+    return `${tools ? `
+    <div class="project-tools">${tools}</div>` : ''}
     <div class="project is-open" data-index="${idx}">
       <div class="project-header" role="button" tabindex="0" aria-expanded="true" aria-controls="panel-${idx}">
         <div class="pcol">
