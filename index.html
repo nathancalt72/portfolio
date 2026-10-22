@@ -30,7 +30,7 @@
 <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
 <link rel="apple-touch-icon" href="favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bai+Jamjuree:wght@400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
    TOKENS
@@ -251,9 +251,16 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 /* Reference sets weight 400, line-height 102% and indents the first line by one
    column (25%), so it starts on the second grid rule. */
-.title-h1 { font-family: var(--display); font-weight: 400; text-transform: lowercase;
-  letter-spacing: -.015em; line-height: 1.02; font-size: 44px;
+/* Bai Jamjuree stands in for the reference's Bugrino, which is licensed: the same
+   squared shoulders and two-storey a. Lines break where the sentence does; a phone
+   lets them flow, or the longest would shrink the whole headline. */
+.title-h1 { font-family: 'Bai Jamjuree', var(--display); font-weight: 400; text-transform: lowercase;
+  letter-spacing: 0; line-height: 1.02; font-size: 44px;
   text-indent: 25%; min-width: 100%; }
+@media (max-width: 767px) { .title-h1 br { display: none; } }
+/* Unwrapped on wider screens, so the auto-fit sees a line overflow and stops there
+   instead of letting it wrap into a fourth. */
+@media (min-width: 768px) { .title-h1 { white-space: nowrap; } }
 
 /* ═══════════════════════════════════════
    WORK — ACCORDION
@@ -922,7 +929,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <!-- ═══ HERO ═══ -->
 <section id="hero">
   <div class="hero-inner">
-    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Creative, motion designer junior &amp; social media editor. Based in France — open to work with you, 2026.</h1>
+    <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Creative, junior motion<br> designer &amp; editor. Based in France —<br> open to work with you, 2026.</h1>
   </div>
 </section>
 
@@ -1319,7 +1326,7 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   // sizes the headline off the fallback and can cost it a whole line. `ready`
   // alone can resolve before the face is applied, so await the face itself too.
   if (document.fonts) {
-    document.fonts.load('400 100px "Space Grotesk"').then(resizeText).catch(function () {});
+    document.fonts.load('400 100px "Bai Jamjuree"').then(resizeText).catch(function () {});
     document.fonts.ready.then(function () { requestAnimationFrame(resizeText); });
   }
 })();
@@ -2584,7 +2591,7 @@ document.addEventListener('click', e => {
 const translations = {
   fr: {
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
-    hero_title: 'Créatif, motion designer junior et monteur. Basé en France — prêt à collaborer avec vous, 2026.',
+    hero_title: 'Créatif, motion designer<br> junior et monteur. Basé en France —<br> prêt à collaborer avec vous, 2026.',
     work_label: 'projets',
     lb_close: 'fermer',
     cat_pro: 'projets pro', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
@@ -2600,7 +2607,7 @@ const translations = {
   },
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
-    hero_title: 'Creative, motion designer junior &amp; social media editor. Based in France — open to work with you, 2026.',
+    hero_title: 'Creative, junior motion<br> designer &amp; editor. Based in France —<br> open to work with you, 2026.',
     work_label: 'projects',
     lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
