@@ -618,7 +618,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
    nowrap lines would set the track's floor and a phone would lose their right edge. */
 .approach-display { grid-column: 1 / 9; grid-row: 2 / 5; align-self: start; min-width: 0;
   z-index: 2; pointer-events: none;
-  font-family: var(--display); font-weight: 700; text-transform: uppercase;
+  font-family: var(--display); font-weight: 700; text-transform: lowercase;
   color: var(--green-deep); font-size: clamp(34px, 11vw, 150px);
   line-height: .84; letter-spacing: -.02em; }
 /* Each line carries its own indent — the spread sets its headline adrift rather than
@@ -645,7 +645,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .approach-body-a p, .approach-body-b p { font-size: 12px; line-height: 1.65;
   /* Justified in a 292px measure, every line had to stretch its spaces to fit,
      and the holes running down the column were the cost. Ragged right instead. */
-  font-weight: 300; color: var(--fg); hyphens: auto; }
+  font-weight: 300; color: var(--fg); hyphens: auto; text-transform: lowercase; }
 .approach-body-a p + p, .approach-body-b p + p { margin-top: 12px; }
 .approach-status { display: flex; align-items: center; gap: 10px; }
 .approach-status-text { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; text-transform: lowercase; }
