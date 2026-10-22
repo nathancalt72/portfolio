@@ -318,6 +318,11 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   transition: opacity .55s ease, transform .65s cubic-bezier(.22,1,.36,1); }
 .project.is-open .project-content { opacity: 1; transform: none; transition-delay: .1s; }
 .project-content { padding: 14px 0 12px; }
+/* The fixed ascii backdrop runs under the write-ups; a veil of the page colour
+   pales it there without hiding it. The note's edge is feathered, the row's is
+   held by its own rules. */
+.project-content, .cat-note { background: color-mix(in srgb, var(--bg) 72%, transparent); }
+.cat-note { box-shadow: 0 0 28px 14px color-mix(in srgb, var(--bg) 72%, transparent); }
 .project-desc { font-size: 13px; line-height: 1.62; font-weight: 300; min-height: 1.62em; max-width: 62ch; }
 .project-meta-label, .project-meta-value { font-family: var(--mono); font-size: 12px; line-height: 1.72;
   color: var(--fg); letter-spacing: .01em; overflow-wrap: break-word; }
