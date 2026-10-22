@@ -436,10 +436,23 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 /* width:0 + min-width:100% keeps the text out of the tile's intrinsic sizing —
    otherwise the paragraph, not the media, would decide how wide the tile is and
    the block would run past the video. */
-.grid-item-desc { display: none; box-sizing: border-box; width: 0; min-width: 100%;
-  padding: 10px 12px 16px; font-size: 13px; line-height: 1.62;
-  font-weight: 300; color: var(--fg); }
-.grid-item.is-open .grid-item-desc { display: block; }
+/* Opens the way a project's write-up does: the space grows on one eased curve
+   (0fr → 1fr) and the text rises into it a beat later; closing runs it back. */
+.grid-item-desc { display: grid; grid-template-rows: 0fr; box-sizing: border-box; width: 0; min-width: 100%;
+  font-size: 13px; line-height: 1.62; font-weight: 300; color: var(--fg);
+  transition: grid-template-rows .6s cubic-bezier(.22,1,.36,1); }
+/* Hidden once shut, so a link inside is out of the tab order too */
+.grid-item-desc-in { min-height: 0; overflow: hidden; padding: 0 12px;
+  opacity: 0; transform: translateY(-8px); visibility: hidden;
+  transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1),
+    padding .6s cubic-bezier(.22,1,.36,1), visibility 0s linear .6s; }
+.grid-item.is-open .grid-item-desc { grid-template-rows: 1fr; }
+.grid-item.is-open .grid-item-desc-in { padding: 10px 12px 16px; opacity: 1; transform: none; visibility: visible;
+  transition: opacity .45s ease .12s, transform .55s cubic-bezier(.22,1,.36,1) .12s,
+    padding .6s cubic-bezier(.22,1,.36,1), visibility 0s; }
+@media (prefers-reduced-motion: reduce) {
+  .grid-item-desc, .grid-item-desc-in { transition: none; }
+}
 .grid-item-link { display: inline-block; margin-top: 10px; font-family: var(--mono);
   font-size: 11px; letter-spacing: .06em; text-transform: lowercase; color: var(--gold);
   text-decoration: none; border-bottom: 1px solid transparent; }
@@ -2056,11 +2069,11 @@ projectList.innerHTML = projectGroups.map(group => {
         ? `<span class="thumb-file" data-fr="${esc(o.title.fr)}" data-en="${esc(o.title.en)}">${esc(o.title.en)}</span>`
         : o.file ? `<span class="thumb-file">${esc(o.file)}</span>` : '';
       const desc = o.video && o.desc
-        ? `<div class="grid-item-desc">` +
+        ? `<div class="grid-item-desc"><div class="grid-item-desc-in">` +
           `<span data-fr="${esc(o.desc.fr)}" data-en="${esc(o.desc.en)}">${o.desc.en}</span>` +
           (o.link ? `<a class="grid-item-link" href="${esc(o.link.href)}" target="_blank" rel="noopener noreferrer"
              data-fr="${esc(o.link.fr)}" data-en="${esc(o.link.en)}">${o.link.en}</a>` : '') +
-          `</div>`
+          `</div></div>`
         : '';
       // Phone-format pieces (9:16 and the like) are left out on a phone, where
       // one would fill the whole screen. Judged from the ratio, not a list.
