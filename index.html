@@ -554,99 +554,100 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .vbox:-webkit-full-screen { background: #000; }
 
 /* ── DOCUMENT VIEWER ──
-   The whole document at a glance, and it has to hold in the window: the panel
-   is a fixed-height column, the write-up sits in the first of three tracks
-   rather than above them, and every page fits inside its cell instead of
-   deciding how tall that cell is. Clicking any page zooms it. */
-.lb { position: fixed; inset: 0; z-index: 300; background: var(--bg);
-  display: flex; flex-direction: column; overflow: hidden;
+   A sheet laid on the site's own grid: the dark bar of an open project, the
+   quarter rules behind, the write-up in the first column and the page across
+   the other three, with every page numbered in a strip under it. */
+.lb { position: fixed; inset: 0; z-index: 300; display: flex; flex-direction: column; overflow: hidden;
+  background:
+    linear-gradient(var(--border-strong), var(--border-strong)) 25% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--border-strong), var(--border-strong)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--border-strong), var(--border-strong)) 75% 0 / 1px 100% no-repeat,
+    var(--bg);
   opacity: 0; pointer-events: none; transition: opacity .3s ease; }
 .lb.open { opacity: 1; pointer-events: auto; }
-.lb-top { flex: 0 0 auto; z-index: 2;
-  display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  padding: 16px 28px; border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); }
-.lb-title { font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
-  text-transform: lowercase; color: var(--green-deep); }
-.lb-counter { font-family: var(--mono); font-size: 10px; color: var(--fg-muted); letter-spacing: .1em; }
-.lb-close { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; cursor: none;
-  background: none; border: 1px solid var(--border); color: var(--fg-muted); padding: 6px 12px; }
-.lb-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-desc { margin: 0; min-height: 0; overflow-y: auto;
-  font-size: 13px; line-height: 1.75; font-weight: 300; color: var(--fg); }
-/* Three tracks: what it is, the cover, then the rest of the pages. */
+/* The same four columns, type and inversion as an open project's bar */
+.lb-top { flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center;
+  padding: 6px 0; background: var(--fg); color: var(--bg);
+  font-family: var(--mono); font-size: 12px; line-height: 1.2; letter-spacing: .02em;
+  transform: translateY(-100%); transition: transform .45s cubic-bezier(.22,1,.36,1); }
+.lb.open .lb-top { transform: none; }
+.lb-name { grid-column: 1 / 3; padding-left: 12px; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-num { color: var(--border-strong); font-size: 11px; letter-spacing: .06em; margin-right: 12px; }
+.lb-title { font-weight: 500; text-transform: lowercase; }
+.lb-counter { grid-column: 3; padding-left: 12px; }
+.lb-close { grid-column: 4; justify-self: end; margin-right: 12px; cursor: none;
+  background: none; border: 0; color: var(--bg); font: inherit; font-size: 15px; line-height: 1;
+  padding: 2px 6px; transition: color .2s; }
+.lb-close:hover, .lb-close:focus-visible { color: var(--green-light); outline: none; }
+
 .lb-body { flex: 1 1 auto; min-height: 0;
-  display: grid; grid-template-columns: minmax(190px, .75fr) 1.25fr 1.35fr;
-  gap: 26px; padding: 22px 28px 26px; align-items: stretch; }
-.lb-cover { min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
-.lb-rest { display: grid; grid-template-columns: repeat(2, 1fr);
-  /* Rows share what is left, but never shrink past legibility: a long document
-     scrolls its own panel rather than crushing thirteen pages into slivers. */
-  grid-auto-rows: minmax(120px, 1fr);
-  gap: 12px; min-height: 0; overflow-y: auto; }
-/* A page is bound by its cell, never the reverse — that is what keeps the
-   document inside the window whatever shape its pages are. */
-.lb-cover .sheet, .lb-rest .sheet { display: flex; align-items: center; justify-content: center;
-  height: 100%; min-height: 0; width: fit-content; max-width: 100%; margin: 0 auto; }
-.lb-cover .sheet img, .lb-rest .sheet img { width: auto; height: auto;
-  max-width: 100%; max-height: 100%; }
-/* A deliverable with no pages yet is just its write-up, so it takes the floor */
-.lb.text-only .lb-cover, .lb.text-only .lb-rest { display: none; }
-.lb.text-only .lb-body { grid-template-columns: 1fr; }
-.lb.text-only .lb-desc { font-size: 15px; line-height: 1.8; max-width: 70ch; }
-/* A film keeps the write-up beside it and takes the rest of the room */
-.lb.film .lb-body { grid-template-columns: minmax(200px, .8fr) 2.65fr; }
-.lb.film .lb-rest { display: none; }
-.film-wrap { position: relative; cursor: none; }
-.lb-film { display: block; width: 100%; max-height: 78vh; background: var(--fg); }
+  display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+.lb-side { grid-column: 1; grid-row: 1 / 3; min-height: 0; overflow-y: auto;
+  padding: 22px 18px 26px 12px; display: flex; flex-direction: column; gap: 30px; }
+.lb-desc { margin: 0; font-size: 13px; line-height: 1.7; font-weight: 300; color: var(--fg); }
+.lb-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .02em; text-transform: lowercase; }
+.lb-meta dt { color: var(--fg-muted); }
+.lb-meta dd { margin: 0; color: var(--fg); }
+/* The software marks again, read from the left here, so their names open rightwards */
+.lb-meta .project-tools { margin: 0; padding: 0; justify-content: flex-start; text-transform: none; }
+.lb-meta .project-tools .tool::after { right: auto; left: -1px; }
+
+.lb-stage { grid-column: 2 / 5; grid-row: 1; min-height: 0;
+  display: flex; align-items: center; gap: 18px; padding: 22px 28px 14px; }
+.lb-page { flex: 1; min-width: 0; height: 100%; margin: 0;
+  display: flex; align-items: center; justify-content: center; }
+.lb-page img { display: block; max-width: 100%; max-height: 100%; object-fit: contain;
+  border: 1px solid var(--border); background: var(--panel); animation: lb-in .35s ease; }
+@keyframes lb-in { from { opacity: 0; transform: translateY(6px); } }
+.lb-nav { flex-shrink: 0; width: 34px; height: 34px; cursor: none;
+  font-family: var(--mono); font-size: 13px; background: none;
+  border: 1px solid var(--fg); color: var(--fg); transition: background-color .2s, color .2s; }
+.lb-nav:hover, .lb-nav:focus-visible { background: var(--fg); color: var(--bg); outline: none; }
+.lb-nav[disabled] { opacity: .2; pointer-events: none; }
+
+.lb-strip { grid-column: 2 / 5; grid-row: 2; display: flex; gap: 12px; overflow-x: auto;
+  padding: 12px 28px 18px; border-top: 1px solid var(--border); scrollbar-width: thin; }
+.lb-thumb { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 0; background: none; border: 0; cursor: none;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: var(--fg-muted); }
+.lb-thumb img { display: block; height: 64px; width: auto; border: 1px solid var(--border);
+  opacity: .5; transition: opacity .2s, border-color .2s; }
+.lb-thumb:hover img, .lb-thumb:focus-visible img { opacity: .85; outline: none; }
+.lb-thumb.is-current img { opacity: 1; border-color: var(--fg); }
+.lb-thumb.is-current { color: var(--fg); }
+
+/* A single page needs neither arrows nor strip */
+.lb.single .lb-nav, .lb.single .lb-strip { display: none; }
+/* A film plays where the page would be */
+.film-wrap { position: relative; cursor: none; width: 100%; }
+.lb-film { display: block; width: 100%; max-height: 74vh; background: var(--fg); }
 .film-sound { position: absolute; left: 14px; bottom: 14px; pointer-events: none;
   font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: lowercase;
   color: var(--bg); background: var(--green-deep); border: none; padding: 6px 11px;
   transition: opacity .3s ease; }
 .film-wrap.sound-on .film-sound { opacity: 0; }
-.sheet { position: relative; cursor: none; border: 1px solid var(--border); background: var(--panel);
-  overflow: hidden; transition: border-color .25s; }
-.sheet:hover { border-color: var(--green-deep); }
-.sheet img { display: block; width: 100%; height: auto; }
+/* No pages yet: the write-up takes the floor */
+.lb.text-only .lb-stage, .lb.text-only .lb-strip { display: none; }
+.lb.text-only .lb-side { grid-column: 1 / 3; }
+.lb.text-only .lb-desc { font-size: 15px; line-height: 1.8; }
 
-/* Zoom layer, on top of the overview */
-.lb-zoom { position: fixed; inset: 0; z-index: 310;
-  background: color-mix(in srgb, var(--bg) 96%, transparent);
-  display: flex; align-items: center; gap: 18px; padding: 64px 28px 28px;
-  opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.lb-zoom.open { opacity: 1; pointer-events: auto; }
-.lb-zoom img { flex: 1; min-width: 0; max-height: 100%; object-fit: contain; }
-.lb-nav { font-family: var(--mono); font-size: 15px; cursor: none; background: none;
-  border: 1px solid var(--border); color: var(--fg-muted); width: 40px; height: 40px; flex-shrink: 0; }
-.lb-nav:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-nav[disabled] { opacity: .25; }
-/* A lone page has nowhere to page to */
-.lb-zoom.solo .lb-nav { display: none; }
-.lb-zoom-close { position: absolute; top: 16px; right: 28px; font-family: var(--mono); font-size: 14px;
-  cursor: none; background: none; border: 1px solid var(--border); color: var(--fg-muted);
-  width: 32px; height: 32px; }
-.lb-zoom-close:hover { border-color: var(--green-deep); color: var(--green-deep); }
-.lb-zoom-counter { position: absolute; top: 22px; left: 28px; font-family: var(--mono);
-  font-size: 10px; letter-spacing: .1em; color: var(--fg-muted); }
-/* Below this there is no room for three tracks: stack them and let the panel
-   scroll again, since a phone cannot hold a document at a glance anyway. */
+/* Narrow: one column that scrolls, the page first under the write-up */
 @media (max-width: 900px) {
-  .lb { overflow-y: auto; }
-  .lb-body { display: block; padding: 20px 28px 40px; }
-  .lb-desc { overflow: visible; max-width: 70ch; margin-bottom: 20px; }
-  .lb-cover { display: block; margin-bottom: 12px; }
-  .lb-rest { grid-auto-rows: auto; overflow: visible; }
-  .lb-cover .sheet, .lb-rest .sheet { display: block; max-height: none; }
-  .lb-cover .sheet img, .lb-rest .sheet img { width: 100%; max-height: none; }
-}
-@media (max-width: 600px) {
-  .lb-top { padding: 12px 16px; }
-  .lb-desc { font-size: 13px; }
-  .lb-body { padding: 16px 16px 36px; }
-  .lb-rest { grid-template-columns: 1fr; }
-  .lb-zoom { padding: 56px 12px 20px; gap: 8px; }
-  .lb-nav { width: 34px; height: 34px; }
-  .lb-zoom-close { right: 12px; } .lb-zoom-counter { left: 16px; }
+  .lb { overflow-y: auto; background: var(--bg); }
+  .lb-top { position: sticky; top: 0; z-index: 2; grid-template-columns: 1fr auto; }
+  .lb-counter { display: none; }
+  .lb-name { grid-column: 1; }
+  .lb-close { grid-column: 2; }
+  .lb-body { display: block; }
+  .lb-side { padding: 18px 16px 20px; gap: 20px; overflow: visible; }
+  /* The page sets the height here, so a landscape sheet leaves no empty band */
+  .lb-stage { padding: 0 16px; gap: 8px; }
+  .lb-page { height: auto; }
+  .lb-page img { max-height: 70vh; }
+  .lb-nav { width: 30px; height: 30px; }
+  .lb-strip { padding: 14px 16px 28px; border-top: 0; }
 }
 
 /* ═══════════════════════════════════════
@@ -822,7 +823,7 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
      a thumb grows, to the 44px a finger needs. Narrower on the flags, which sit
      side by side and would otherwise claim each other's taps. */
   .lang-btn, .lb-close, .lb-nav, .contact-links a { position: relative; }
-  .lang-btn::after, .lb-close::after, .lb-nav::after, .lb-zoom-close::after,
+  .lang-btn::after, .lb-close::after, .lb-nav::after,
   .contact-links a::after { content: ''; position: absolute; inset: -10px; }
   .lang-btn::after { inset: -10px -4px; }
   #approach { padding: 64px 18px 60px; }
@@ -1056,22 +1057,22 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <!-- ═══ SLIDE VIEWER ═══ -->
 <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="document">
   <div class="lb-top">
-    <span class="lb-title" id="lbTitle"></span>
+    <span class="lb-name"><span class="lb-num" id="lbNum"></span><span class="lb-title" id="lbTitle"></span></span>
     <span class="lb-counter" id="lbCounter"></span>
-    <button class="lb-close" id="lbClose" data-i18n="lb_close">close</button>
+    <button class="lb-close" id="lbClose" type="button" aria-label="close">×</button>
   </div>
   <div class="lb-body">
-    <p class="lb-desc" id="lbDesc"></p>
-    <div class="lb-cover" id="lbCover"></div>
-    <div class="lb-rest" id="lbRest"></div>
+    <aside class="lb-side">
+      <p class="lb-desc" id="lbDesc"></p>
+      <dl class="lb-meta" id="lbMeta"></dl>
+    </aside>
+    <div class="lb-stage">
+      <button class="lb-nav" id="lbPrev" type="button" aria-label="previous">←</button>
+      <figure class="lb-page" id="lbPage"></figure>
+      <button class="lb-nav" id="lbNext" type="button" aria-label="next">→</button>
+    </div>
+    <div class="lb-strip" id="lbStrip"></div>
   </div>
-</div>
-<div class="lb-zoom" id="lbZoom" role="dialog" aria-modal="true">
-  <span class="lb-zoom-counter" id="lbZoomCounter"></span>
-  <button class="lb-zoom-close" id="lbZoomClose" aria-label="close">×</button>
-  <button class="lb-nav" id="lbPrev" aria-label="previous">←</button>
-  <img id="lbImg" alt="">
-  <button class="lb-nav" id="lbNext" aria-label="next">→</button>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
@@ -1937,7 +1938,9 @@ const projectGroups = [
 
 const projectList = document.getElementById('projectList');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-const pageCount = n => String(n).padStart(2, '0') + (n > 1 ? ' pages' : ' page');
+// The software marks, shared by a project's row and the viewer's sheet. Focusable
+// so a click or a tap shows the name too, not only a hover.
+const toolMarks = list => list.map(t => `<span class="tool" tabindex="0" role="img" aria-label="${TOOLS[t][1]}" data-name="${TOOLS[t][1]}">${TOOLS[t][0]}</span>`).join('');
 // A client can carry both languages, for a name that is worth translating.
 // Plain strings still work, and stay as they are in either language.
 const clientCell = c => (c && typeof c === 'object')
@@ -1997,7 +2000,7 @@ projectList.innerHTML = projectGroups.map(group => {
     // write-up opens the viewer; the rest keep the in-place expand.
     const grid = p.thumbs.map((t, gi) => {
       const o = typeof t === 'string' ? { ratio: t } : t;
-      const gal = o.desc ? galleries.push(o) - 1 : -1;
+      const gal = o.desc ? galleries.push(Object.assign(o, { parent: p, n: gi + 1 })) - 1 : -1;
       // A screen reader met nothing but a run of unnamed images. The piece's own
       // title is the name; it rides on data attributes so the language switch can
       // swap it the way it swaps every other pair of strings.
@@ -2054,8 +2057,7 @@ projectList.innerHTML = projectGroups.map(group => {
         ${desc}
       </div>`;
     }).join('');
-    // Focusable so a click or a tap shows the name too, not only a hover.
-    const tools = (p.tools || []).map(t => `<span class="tool" tabindex="0" role="img" aria-label="${TOOLS[t][1]}" data-name="${TOOLS[t][1]}">${TOOLS[t][0]}</span>`).join('');
+    const tools = toolMarks(p.tools || []);
     return `${tools ? `
     <div class="project-tools">${tools}</div>` : ''}
     <div class="project is-open" data-index="${idx}">
@@ -2448,93 +2450,85 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── DOCUMENT VIEWER ──
-   Two levels: an overview of every page, and a zoom layer over it. */
+   One sheet: the page in large, every page numbered in the strip under it. */
 const lb = document.getElementById('lightbox');
-const lbZoom = document.getElementById('lbZoom');
-const lbImg = document.getElementById('lbImg');
+const lbNum = document.getElementById('lbNum');
 const lbTitle = document.getElementById('lbTitle');
 const lbDesc = document.getElementById('lbDesc');
+const lbMeta = document.getElementById('lbMeta');
 const lbCounter = document.getElementById('lbCounter');
-const lbZoomCounter = document.getElementById('lbZoomCounter');
-const lbCover = document.getElementById('lbCover');
-const lbRest = document.getElementById('lbRest');
+const lbPage = document.getElementById('lbPage');
+const lbStrip = document.getElementById('lbStrip');
 const lbPrev = document.getElementById('lbPrev');
 const lbNext = document.getElementById('lbNext');
-let lbGallery = null, lbAt = 0, lbSoloZoom = false;
+let lbGallery = null, lbAt = 0;
+const pad2 = n => String(n).padStart(2, '0');
 
 function lbOpen(g) {
   lbGallery = g;
-  lbTitle.textContent = g.title[currentLang] || g.title.en;
+  const fr = currentLang === 'fr';
+  const title = g.title[currentLang] || g.title.en;
+  const p = g.parent;
+  lbNum.textContent = pad2(g.n || 1);
+  lbTitle.textContent = title;
   lbDesc.textContent = g.desc[currentLang] || g.desc.en;
+  lbMeta.innerHTML = p ? `
+    <dt>${fr ? 'projet' : 'project'}</dt><dd>${esc(p.title[currentLang] || p.title.en)}</dd>
+    <dt>${fr ? 'année' : 'year'}</dt><dd>${esc(p.year)}</dd>
+    ${p.tools ? `<dt>${fr ? 'logiciels' : 'software'}</dt><dd class="project-tools">${toolMarks(p.tools)}</dd>` : ''}` : '';
   const imgs = g.images || [];
 
-  // One page has nothing to browse, so skip the panel and just show it big.
-  lbSoloZoom = imgs.length === 1 && !g.video;
-  if (lbSoloZoom) {
-    zoomShow(0);
-    document.body.style.overflow = 'hidden';
-    return;
-  }
-
-  lbCounter.textContent = imgs.length ? pageCount(imgs.length) : '';
-  const sheet = (src, i) => `
-    <div class="sheet" data-at="${i}">
-      <img src="${esc(src)}" alt="${esc((g.title[currentLang] || g.title.en) + ' · ' + (i + 1) + '/' + imgs.length)}" ${i ? 'loading="lazy"' : ''}>
-    </div>`;
-  // A film takes the whole width and plays in place; pages keep the cover-plus-
-  // grid split. preload="none" so opening the entry does not pull megabytes.
   if (g.video) {
-    lbCounter.textContent = '';
     // Loops silently on open; the first click turns the sound on and hands over
-    // to the native controls.
-    lbCover.innerHTML = `<div class="film-wrap">
+    // to the native controls. preload="metadata" so opening does not pull megabytes.
+    lbPage.innerHTML = `<div class="film-wrap">
         <video class="lb-film" autoplay muted loop playsinline preload="metadata"
           poster="${esc(g.poster || '')}" src="${esc(g.video)}"></video>
-        <button class="film-sound" type="button">${currentLang === 'fr' ? 'cliquer pour le son' : 'click for sound'}</button>
+        <button class="film-sound" type="button">${fr ? 'cliquer pour le son' : 'click for sound'}</button>
       </div>`;
-    lbRest.innerHTML = '';
-    const film = lbCover.querySelector('.lb-film');
+    const film = lbPage.querySelector('.lb-film');
     const kick = () => { const pr = film.play(); if (pr) pr.catch(function () {}); };
     kick();
     film.addEventListener('loadeddata', kick, { once: true });
+    lbStrip.innerHTML = '';
+    lbCounter.textContent = 'film';
   } else {
-    lbCover.innerHTML = imgs.length ? sheet(imgs[0], 0) : '';
-    lbRest.innerHTML = imgs.slice(1).map((src, i) => sheet(src, i + 1)).join('');
+    lbStrip.innerHTML = imgs.map((src, i) => `
+      <button class="lb-thumb" type="button" data-at="${i}" aria-label="${esc(title)} · ${i + 1}/${imgs.length}">
+        <img src="${esc(src)}" alt="" loading="lazy"><span>${pad2(i + 1)}</span>
+      </button>`).join('');
+    if (imgs.length) lbShow(0); else { lbPage.innerHTML = ''; lbCounter.textContent = ''; }
   }
-  lb.classList.toggle('film', !!g.video);
+  lb.classList.toggle('single', !!g.video || imgs.length < 2);
   lb.classList.toggle('text-only', !imgs.length && !g.video);
   lb.classList.add('open');
   lb.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+  lbCloseBtn.focus({ preventScroll: true });
+}
+function lbShow(i) {
+  const imgs = lbGallery && lbGallery.images;
+  if (!imgs || !imgs.length) return;
+  lbAt = Math.max(0, Math.min(i, imgs.length - 1));
+  const title = lbGallery.title[currentLang] || lbGallery.title.en;
+  // A fresh img each time, so the page fades in rather than swapping in place.
+  lbPage.innerHTML = `<img src="${esc(imgs[lbAt])}" alt="${esc(title + (imgs.length > 1 ? ' · ' + (lbAt + 1) + '/' + imgs.length : ''))}">`;
+  lbCounter.textContent = imgs.length > 1 ? pad2(lbAt + 1) + ' / ' + pad2(imgs.length) : '';
+  lbPrev.disabled = lbAt === 0;
+  lbNext.disabled = lbAt === imgs.length - 1;
+  lbStrip.querySelectorAll('.lb-thumb').forEach((t, n) => {
+    t.classList.toggle('is-current', n === lbAt);
+    if (n === lbAt) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
 }
 function lbClose() {
-  lbZoom.classList.remove('open');
   // Stop the film rather than leave it running behind a closed panel.
   const film = lb.querySelector('.lb-film');
   if (film) { film.pause(); film.removeAttribute('src'); film.load(); }
   lb.classList.remove('open');
   document.body.style.overflow = '';
   lbGallery = null;
-  lbSoloZoom = false;
 }
-function zoomShow(i) {
-  if (!lbGallery || !lbGallery.images) return;
-  lbAt = Math.max(0, Math.min(i, lbGallery.images.length - 1));
-  lbImg.src = lbGallery.images[lbAt];
-  lbImg.alt = lbGallery.title
-    ? (lbGallery.title[currentLang] || lbGallery.title.en) +
-      (lbGallery.images.length > 1 ? ' · ' + (lbAt + 1) + '/' + lbGallery.images.length : '')
-    : '';
-  const solo = lbGallery.images.length === 1;
-  lbZoomCounter.textContent = solo ? '' : String(lbAt + 1).padStart(2, '0') + ' / ' + String(lbGallery.images.length).padStart(2, '0');
-  lbPrev.disabled = lbAt === 0;
-  lbNext.disabled = lbAt === lbGallery.images.length - 1;
-  lbZoom.classList.toggle('solo', solo);
-  lbZoom.classList.add('open');
-}
-// Opened straight into the zoom, there is no panel to fall back to, so closing
-// the zoom has to close the whole thing.
-function zoomClose() { if (lbSoloZoom) lbClose(); else lbZoom.classList.remove('open'); }
 
 lb.addEventListener('click', e => {
   // First click on a silent loop turns the sound on and reveals the controls.
@@ -2549,19 +2543,18 @@ lb.addEventListener('click', e => {
     }
     return;
   }
-  const sheet = e.target.closest('.sheet');
-  if (sheet) zoomShow(+sheet.dataset.at);
+  const thumb = e.target.closest('.lb-thumb');
+  if (thumb) lbShow(+thumb.dataset.at);
 });
-lbPrev.addEventListener('click', () => zoomShow(lbAt - 1));
-lbNext.addEventListener('click', () => zoomShow(lbAt + 1));
-document.getElementById('lbZoomClose').addEventListener('click', zoomClose);
-document.getElementById('lbClose').addEventListener('click', lbClose);
+lbPrev.addEventListener('click', () => lbShow(lbAt - 1));
+lbNext.addEventListener('click', () => lbShow(lbAt + 1));
+const lbCloseBtn = document.getElementById('lbClose');
+lbCloseBtn.addEventListener('click', lbClose);
 document.addEventListener('keydown', e => {
   if (!lbGallery) return;
-  const zoomed = lbZoom.classList.contains('open');
-  if (e.key === 'Escape') { zoomed ? zoomClose() : lbClose(); }
-  else if (zoomed && e.key === 'ArrowLeft') zoomShow(lbAt - 1);
-  else if (zoomed && e.key === 'ArrowRight') zoomShow(lbAt + 1);
+  if (e.key === 'Escape') lbClose();
+  else if (e.key === 'ArrowLeft') lbShow(lbAt - 1);
+  else if (e.key === 'ArrowRight') lbShow(lbAt + 1);
 });
 
 /* grid item click-to-enlarge (lightweight FLIP) */
@@ -2616,7 +2609,6 @@ const translations = {
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
     hero_title: 'Créatif, motion designer<br> et monteur. Basé en France,<br> disponible 2026.',
     work_label: 'projets',
-    lb_close: 'fermer',
     cat_pro: 'projets pro', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
     pm_client: 'client :', pm_school: 'formation :', pm_site: 'site :', pm_credits: 'crédits :',
     approach_label: 'à propos',
@@ -2632,7 +2624,6 @@ const translations = {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
     hero_title: 'Creative, motion designer<br> and editor. Based in France,<br> available 2026.',
     work_label: 'projects',
-    lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
     pm_client: 'client:', pm_school: 'course:', pm_site: 'site:', pm_credits: 'credits:',
     approach_label: 'about',
