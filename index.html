@@ -144,11 +144,32 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
   text-transform: lowercase;
 }
 
-/* ── SCROLL-FOLLOW LABEL ── */
-#scrollLabel { position: fixed; top: 0; left: 0; z-index: 9997; pointer-events: none;
-  font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
-  color: var(--fg); opacity: 0; }
-#scrollLabel span { display: inline-block; opacity: 0; }
+/* ── SCROLL CUES ──
+   One on each edge, halfway down, for a mouse on a wide screen only: a phone
+   scrolls by instinct. The arrow slides down and fades on a loop; both leave
+   as soon as the page moves. */
+.scroll-cue { display: none; }
+@media (hover: hover) and (min-width: 1024px) {
+  .scroll-cue { position: fixed; top: 50%; z-index: 50; pointer-events: none;
+    display: flex; align-items: center; gap: 8px; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
+    color: var(--fg-muted); transition: opacity .5s ease;
+    animation: cue-in .8s ease 1.2s backwards; }
+  .scroll-cue-l { left: 28px; }
+  .scroll-cue-r { right: 28px; }
+  .scroll-cue span { writing-mode: vertical-rl; }
+  .scroll-cue svg { overflow: visible; animation: cue-drop 2s cubic-bezier(.5,0,.3,1) infinite; }
+  .scroll-cue.is-gone { opacity: 0; }
+}
+@keyframes cue-in { from { opacity: 0; } }
+@keyframes cue-drop {
+  0%   { transform: translateY(-8px); opacity: 0; }
+  30%, 65% { opacity: 1; }
+  100% { transform: translateY(8px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue, .scroll-cue svg { animation: none; }
+}
 
 /* ── CLICK EFFECT ── */
 .ck-mark { position: fixed; pointer-events: none; z-index: 9997; font-family: var(--mono); color: var(--gold); font-size: 12px; }
@@ -232,8 +253,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
   letter-spacing: -.015em; line-height: 1.02; font-size: 44px;
   text-indent: 25%; min-width: 100%; }
 .title-h1 .mark { color: var(--green-deep); }
-.scroll-down-tag { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
-  color: var(--fg-muted); margin-top: 16px; }
 
 /* ═══════════════════════════════════════
    WORK — ACCORDION
@@ -841,7 +860,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
-<div id="scrollLabel"></div>
+<div class="scroll-cue scroll-cue-l" aria-hidden="true"><span>scroll</span><svg width="9" height="36" viewBox="0 0 9 36" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 0V35M1 31.5 4.5 35 8 31.5"/></svg></div>
+<div class="scroll-cue scroll-cue-r" aria-hidden="true"><svg width="9" height="36" viewBox="0 0 9 36" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 0V35M1 31.5 4.5 35 8 31.5"/></svg><span>scroll</span></div>
 
 <nav id="nav">
   <a href="#hero" class="nav-logo">
@@ -902,7 +922,6 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 <section id="hero">
   <div class="hero-inner">
     <h1 class="title-h1" id="heroTitle" data-i18n-html="hero_title">Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.</h1>
-    <div class="scroll-down-tag" id="scrollTag" data-i18n="hero_scroll">scroll</div>
   </div>
 </section>
 
@@ -1135,73 +1154,18 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; })
   requestAnimationFrame(animCursor);
 })();
 
-/* ── SCROLL-FOLLOW LABEL (mirrors scroll-down-tag) ── */
+/* ── SCROLL CUES ── gone once the page moves, back at the very top. */
 (function () {
-  const source = document.getElementById('scrollTag');
-  const label = document.getElementById('scrollLabel');
-  const navEl = document.getElementById('nav');
-  if (!source || !label) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced) return;
-
-  source.style.opacity = '0';
-  let hasScrolled = false, hasInit = false, animating = false;
-  let curX = 0, curY = 0;
-
-  function buildLetters() {
-    const text = source.textContent;
-    label.innerHTML = text.split('').map(c => `<span>${c === ' ' ? '&nbsp;' : c}</span>`).join('');
-    return label.querySelectorAll('span');
+  const cues = document.querySelectorAll('.scroll-cue');
+  let gone = null;
+  function check() {
+    const now = window.scrollY > 40;
+    if (now === gone) return;
+    gone = now;
+    cues.forEach(c => c.classList.toggle('is-gone', now));
   }
-  let letters = buildLetters();
-  // Built before the language is applied, the label kept the English "scroll" on the French page.
-  applyLangHooks.push(() => {
-    letters = buildLetters();
-    if (hasInit && !hasScrolled) letters.forEach(l => { l.style.opacity = '1'; });
-  });
-
-  function isOverNav(x, y) {
-    const r = navEl.getBoundingClientRect();
-    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-  }
-
-  document.addEventListener('mousemove', e => {
-    if (hasScrolled || hasInit) return;
-    if (isOverNav(e.clientX, e.clientY)) return;
-    curX = e.clientX; curY = e.clientY;
-    label.style.left = (curX + 16) + 'px';
-    label.style.top = (curY - 22) + 'px';
-    label.style.opacity = '.7';
-    letters.forEach((l, i) => setTimeout(() => { l.style.opacity = '1'; }, i * 26));
-    setTimeout(() => { hasInit = true; }, letters.length * 26);
-  });
-
-  function follow() {
-    if (!hasScrolled && hasInit) {
-      curX += (mx - curX) * .07; curY += (my - curY) * .07;
-      label.style.left = (curX + 16) + 'px';
-      label.style.top = (curY - 22) + 'px';
-    }
-    requestAnimationFrame(follow);
-  }
-  follow();
-
-  function hideLetters() {
-    letters.forEach((l, i) => setTimeout(() => { l.style.opacity = '0'; }, (letters.length - 1 - i) * 22));
-  }
-
-  navEl.addEventListener('mouseenter', () => { if (!hasScrolled && hasInit && !animating) hideLetters(); });
-  navEl.addEventListener('mouseleave', () => { if (!hasScrolled && hasInit && !animating) letters.forEach((l, i) => setTimeout(() => { l.style.opacity = '1'; }, i * 26)); });
-
-  window.addEventListener('scroll', () => {
-    if (hasScrolled) return;
-    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
-    if (pct > 2) {
-      hasScrolled = true;
-      hideLetters();
-      setTimeout(() => { label.style.opacity = '0'; }, letters.length * 22 + 150);
-    }
-  }, { passive: true });
+  check();
+  window.addEventListener('scroll', check, { passive: true });
 })();
 
 /* ── STICKY NAV ──
@@ -2620,7 +2584,6 @@ const translations = {
   fr: {
     nav_work: 'projets', nav_about: 'à propos', nav_contact: 'contact',
     hero_title: 'Motion designer et monteur. <span class="mark">Je fais bouger les marques</span> qui ont quelque chose à dire.',
-    hero_scroll: 'défiler',
     work_label: 'projets',
     lb_close: 'fermer',
     cat_pro: 'projets pro', cat_school: 'projets d\'école', cat_personal: 'projets personnels',
@@ -2637,7 +2600,6 @@ const translations = {
   en: {
     nav_work: 'work', nav_about: 'about', nav_contact: 'contact',
     hero_title: 'Motion designer and video editor. <span class="mark">I make brands move</span> — the ones with something to say.',
-    hero_scroll: 'scroll',
     work_label: 'projects',
     lb_close: 'close',
     cat_pro: 'professional work', cat_school: 'academic work', cat_personal: 'personal work',
