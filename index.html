@@ -586,12 +586,15 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 .lb-side { grid-column: 1; grid-row: 1 / 3; min-height: 0; overflow-y: auto;
   padding: 22px 18px 26px 12px; display: flex; flex-direction: column; gap: 30px; }
 .lb-desc { margin: 0; font-size: 13px; line-height: 1.7; font-weight: 300; color: var(--fg); }
-.lb-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center;
-  font-family: var(--mono); font-size: 11px; letter-spacing: .02em; text-transform: lowercase; }
-.lb-meta dt { color: var(--fg-muted); }
-.lb-meta dd { margin: 0; color: var(--fg); }
+/* Set like a project's client and site rows: one size, one ink, rows of one height */
+.lb-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; grid-auto-rows: 24px;
+  column-gap: 14px; align-items: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: .01em;
+  color: var(--fg); text-transform: lowercase; }
+.lb-meta dt::after { content: ' :'; }
+.lb-meta dd { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* The software marks again, read from the left here, so their names open rightwards */
-.lb-meta .project-tools { margin: 0; padding: 0; justify-content: flex-start; text-transform: none; }
+.lb-meta .project-tools { margin: 0; padding: 0; justify-content: flex-start; text-transform: none; overflow: visible; }
 .lb-meta .project-tools .tool::after { right: auto; left: -1px; }
 
 .lb-stage { grid-column: 2 / 5; grid-row: 1; min-height: 0;
@@ -2478,6 +2481,7 @@ const pad2 = n => String(n).padStart(2, '0');
 
 function lbOpen(g) {
   lbGallery = g;
+  lbTicket++; // a page still decoding for the previous document must not land here
   const fr = currentLang === 'fr';
   const title = g.title[currentLang] || g.title.en;
   const p = g.parent;
@@ -2522,6 +2526,7 @@ function lbOpen(g) {
 }
 const lbStill = window.matchMedia('(prefers-reduced-motion: reduce)');
 const LB_EASE = 'cubic-bezier(.22,1,.36,1)';
+let lbTicket = 0;
 function lbShow(i) {
   const imgs = lbGallery && lbGallery.images;
   if (!imgs || !imgs.length) return;
@@ -2534,22 +2539,30 @@ function lbShow(i) {
   const img = new Image();
   img.src = imgs[lbAt];
   img.alt = title + (imgs.length > 1 ? ' · ' + (lbAt + 1) + '/' + imgs.length : '');
-  // The outgoing page leaves while the new one arrives, laid over it rather than
-  // after it; anything older, left by fast clicking, just goes.
-  const imgsNow = lbPage.querySelectorAll('img');
-  const old = imgsNow[imgsNow.length - 1];
-  imgsNow.forEach(el => { if (el !== old) el.remove(); });
-  lbPage.appendChild(img);
-  if (lbStill.matches) { if (old) old.remove(); }
-  else {
+  const ticket = ++lbTicket;
+  // Swapped only once the page is decoded: animated before, it showed up blank and
+  // popped in halfway through.
+  img.decode().catch(() => {}).then(() => {
+    if (ticket !== lbTicket || !lbGallery) return;
+    // The outgoing page drifts off while the new one settles over it, both on long,
+    // soft curves; anything older, left by fast clicking, just goes.
+    const imgsNow = lbPage.querySelectorAll('img');
+    const old = imgsNow[imgsNow.length - 1];
+    imgsNow.forEach(el => { if (el !== old) el.remove(); });
+    lbPage.appendChild(img);
+    if (lbStill.matches) { if (old) old.remove(); return; }
     if (old) {
       old.classList.add('is-leaving');
-      old.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 40}px)` }],
-        { duration: 260, easing: 'ease-in', fill: 'forwards' }).onfinish = () => old.remove();
+      old.animate([{ opacity: 1, transform: 'none' },
+        { opacity: 0, transform: `translateX(${-dir * 18}px) scale(.985)` }],
+        { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).onfinish = () => old.remove();
     }
-    img.animate([{ opacity: 0, transform: old ? `translateX(${dir * 40}px)` : 'translateY(10px)' }, { opacity: 1, transform: 'none' }],
-      { duration: 560, easing: LB_EASE });
-  }
+    img.animate([{ opacity: 0, transform: old ? `translateX(${dir * 28}px) scale(.985)` : 'translateY(10px)' },
+      { opacity: 1, transform: 'none' }],
+      { duration: 720, delay: old ? 60 : 0, easing: LB_EASE, fill: 'backwards' });
+  });
+  // The neighbours load ahead, so the next click has nothing to wait for.
+  [lbAt - 1, lbAt + 1].forEach(n => { if (imgs[n]) new Image().src = imgs[n]; });
   lbCounter.textContent = imgs.length > 1 ? pad2(lbAt + 1) + ' / ' + pad2(imgs.length) : '';
   if (!lbStill.matches) lbCounter.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }],
     { duration: 320, easing: LB_EASE });
