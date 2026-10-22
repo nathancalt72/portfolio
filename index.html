@@ -150,9 +150,11 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
    as soon as the page moves. */
 .scroll-cue { display: none; }
 @media (hover: hover) and (min-width: 1024px) {
-  .scroll-cue { position: fixed; top: 50%; z-index: 50; pointer-events: none;
-    display: flex; align-items: center; gap: 8px; transform: translateY(-50%);
-    font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: lowercase;
+  /* Centred by layout over the full height, not by translateY(-50%): that lands on
+     half pixels and the vertical type blurred unevenly, its r looking bolder. */
+  .scroll-cue { position: fixed; top: 0; bottom: 0; z-index: 50; pointer-events: none;
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 8px; font-weight: 400; letter-spacing: .2em; text-transform: lowercase;
     color: var(--fg-muted); transition: opacity .5s ease;
     animation: cue-in .8s ease 1.2s backwards; }
   .scroll-cue-l { left: 28px; }
@@ -163,9 +165,9 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 52p
 }
 @keyframes cue-in { from { opacity: 0; } }
 @keyframes cue-drop {
-  0%   { transform: translateY(-8px); opacity: 0; }
+  0%   { transform: translateY(-5px); opacity: 0; }
   30%, 65% { opacity: 1; }
-  100% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(5px); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue, .scroll-cue svg { animation: none; }
@@ -859,8 +861,8 @@ nav.is-stuck .nav-links { opacity: 0; pointer-events: none; }
 
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
-<div class="scroll-cue scroll-cue-l" aria-hidden="true"><span>scroll</span><svg width="9" height="36" viewBox="0 0 9 36" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 0V35M1 31.5 4.5 35 8 31.5"/></svg></div>
-<div class="scroll-cue scroll-cue-r" aria-hidden="true"><svg width="9" height="36" viewBox="0 0 9 36" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 0V35M1 31.5 4.5 35 8 31.5"/></svg><span>scroll</span></div>
+<div class="scroll-cue scroll-cue-l" aria-hidden="true"><span>scroll</span><svg width="7" height="26" viewBox="0 0 7 26" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 0V25M1 22.5 3.5 25 6 22.5"/></svg></div>
+<div class="scroll-cue scroll-cue-r" aria-hidden="true"><svg width="7" height="26" viewBox="0 0 7 26" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 0V25M1 22.5 3.5 25 6 22.5"/></svg><span>scroll</span></div>
 
 <nav id="nav">
   <a href="#hero" class="nav-logo">
